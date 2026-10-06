@@ -383,10 +383,17 @@ export const OPENCODE2_MODEL_SELECTION = {
   options: [{ id: "variant", value: "high" }],
 } satisfies ModelSelection;
 
-/** Pi fixtures are recorded against this pinned OpenRouter model; the slug is `provider/model`. */
+/**
+ * Pi fixtures are recorded against this pinned OpenRouter model; the slug is `provider/model`.
+ *
+ * A local `pi` install does not necessarily expose that provider — anyone
+ * routing through their own catalog (a local OpenRouter-compatible gateway,
+ * for example) needs a slug their own `pi` actually serves. Override it with
+ * `T3_PI_FIXTURE_MODEL=provider/model`; the default is unchanged.
+ */
 export const PI_MODEL_SELECTION = {
   instanceId: ProviderInstanceId.make("pi"),
-  model: "openrouter/deepseek/deepseek-v4-flash",
+  model: process.env["T3_PI_FIXTURE_MODEL"] ?? "openrouter/deepseek/deepseek-v4-flash",
 } satisfies ModelSelection;
 
 export const ACP_REGISTRY_MODEL_SELECTION = {
