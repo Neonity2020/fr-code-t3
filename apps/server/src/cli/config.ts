@@ -41,7 +41,7 @@ const hostFlag = Flag.String("host").pipe(
 );
 export const baseDirFlag = Flag.String("base-dir").pipe(
   Flag.withDescription(
-    "Explicit T3 Code data directory; runtime state is stored under userdata (equivalent to T3CODE_HOME).",
+    "Explicit FR Code data directory; runtime state is stored under userdata (equivalent to T3CODE_HOME).",
   ),
   Flag.optional,
 );
@@ -336,7 +336,7 @@ export const resolveServerConfig = (
       const runtime = yield* readPersistedServerRuntimeState(derivedPaths.serverRuntimeStatePath);
       if (Option.isSome(runtime) && runtime.value.pid > 0 && isProcessAlive(runtime.value.pid)) {
         return yield* new CliError.UserError({
-          cause: `A T3 Code server is already running for ${baseDir} (pid ${runtime.value.pid}, ${runtime.value.origin}). Connect to that server, stop it before starting another, or use a different --base-dir.`,
+          cause: `A FR Code server is already running for ${baseDir} (pid ${runtime.value.pid}, ${runtime.value.origin}). Connect to that server, stop it before starting another, or use a different --base-dir.`,
         });
       }
     }
@@ -410,7 +410,7 @@ export const resolveServerConfig = (
 
     const otel = yield* OtelEnvironment.load;
 
-    // T3 Code's own OTLP variables name no signal, so the one answer they give
+    // FR Code's own OTLP variables name no signal, so the one answer they give
     // is the answer for all three.
     const signalExport: SignalExport = {
       protocol: env.otlpProtocol,

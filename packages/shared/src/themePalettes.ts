@@ -1,6 +1,6 @@
 export const BUILT_IN_THEME_IDS = ["t3-chat", "grove", "ocean", "ember", "iris"] as const;
 
-/** The standard T3 Code palette, kept separate from the optional built-in theme library. */
+/** The standard FR Code palette, kept separate from the optional built-in theme library. */
 export const MOBILE_DEFAULT_THEME_ID = "t3-code";
 
 /**
@@ -122,7 +122,7 @@ export type ThemeDefinition = Readonly<{
 }>;
 
 /**
- * The palette T3 Code wears with no theme installed, captured from the app's
+ * The palette FR Code wears with no theme installed, captured from the app's
  * stock tokens (index.css) so a draft seeded from the default look paints the
  * pixels the user is already seeing. Alpha-bearing tokens are flattened over
  * their real backdrops (canvas, or the sidebar for its rows) because theme
