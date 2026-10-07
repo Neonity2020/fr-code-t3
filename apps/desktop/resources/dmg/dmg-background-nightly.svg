@@ -23,7 +23,8 @@
   <path d="M-60 306C113 252 223 298 367 272S553 242 707 280" stroke="url(#silk)" stroke-width="86" fill="none" opacity="1" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M-60 266C113 212 223 258 367 232S553 202 707 240" stroke="#C7F2F1" stroke-width="0.8" fill="none" opacity="0.42" stroke-linecap="round" stroke-linejoin="round"/>
   <!-- Official mark from apps/web/src/components/T3Wordmark.tsx. -->
-  <svg x="32" y="26" width="31.2" height="18.2" viewBox="73.00 -708.00 1215.00 708.00" fill="#303034">
+  <!-- FR Code mark, shared with apps/web/src/components/FRWordmark.tsx. -->
+  <svg x="32" y="26.00" width="30.00" height="17.48" viewBox="73.00 -708.00 1215.00 708.00" fill="#edf0ff">
     <path d="M242.0 -562 V-416 H516.0 V-275 H242.0 V0 H73.0 V-708 H539.0 V-562ZM1088 0 935 -281 H877 V0 H709 V-708 H979Q1030 -708 1078.5 -697.5Q1127 -687 1165.5 -662.0Q1204 -637 1227.0 -596.0Q1250 -555 1250 -494Q1250 -422 1211.0 -373.0Q1172 -324 1103 -303 L1288 0ZM1081 -491Q1081 -516 1070.5 -531.5Q1060 -547 1043.5 -555.5Q1027 -564 1006.5 -567.0Q986 -570 967 -570 H876 V-405 H957Q978 -405 1000.0 -408.5Q1022 -412 1040.0 -421.0Q1058 -430 1069.5 -447.0Q1081 -464 1081 -491Z"/>
   </svg>
   <text x="608" y="38" fill="#C3C8E5" font-family="Helvetica" font-size="9" font-weight="400" text-anchor="end">NIGHTLY</text>
