@@ -1,14 +1,22 @@
 import type { SVGProps } from "react";
 
 /**
- * FR Code wordmark. Outlines are extracted from Helvetica Neue Bold with
- * +60/1000em tracking, chosen to match the proportions of the mark it
- * replaces, so existing `h-* w-*` sizing keeps working unchanged.
+ * FR Code wordmark.
+ *
+ * Outlines are baked from Avenir Next Bold at +60/1000em tracking, which
+ * puts the mark's proportions (viewBox aspect 1.72) and
+ * weight next to the T3 mark it replaces (1.66), so `h-*` sizing at the
+ * call sites lines up as before.
+ *
+ * NOTE: glyph outlines come out of the font in a Y-up coordinate system
+ * while SVG is Y-down, so the extraction applies a flip. Without it the
+ * mark renders upside down -- an inverted FR reads as a single "B" glyph
+ * at sidebar size.
  */
 export function FRWordmark(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg {...props} viewBox="69.00 0.00 1268.00 714.00" xmlns="http://www.w3.org/2000/svg">
-      <path d="M69.0 714 V0 H226.0 V295 H525.0 V417 H226.0 V582 H571.0 V714ZM879 391 V592 H1051Q1105 592 1132.0 568.5Q1159 545 1159 493Q1159 439 1132.0 415.0Q1105 391 1051 391ZM722 714 V0 H879 V279 H1036Q1095 279 1121.0 253.0Q1147 227 1155 171Q1161 128 1164.0 81.0Q1167 34 1180 0 H1337Q1326 15 1320.5 36.5Q1315 58 1312.5 82.0Q1310 106 1309.0 129.0Q1308 152 1307 169Q1305 196 1299.5 223.0Q1294 250 1282.0 272.5Q1270 295 1251.0 311.5Q1232 328 1203 336 V338Q1263 362 1289.5 408.0Q1316 454 1316 517Q1316 558 1301.5 593.5Q1287 629 1259.5 656.0Q1232 683 1193.5 698.5Q1155 714 1107 714Z" fill="currentColor" />
+    <svg {...props} viewBox="73.00 -708.00 1215.00 708.00" xmlns="http://www.w3.org/2000/svg">
+      <path d="M242.0 -562 V-416 H516.0 V-275 H242.0 V0 H73.0 V-708 H539.0 V-562ZM1088 0 935 -281 H877 V0 H709 V-708 H979Q1030 -708 1078.5 -697.5Q1127 -687 1165.5 -662.0Q1204 -637 1227.0 -596.0Q1250 -555 1250 -494Q1250 -422 1211.0 -373.0Q1172 -324 1103 -303 L1288 0ZM1081 -491Q1081 -516 1070.5 -531.5Q1060 -547 1043.5 -555.5Q1027 -564 1006.5 -567.0Q986 -570 967 -570 H876 V-405 H957Q978 -405 1000.0 -408.5Q1022 -412 1040.0 -421.0Q1058 -430 1069.5 -447.0Q1081 -464 1081 -491Z" fill="currentColor" />
     </svg>
   );
 }
