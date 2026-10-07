@@ -99,7 +99,17 @@ jobs:
           cache: true
           run-install: true
 
+      - name: Align package versions to the tag
+        # Same step upstream's release.yml runs before its build: the four
+        # workspace package.json files carry the version, and the DMG is named
+        # from it. Doing this here is what lets the tag be the single source of
+        # truth instead of requiring a manual bump in the tree.
+        run: node scripts/update-release-package-versions.ts "$VERSION"
+
       - name: Package DMG
+        # T3CODE_DESKTOP_VERSION is set in the job env. After the step above
+        # the tree already agrees, so this only pins the build to the tag if
+        # the script ever misses a file.
         run: vp run dist:desktop:dmg
 
       - name: Verify artifact matches the tag
