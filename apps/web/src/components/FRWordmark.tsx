@@ -1,0 +1,14 @@
+import type { SVGProps } from "react";
+
+/**
+ * FR Code wordmark. Outlines are extracted from Helvetica Neue Bold with
+ * +60/1000em tracking, chosen to match the proportions of the mark it
+ * replaces, so existing `h-* w-*` sizing keeps working unchanged.
+ */
+export function FRWordmark(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} viewBox="69.00 0.00 1268.00 714.00" xmlns="http://www.w3.org/2000/svg">
+      <path d="M69.0 714 V0 H226.0 V295 H525.0 V417 H226.0 V582 H571.0 V714ZM879 391 V592 H1051Q1105 592 1132.0 568.5Q1159 545 1159 493Q1159 439 1132.0 415.0Q1105 391 1051 391ZM722 714 V0 H879 V279 H1036Q1095 279 1121.0 253.0Q1147 227 1155 171Q1161 128 1164.0 81.0Q1167 34 1180 0 H1337Q1326 15 1320.5 36.5Q1315 58 1312.5 82.0Q1310 106 1309.0 129.0Q1308 152 1307 169Q1305 196 1299.5 223.0Q1294 250 1282.0 272.5Q1270 295 1251.0 311.5Q1232 328 1203 336 V338Q1263 362 1289.5 408.0Q1316 454 1316 517Q1316 558 1301.5 593.5Q1287 629 1259.5 656.0Q1232 683 1193.5 698.5Q1155 714 1107 714Z" fill="currentColor" />
+    </svg>
+  );
+}
