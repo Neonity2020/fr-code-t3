@@ -1,134 +1,160 @@
-# T3 Code
+# FR Code
 
-T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
+**Free Router Code** — a desktop agent client built on [T3 Code](https://github.com/pingdotgg/t3code), driving [Pi Agent](https://github.com/pingdotgg/pi) as its single kernel.
 
-Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, and Google Antigravity. If they're set up on your computer, T3 Code can control them.
+> **This is a fork of T3 Code**, an MIT-licensed project by T3 Tools Inc. The upstream
+> `LICENSE` is unmodified and still reads `Copyright (c) 2026 T3 Tools Inc.` All
+> original work — the T3 orchestration engine, the Electron shell, the React UI, the
+> provider adapters — remains theirs. See [Attribution](#attribution) for what is
+> ours and what is theirs.
 
-## "Wait, what are you selling me?"
+---
 
-Nothing. We built T3 Code because we wanted the best possible development experience with agents. We were inspired by existing solutions like the Codex desktop app, Conductor, Claude Desktop and Cursor Glass, but none met our bar.
+## What this fork changes
 
-We wanted something performant, remote-ready, and truly open. If we ever go the wrong direction, we want you to have everything you need to fork and build the editor that you want.
+T3 Code is a control plane for many coding agents (Claude Code, Codex, Cursor, Grok,
+OpenCode, Antigravity, plus an ACP registry). FR Code keeps that engine and UI intact
+and changes two things: the identity, and the kernel.
 
-## Installation
+### 1. Rebrand
 
-> [!WARNING]
-> T3 Code currently supports Codex, Claude, Cursor, Grok Build, OpenCode, and Antigravity. Install and authenticate at least one provider before use:
->
-> - Codex: install [Codex CLI](https://developers.openai.com/codex/cli) and run `codex login`
-> - Claude: install [Claude Code](https://claude.com/product/claude-code) and run `claude auth login`
-> - Cursor: install [Cursor CLI](https://cursor.com/cli) and run `agent login`
-> - Grok Build: install [Grok Build CLI](https://x.ai/cli) and run `grok login`
-> - OpenCode: install [OpenCode](https://opencode.ai) and run `opencode auth login`
-> - Antigravity: enable it in Settings, then use **Install Antigravity** and **Sign in with Google**. No CLI is required.
+| | Upstream | FR Code |
+|---|---|---|
+| Display name | T3 Code | FR Code |
+| macOS bundle id | `com.t3tools.t3code` | `com.frcode.app` |
+| URL scheme | `t3code://` | `frcode://` |
+| Artifact name | `T3-Code-*.dmg` | `FR-Code-*.dmg` |
 
-### Command line
+The bundle id change is what lets FR Code install alongside the official app instead of
+replacing it. Verified: both run at once, on separate loopback ports.
+
+Roughly 600 user-visible strings across `apps/web`, `apps/server` and `packages/*` were
+renamed. Icon, UI wordmark, favicons, Icon Composer projects and the DMG artwork were
+redrawn as well.
+
+### 2. One kernel: Pi
+
+`apps/server/src/provider/builtInDrivers.ts` registers exactly one driver:
+
+```ts
+export const BUILT_IN_DRIVERS: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv>> = [
+  PiDriver,
+];
+```
+
+`PiDriver` drives the user's own `pi` CLI over `--mode rpc` (line-delimited JSON on
+stdio). It spawns an external process rather than importing a library, so **FR Code does
+not pin a Pi version** — `pi update --self` is picked up on the next run.
+
+This was deliberate on T3's part, and it carries over: the adapter spawns `pi` with no
+`--no-*` flags, so your extensions, skills, prompt templates and context files load
+exactly as they do in the Pi TUI, and sessions stay in your own `~/.pi/agent/sessions/`.
+
+Verified against Pi 1.0.4: the RPC commands the adapter sends (`get_state`,
+`get_available_models`, `prompt`, …) are all accepted.
+
+The removed drivers' UI stays in the tree and degrades to the documented `"unavailable"`
+shadow snapshot rather than crashing.
+
+### Also
+
+- `T3_PI_FIXTURE_MODEL` env override for the Pi replay fixtures, whose pinned
+  `openrouter/...` slug only resolves for a Pi install configured against OpenRouter.
+- The Linux/Windows packaging identity (binary name, `StartupWMClass`, AppStream and
+  doc paths) was carried over from the rebrand so those targets stay consistent.
+
+287 files changed, +673 / −669 across 7 commits on top of upstream `f4f148eb`.
+
+---
+
+## Build
+
+T3 Code uses a Bun-style workspace with pnpm and Vite+ (`vp`) for orchestration.
 
 ```bash
-curl -fsSL https://t3.codes/install.sh | sh
+pnpm install
+curl -fsSL https://vite.plus | bash   # required: the global `vp` CLI
+pnpm exec vp run dev:desktop         # run against a source checkout
+pnpm exec vp run dist:desktop:dmg    # package a .dmg
 ```
 
-On Windows, in PowerShell:
+Node `^22.16 || ^23.11 || >=24.10`.
 
-```powershell
-irm https://t3.codes/install.ps1 | iex
-```
+### Two environment notes
 
-Then run `t3` to start the server and open the local web app. `t3 service install` keeps it running in the background, `t3 update` moves to a newer release, and `t3 --help` has the full reference.
-
-To try it once without installing, run `npx t3@latest` instead.
-
-### Desktop app
-
-Install the latest version of the desktop app from [GitHub Releases](https://github.com/pingdotgg/t3code/releases), or from your favorite package registry:
-
-#### Windows (`winget`)
+Both of these bite on a fresh machine and neither is discoverable from the failure:
 
 ```bash
-winget install T3Tools.T3Code
+# 1. pnpm runs out of heap on this workspace (2200+ packages) and is killed
+#    mid-install with "Ineffective mark-compacts near heap limit".
+NODE_OPTIONS="--max-old-space-size=6144" pnpm install
+
+# 2. electron-builder pulls a ~100 MB Electron dist straight from GitHub.
+#    Behind a slow link that measured 192 KB/s — a 3 hour build that looks hung.
+#    It is I/O bound, so 0% CPU with no output is the symptom, not a deadlock.
+export ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
+export ELECTRON_BUILDER_BINARIES_MIRROR="https://npmmirror.com/mirrors/electron-builder-binaries/"
 ```
 
-#### macOS (Homebrew)
+On the mirror above the same download runs at 6.7 MB/s.
+
+---
+
+## Requirements at runtime
+
+- macOS (the packaging identity was verified on arm64; the shell and UI are upstream's
+  and are cross-platform, but only macOS was exercised here)
+- Node 24 as an Electron runtime host is not needed — the app ships its own
+- **Pi on `PATH`.** FR Code spawns `pi`, it does not bundle it:
+  ```bash
+  npm install -g @earendil-works/pi-coding-agent
+  ```
+
+---
+
+## Known gaps
+
+- **Unsigned.** No Developer ID signature or notarization. Gatekeeper will quarantine the
+  DMG on another machine; `xattr -dr com.apple.quarantine` or right-click → Open works.
+- **Shares `~/.t3` with an installed T3 Code.** Threads, projects and settings are
+  shared, which is convenient but means the two can interfere. Set `T3CODE_HOME` to
+  isolate.
+- **`apps/mobile/` and `apps/marketing/` are unbranded.** They do not ship in the
+  desktop build.
+- **Filenames still say `t3`** (`assets/prod/t3-black-web-favicon-32x32.png`). Content is
+  FR Code's; the names are referenced from `scripts/lib/brand-assets.ts` and were left
+  alone to keep the fork mergeable.
+
+---
+
+## Attribution
+
+**T3 Code** — Copyright (c) 2026 T3 Tools Inc. — MIT License. <https://github.com/pingdotgg/t3code>
+
+The bulk of this repository is theirs: `apps/server` (274k lines, the orchestration
+engine), `apps/web` (the UI), `apps/desktop` (the Electron shell), and `packages/*`
+(74k lines of shared contracts and runtime). FR Code is a rebrand and a reduction of
+the provider surface, not a fork of an idea.
+
+**Pi Agent** — <https://github.com/pingdotgg/pi> — invoked as an external process over
+its `--mode rpc` stdio protocol. No Pi source is vendored here.
+
+**Claude/Free Router naming.** "Free Router Code" and "FR Code" are this fork's own
+product name and have no relationship to T3 Tools Inc.
+
+MIT permits all of this. Retain the upstream `LICENSE` file if you redistribute.
+
+---
+
+## Upstream
+
+`origin` still points at `pingdotgg/t3code`, so upstream changes remain easy to pull:
 
 ```bash
-brew install --cask t3-code
+git remote add upstream https://github.com/pingdotgg/t3code.git
+git fetch upstream && git rebase upstream/main
 ```
 
-#### Debian, Ubuntu (`.deb`)
-
-Download the `.deb` from [GitHub Releases](https://github.com/pingdotgg/t3code/releases), then:
-
-```bash
-sudo apt install ./T3-Code-*.deb
-```
-
-#### Arch Linux (AUR)
-
-Stable:
-
-```bash
-yay -S t3code-bin
-```
-
-Nightly:
-
-```bash
-yay -S t3code-nightly-bin
-```
-
-The AUR packaging is maintained in this repository under [`packaging/aur`](./packaging/aur).
-
-## Some notes
-
-We are very very early in this project. Expect bugs.
-
-We are (mostly) not accepting contributions yet. Small fixes may be considered. Big features will not be.
-
-## Documentation
-
-Full docs live in [docs/](./docs). There's no docs site yet.
-
-- [Install and first run](./docs/user/install.md)
-- [Permission modes](./docs/user/permission-modes.md)
-- [Keyboard shortcuts](./docs/user/keybindings.md)
-- [Project settings](./docs/user/project-settings.md)
-- [Appearance preferences](./docs/user/appearance.md)
-- [Remote access from a phone or another machine](./docs/user/remote-access.md)
-- [Keeping app and server in sync](./docs/user/updating.md)
-- [Source control integrations](./docs/user/source-control.md)
-- Multiple accounts: [Codex](./docs/user/providers-codex.md) · [Claude](./docs/user/providers-claude.md)
-- [Run T3 Code as a background service](./docs/user/background-service.md)
-
-Building from source? Start at [docs/internals/overview.md](./docs/internals/overview.md).
-
-## If you REALLY want to contribute still.... read this first
-
-### Install `vp`
-
-T3 Code uses Vite+ so you'll need to install the global `vp` command-line tool.
-
-#### macOS / Linux
-
-```bash
-curl -fsSL https://vite.plus | bash
-```
-
-#### Windows
-
-```bash
-irm https://vite.plus/ps1 | iex
-```
-
-Checkout their getting started guide for more information: https://viteplus.dev/guide/
-
-### Install dependencies
-
-```bash
-vp i
-```
-
-Read [CONTRIBUTING.md](./CONTRIBUTING.md) before reporting a bug or opening a PR.
-
-Have a feature request? Start an [Ideas discussion](https://github.com/pingdotgg/t3code/discussions/categories/ideas).
-
-Need support? Join the [Discord](https://discord.gg/jn4EGJjrvv).
+The rebrand is deliberately mechanical (literal string replacement plus five identity
+constants) and the provider change is confined to one file, so the fork has stayed easy
+to rebase — but artwork binaries and the regenerated wordmark will conflict.
