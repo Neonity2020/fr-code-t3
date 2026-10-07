@@ -2645,8 +2645,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
 
 export function resolveDesktopProductName(version: string): string {
   return resolveDesktopUpdateChannel(version) === "nightly"
-    ? "T3 Code (Nightly)"
-    : (desktopPackageJson.productName ?? "T3 Code");
+    ? "FR Code (Nightly)"
+    : (desktopPackageJson.productName ?? "FR Code");
 }
 
 export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
@@ -3712,7 +3712,7 @@ const buildDesktopArtifact = Effect.fn("buildDesktopArtifact")(function* (
     private: true,
     packageManager: rootPackageJson.packageManager,
     description:
-      "T3 Code is an open-source desktop app for coding agents. Work with your existing agent subscriptions, review code changes, and run commands in your projects. Connect from desktop, web, or mobile to continue working remotely.",
+      "FR Code is an open-source desktop app for coding agents. Built on T3 Code by T3 Tools Inc. (MIT). Drives Pi Agent as its single kernel.",
     license: "MIT",
     // Required by the .deb control file.
     homepage: "https://t3.codes",

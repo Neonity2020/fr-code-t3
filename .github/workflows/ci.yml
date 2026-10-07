@@ -85,6 +85,10 @@ jobs:
     name: Build
     runs-on: blacksmith-8vcpu-ubuntu-2404
     timeout-minutes: 10
+    env:
+      ELECTRON_MIRROR: "https://npmmirror.com/mirrors/electron/"
+      ELECTRON_BUILDER_BINARIES_MIRROR: "https://npmmirror.com/mirrors/electron-builder-binaries/"
+      NODE_OPTIONS: "--max-old-space-size=6144"
     steps:
       - name: Checkout
         uses: actions/checkout@v6
