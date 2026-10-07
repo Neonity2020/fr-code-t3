@@ -246,7 +246,7 @@ export const runSqliteState = Effect.fn("runSqliteState")(function* (
 });
 
 const t3SqliteStateCommand = Command.make(
-  "t3-sqlite-state",
+  "fr-sqlite-state",
   {
     operation: Argument.Literals("operation", SqliteStateOperation.literals).pipe(
       Argument.withDescription("Run a read-only query or a backed-up fixture mutation."),

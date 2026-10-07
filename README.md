@@ -120,10 +120,14 @@ On the mirror above the same download runs at 6.7 MB/s.
   shared, which is convenient but means the two can interfere. Set `T3CODE_HOME` to
   isolate.
 - **`apps/mobile/` and `apps/marketing/` are unbranded.** They do not ship in the
-  desktop build.
-- **Filenames still say `t3`** (`assets/prod/t3-black-web-favicon-32x32.png`). Content is
-  FR Code's; the names are referenced from `scripts/lib/brand-assets.ts` and were left
-  alone to keep the fork mergeable.
+  desktop build. `apps/marketing/public/95/t3-code-concepts/` still carries upstream
+  screenshot filenames, and the `apps/mobile/modules/t3-*` native module names
+  (`t3-composer-editor`, `t3-markdown-text`, …) are deliberately untouched: Gradle
+  module names, podspec names and Java package paths have to agree with each other,
+  so renaming those is a coordinated change across Android and iOS, not a find-replace.
+- **Internal identifiers still say `t3`.** `T3CODE_HOME`, `t3` (the `@t3tools/server`
+  package name), `T3CODE_*` env vars and `~/.t3` are upstream's own names. Renaming
+  them buys cosmetics and costs every `git rebase upstream/main` in the future.
 
 ---
 
