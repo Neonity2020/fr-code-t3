@@ -1,0 +1,160 @@
+name: Release macOS DMG
+
+# Tag-driven GitHub Release. Separate from build-macos.yml (the continuous
+# branch build) because the two differ in what they may do: a tag gets a
+# durable release asset, a push only gets a 14-day artifact.
+#
+# Usage:
+#   git tag v0.0.46
+#   git push fr v0.0.46
+#
+# The tag's version reaches the build through T3CODE_DESKTOP_VERSION, the
+# script's own `version` input, so apps/server/package.json does not have to
+# be edited before tagging. Upstream's env name is kept rather than
+# introducing a local alias, so this workflow keeps working across a rebase.
+#
+# Unsigned on purpose: this fork has no Apple Developer ID, so no CSC_LINK or
+# APPLE_API_KEY is wired up. Release assets are quarantined on first open.
+# When a certificate exists, add the signing block from release-desktop.yml
+# between "Package DMG" and "Verify artifact".
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to publish (e.g. v0.0.46)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    name: Resolve version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      # Done in its own job so every later step can use `needs.resolve.outputs`
+      # instead of re-deriving the tag from a context that differs between a
+      # tag push and a manual dispatch.
+      - name: Derive tag and version
+        id: v
+        env:
+          RAW_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          tag="${RAW_TAG#refs/tags/}"
+          version="${tag#v}"
+          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            printf 'Tag %s does not carry a semver version (expected vX.Y.Z).\n' "$tag" >&2
+            exit 1
+          fi
+          printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
+          printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+
+  release:
+    name: Publish ${{ needs.resolve.outputs.tag }}
+    needs: resolve
+    runs-on: macos-15
+    timeout-minutes: 120
+    env:
+      ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
+      ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
+      NODE_OPTIONS: --max-old-space-size=6144
+      TAG: ${{ needs.resolve.outputs.tag }}
+      VERSION: ${{ needs.resolve.outputs.version }}
+      T3CODE_DESKTOP_VERSION: ${{ needs.resolve.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.resolve.outputs.tag }}
+          sparse-checkout: |
+            /*
+            !/.repos/
+          sparse-checkout-cone-mode: false
+
+      # Fail before spending four minutes on a build that could not be
+      # published anyway.
+      - name: Check release does not already exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            printf 'Release %s already exists. Delete it, or move the tag.\n' "$TAG" >&2
+            exit 1
+          fi
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: package.json
+          cache: true
+          run-install: true
+
+      - name: Package DMG
+        run: vp run dist:desktop:dmg
+
+      - name: Verify artifact matches the tag
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          found=(release/FR-Code-*-arm64.dmg)
+          shopt -u nullglob
+          if [ "${#found[@]}" -ne 1 ]; then
+            printf 'Expected one arm64 DMG, found %s.\n' "${#found[@]}" >&2
+            exit 1
+          fi
+          artifact="${found[0]}"
+          printf 'Artifact: %s\n' "$artifact"
+          # Catches a tag/version disagreement before it becomes a release
+          # asset labelled with the wrong version.
+          if [[ "$artifact" != *"-${VERSION}-arm64.dmg" ]]; then
+            printf 'Artifact %s does not match version %s from the tag.\n' "$artifact" "$VERSION" >&2
+            exit 1
+          fi
+          printf 'version=%s\n' "$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          url=$(gh release create "$TAG" \
+            --title "FR Code $VERSION" \
+            --generate-notes \
+            release/FR-Code-*-arm64.dmg)
+          printf 'url=%s\n' "$url" >> "$GITHUB_OUTPUT"
+          printf '## FR Code %s\n\n%s\n' "$VERSION" "$url" >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: Assert the release asset is downloadable
+    needs: [resolve, release]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # A release created without its asset still reports success, so fetch it
+      # back rather than trusting the create step.
+      - name: Download the published asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --pattern 'FR-Code-*-arm64.dmg' --dir /tmp/rel
+          ls -l /tmp/rel/*.dmg
+          if ! ls /tmp/rel | grep -q "^FR-Code-${VERSION}-arm64.dmg$"; then
+            printf 'Downloaded asset does not match version %s.\n' "$VERSION" >&2
+            exit 1
+          fi
