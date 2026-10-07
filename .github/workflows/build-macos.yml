@@ -1,5 +1,17 @@
 name: Build macOS DMG
 
+# Continuous unsigned macOS DMG build.
+#
+# Runner note: upstream uses Blacksmith-hosted labels (`macos-15`),
+# which only resolve on T3's own CI account. A fork has to use GitHub-hosted
+# runners. macos-15 is Apple Silicon, which is what the arm64 DMG needs, and it is
+# slower than the 8 vCPU Blacksmith box upstream uses, so the timeout is generous.
+#
+# Unsigned on purpose: there is no Apple Developer ID for this fork yet, so the
+# build runs without CSC_LINK/APPLE_API_KEY. Gatekeeper will quarantine the
+# artifact on another machine. Add the secrets and the signing block in
+# release-desktop.yml once there is a certificate to use.
+
 on:
   push:
     branches: [main]
@@ -8,11 +20,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: build-macos-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   dmg:
     name: Package macOS arm64 DMG
-    runs-on: blacksmith-8vcpu-macos-26
-    timeout-minutes: 60
+    runs-on: macos-15
+    timeout-minutes: 120
     env:
       ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
       ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
@@ -35,6 +51,19 @@ jobs:
 
       - name: Package DMG
         run: vp run dist:desktop:dmg
+
+      # A silently wrong arch would ship a DMG the runner could not have built.
+      - name: Verify artifact
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          found=(release/FR-Code-*-arm64.dmg)
+          shopt -u nullglob
+          if [ "${#found[@]}" -ne 1 ]; then
+            printf 'Expected one arm64 DMG, found %s.\n' "${#found[@]}" >&2
+            exit 1
+          fi
+          printf 'Built %s (%s bytes)\n' "${found[0]}" "$(stat -f%z "${found[0]}")"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
