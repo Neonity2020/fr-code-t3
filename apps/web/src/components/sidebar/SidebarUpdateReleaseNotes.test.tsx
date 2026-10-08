@@ -92,9 +92,9 @@ describe("SidebarUpdateReleaseNotes", () => {
       "https://github.com/pingdotgg/t3code/releases/tag/v0.0.36-nightly.1",
     ]);
     expect(anchors.map(({ props }) => textContent(props.children))).toEqual([
-      "View release on GitHub",
-      "1 more change on GitHub",
-      "2 more changes on GitHub",
+      "在 GitHub 查看发布",
+      "在 GitHub 查看另外 1 条改动",
+      "在 GitHub 查看另外 2 条改动",
     ]);
   });
 
@@ -108,7 +108,7 @@ describe("SidebarUpdateReleaseNotes", () => {
     );
 
     expect(anchors.at(-1)?.props.href).toBe("https://github.com/pingdotgg/t3code/releases");
-    expect(textContent(anchors.at(-1)?.props.children)).toBe("1 older release on GitHub");
+    expect(textContent(anchors.at(-1)?.props.children)).toBe("在 GitHub 查看更早的 1 个release");
   });
 
   it("shows plural history text for multiple omitted releases", () => {
@@ -120,7 +120,7 @@ describe("SidebarUpdateReleaseNotes", () => {
       }),
     );
 
-    expect(textContent(anchors.at(-1)?.props.children)).toBe("3 older releases on GitHub");
+    expect(textContent(anchors.at(-1)?.props.children)).toBe("在 GitHub 查看更早的 3 个releases");
   });
 
   it("reports a release link that fails to open", async () => {
@@ -145,7 +145,7 @@ describe("SidebarUpdateReleaseNotes", () => {
       );
       expect(testState.addToast).toHaveBeenCalledWith({
         type: "error",
-        title: "Unable to open release notes",
+        title: "无法打开更新说明",
       });
     });
   });

@@ -1,15 +1,14 @@
 import type { DpopFailureReason } from "@t3tools/contracts";
 import type { RelayEnvironmentStatusResponse, RelayProtectedError } from "@t3tools/contracts/relay";
 
-export const DPOP_CLOCK_HINT =
-  "Hint: Check that automatic date and time is enabled on both devices, then try again.";
+export const DPOP_CLOCK_HINT = "提示：请确认两台设备都已启用自动设置日期和时间，然后重试。";
 
 /** Older servers omit the DPoP category, but newer servers can also omit it for
  * a credential failure that happens after proof verification. */
 export const DPOP_UNKNOWN_HINT =
-  "Hint: Try again. If it still fails, clock skew may be the cause; check that automatic date and time is enabled on both devices.";
+  "提示：请重试。如果仍然失败，可能是设备时间不同步；请确认两台设备都已启用自动设置日期和时间。";
 
-export const DPOP_RETRY_HINT = "Hint: Try again. If the problem continues, copy the trace ID.";
+export const DPOP_RETRY_HINT = "提示：请重试。如果问题仍然存在，请复制追踪 ID。";
 
 function dpopFailureHint(reason: DpopFailureReason | undefined): string {
   if (reason === "time_window") return DPOP_CLOCK_HINT;
@@ -27,41 +26,41 @@ export function relayProtectedErrorMessage(error: RelayProtectedError): string {
       switch (error.reason) {
         case "missing_bearer":
         case "invalid_bearer":
-          return "Relay rejected the cloud session token.";
+          return "中继服务拒绝了云端会话令牌。";
         case "invalid_dpop":
-          return dpopFailureMessage("Relay rejected the DPoP proof.", error.dpopFailureReason);
+          return dpopFailureMessage("中继服务拒绝了 DPoP 证明。", error.dpopFailureReason);
         case "not_authorized":
-          return "Relay rejected the authenticated request.";
+          return "中继服务拒绝了已认证的请求。";
       }
     case "RelayEnvironmentLinkProofExpiredError":
-      return "Relay rejected an expired environment link proof.";
+      return "中继服务拒绝了已过期的环境关联证明。";
     case "RelayEnvironmentLinkProofInvalidError":
-      return `Relay rejected the environment link proof (${error.reason}).`;
+      return `中继服务拒绝了环境关联证明（${error.reason}）。`;
     case "RelayEnvironmentConnectNotAuthorizedError":
       // "Not authorized" covers non-auth causes too; surface the reason so a
       // missing link does not read as a credential problem.
       if (error.reason === "environment_link_not_found") {
-        return "Relay has no active link for this environment. The environment server may not have re-established its link yet.";
+        return "中继服务尚未关联此环境。环境服务器可能还未重新建立关联。";
       }
       return error.reason
-        ? `Relay rejected the environment connection request (${error.reason}).`
-        : "Relay rejected the environment connection request.";
+        ? `中继服务拒绝了环境连接请求（${error.reason}）。`
+        : "中继服务拒绝了环境连接请求。";
     case "RelayEnvironmentEndpointUnavailableError":
-      return `Relay could not reach the environment endpoint (${error.reason}).`;
+      return `中继服务无法连接环境端点（${error.reason}）。`;
     case "RelayEnvironmentEndpointTimedOutError":
-      return "Relay timed out while contacting the environment endpoint.";
+      return "中继服务连接环境端点时超时。";
     case "RelayEnvironmentLinkFailedError":
-      return `Relay could not link the environment (${error.reason}).`;
+      return `中继服务无法关联环境（${error.reason}）。`;
     case "RelayEnvironmentLinkUnavailableError":
-      return `Relay cannot provision the managed endpoint (${error.reason}).`;
+      return `中继服务无法配置托管端点（${error.reason}）。`;
     case "RelayEnvironmentLinkLimitExceededError":
-      return `Relay refused the link: this account already has its maximum of ${error.maxTunnels} managed tunnels. Unlink an environment to free one up.`;
+      return `中继服务拒绝关联：此账号已达到 ${error.maxTunnels} 条托管隧道的上限。请取消一个环境的关联以释放名额。`;
     case "RelayAgentActivityPublishProofExpiredError":
-      return "Relay rejected an expired agent activity publish proof.";
+      return "中继服务拒绝了已过期的智能体活动发布证明。";
     case "RelayAgentActivityPublishProofInvalidError":
-      return `Relay rejected the agent activity publish proof (${error.reason}).`;
+      return `中继服务拒绝了智能体活动发布证明（${error.reason}）。`;
     case "RelayInternalError":
-      return `Relay encountered an internal error (${error.reason}).`;
+      return `中继服务发生内部错误（${error.reason}）。`;
   }
 }
 
@@ -69,7 +68,7 @@ export function relayProtectedErrorMessage(error: RelayProtectedError): string {
 // coming back, which clears this reason. While it is still reported, the host
 // is either still off or running a build too old to do that.
 export const RELAY_TUNNEL_RELEASED_MESSAGE =
-  "Offline for a while, so its T3 Connect tunnel was removed. Start FR Code on that computer and update it to the latest version to reconnect.";
+  "此环境离线时间较长，T3 Connect 隧道已被移除。请在该电脑上启动 FR Code 并更新至最新版以重新连接。";
 
 /** User-facing text for an offline status, or null when the relay gave no known reason. */
 export function relayOfflineReasonMessage(

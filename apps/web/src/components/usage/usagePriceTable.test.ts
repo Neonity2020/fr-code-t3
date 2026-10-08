@@ -37,19 +37,19 @@ describe("price table edits", () => {
     expect(usagePriceCell(targets, "example", "inputCostPerMillionTokens").value).toBe("2");
     expect(usagePriceCell(targets, "example", "outputCostPerMillionTokens")).toEqual({
       value: "",
-      placeholder: "Mixed",
+      placeholder: "混合",
     });
     expect(usagePriceCell(targets, "example", "cacheReadCostPerMillionTokens")).toEqual({
       value: "",
-      placeholder: "Input rate",
+      placeholder: "输入费率",
     });
     expect(
       usagePriceCell([target("a", {})], "example", "inputCostPerMillionTokens").placeholder,
-    ).toBe("Automatic");
+    ).toBe("自动");
     expect(
       usagePriceCell([targets[0]!, target("b", null)], "example", "inputCostPerMillionTokens")
         .placeholder,
-    ).toBe("Unavailable");
+    ).toBe("不可用");
   });
 
   it.each(["constructor", "toString", "__proto__"])(
@@ -58,7 +58,7 @@ describe("price table edits", () => {
       const environment = target("a", {});
       expect(usagePriceCell([environment], model, "inputCostPerMillionTokens")).toEqual({
         value: "",
-        placeholder: "Automatic",
+        placeholder: "自动",
       });
       const result = usagePriceTableChanges(environment, [
         {
@@ -149,7 +149,7 @@ describe("price table edits", () => {
     ).toBe("Enter a model ID.");
   });
 
-  it.each(["Offline", "Read-only access", "Update server to edit prices"])(
+  it.each(["离线", "Read-only access", "Update server to edit prices"])(
     "does not let %s destinations block a valid edit elsewhere",
     (unavailable) => {
       const edits = [draft({ inputCostPerMillionTokens: "3" })];
@@ -222,6 +222,6 @@ describe("price table edits", () => {
         [target("a", {}, { example: "example-model" }), target("b", { example: price })],
         "example",
       ),
-    ).toEqual({ value: "", placeholder: "Mixed" });
+    ).toEqual({ value: "", placeholder: "混合" });
   });
 });

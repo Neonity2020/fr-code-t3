@@ -19,7 +19,7 @@ export function DiffFileStatus({
           <Button
             size="icon-micro"
             variant="ghost-muted"
-            aria-label={error ? "Retry loading diff" : "Partial diff preview"}
+            aria-label={error ? "重新加载差异" : "部分差异预览"}
             onClick={(event) => {
               event.stopPropagation();
               if (error) retry();
@@ -30,9 +30,7 @@ export function DiffFileStatus({
         {error ? <RotateCwIcon className="size-3" /> : <InfoIcon className="size-3" />}
       </TooltipTrigger>
       <TooltipPopup>
-        {error
-          ? "Retry loading diff"
-          : "This file is too large to show in full. Counts include all changes."}
+        {error ? "重新加载差异" : "此文件过大，无法完整显示。统计包含全部改动。"}
       </TooltipPopup>
     </Tooltip>
   );

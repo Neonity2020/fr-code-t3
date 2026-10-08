@@ -1,6 +1,7 @@
 "use client";
 
 import { DayPicker } from "@daypicker/react";
+import { zhCN } from "@daypicker/react/locale";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsUpDownIcon } from "lucide-react";
 import type * as React from "react";
 import { cn } from "~/lib/utils";
@@ -96,12 +97,13 @@ export function Calendar({
   };
 
   const dayPickerProps = {
+    locale: zhCN,
     className: cn("w-fit [--cell-size:--spacing(10)] sm:[--cell-size:--spacing(9)]", className),
     classNames: mergedClassNames,
     components: mergedComponents,
     "data-slot": "calendar",
     formatters: {
-      formatMonthDropdown: (date: Date) => date.toLocaleString("default", { month: "short" }),
+      formatMonthDropdown: (date: Date) => date.toLocaleString("zh-CN", { month: "short" }),
     } as React.ComponentProps<typeof DayPicker>["formatters"],
     mode,
     showOutsideDays,

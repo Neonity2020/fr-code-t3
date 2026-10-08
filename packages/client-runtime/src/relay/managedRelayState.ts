@@ -127,7 +127,7 @@ export function createManagedRelaySession(input: ManagedRelaySessionInput): Mana
         try: () => readCachedClerkToken(nowMillis),
         catch: (cause) =>
           new ManagedRelaySessionError({
-            message: "Could not obtain the T3 Connect session token.",
+            message: "无法获取 T3 Connect 会话令牌。",
             cause,
           }),
       });
@@ -184,7 +184,7 @@ function readSessionClerkToken(
       (token): token is string => Boolean(token),
       () =>
         new ManagedRelaySessionError({
-          message: "The T3 Connect session token is unavailable.",
+          message: "T3 Connect 会话令牌不可用。",
         }),
     ),
   );
@@ -200,7 +200,7 @@ export const deregisterManagedRelayEnvironment = Effect.fn(
   const session = registry.get(managedRelaySessionAtom);
   if (!session || session.accountId !== input.accountId) {
     return yield* new ManagedRelaySessionError({
-      message: "Sign in to T3 Connect before deregistering an environment.",
+      message: "取消环境注册前请登录 T3 Connect。",
     });
   }
   const clerkToken = yield* readSessionClerkToken(session);
@@ -216,7 +216,7 @@ function requireClerkToken(
   if (!session || session.accountId !== accountId) {
     return Effect.fail(
       new ManagedRelaySessionError({
-        message: "Sign in to T3 Connect before loading relay data.",
+        message: "加载中继数据前请登录 T3 Connect。",
       }),
     );
   }
@@ -258,21 +258,21 @@ function validateEnvironmentStatus(
   if (status.environmentId !== environment.environmentId) {
     return Effect.fail(
       new ManagedRelaySnapshotError({
-        message: "Relay returned status for a different environment.",
+        message: "中继返回了其他环境的状态。",
       }),
     );
   }
   if (!endpointMatches(status.endpoint, environment.endpoint)) {
     return Effect.fail(
       new ManagedRelaySnapshotError({
-        message: "Relay returned status for a different endpoint.",
+        message: "中继返回了其他端点的状态。",
       }),
     );
   }
   if (status.descriptor && status.descriptor.environmentId !== environment.environmentId) {
     return Effect.fail(
       new ManagedRelaySnapshotError({
-        message: "Relay returned status descriptor for a different environment.",
+        message: "中继返回了其他环境的状态描述。",
       }),
     );
   }

@@ -765,7 +765,7 @@ export const OtlpHeadersFromString = Schema.String.pipe(
           if (key === "") {
             return Effect.fail(
               new SchemaIssue.InvalidValue({
-                message: `Expected key=value but received ${JSON.stringify(pair.trim())}.`,
+                message: `应为 key=value，实际收到 ${JSON.stringify(pair.trim())}。`,
               }),
             );
           }
@@ -774,7 +774,7 @@ export const OtlpHeadersFromString = Schema.String.pipe(
           } catch {
             return Effect.fail(
               new SchemaIssue.InvalidValue({
-                message: `Header ${JSON.stringify(key)} has a malformed percent-encoded value.`,
+                message: `请求头 ${JSON.stringify(key)} 的百分号编码值格式错误。`,
               }),
             );
           }

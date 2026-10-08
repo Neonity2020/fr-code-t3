@@ -17,11 +17,11 @@ export function orchestrationProtocolCompatibilityError(
   return serverProtocolVersion > ORCHESTRATION_PROTOCOL_VERSION
     ? new ConnectionBlockedError({
         reason: "unsupported",
-        detail: `This client is not supported by this server. Update your app or use a compatible release to connect to ${descriptor.label}.`,
+        detail: `此服务器不支持当前客户端。请更新应用或使用兼容版本连接 ${descriptor.label}。`,
       })
     : new ConnectionBlockedError({
         reason: "unsupported",
-        detail: `This client requires a newer server. Update FR Code on ${descriptor.label} to connect.`,
+        detail: `此客户端需要更新的服务器。请更新 ${descriptor.label} 上的 FR Code 后连接。`,
         ...(canSelfUpdate(descriptor) ? { serverUpdateRequired: true } : {}),
       });
 }

@@ -57,18 +57,16 @@ export function ProviderWizardAuthenticationStep({
             />
           ) : (
             <SettingsRow
-              title="Account"
+              title="账号"
               description={
                 isDiscovering
-                  ? "Discovering sign-in methods…"
-                  : (query.error ??
-                    auth?.message ??
-                    "No in-app sign-in advertised. Follow the provider's docs to finish setup.")
+                  ? "正在查找登录方式…"
+                  : (query.error ?? auth?.message ?? "未提供应用内登录。请按照提供方文档完成设置。")
               }
               control={
                 isDiscovering ? (
                   <Button disabled size="sm" variant="outline">
-                    Sign in
+                    登录
                   </Button>
                 ) : provider?.setup?.documentationUrl ? (
                   <Button
@@ -78,7 +76,7 @@ export function ProviderWizardAuthenticationStep({
                       <a href={provider.setup.documentationUrl} target="_blank" rel="noreferrer" />
                     }
                   >
-                    Open docs
+                    打开文档
                   </Button>
                 ) : undefined
               }
@@ -93,7 +91,7 @@ export function ProviderWizardAuthenticationStep({
           disabled={active}
           onClick={onFinish}
         >
-          {signedIn ? "Done" : "Skip for now"}
+          {signedIn ? "完成" : "暂时跳过"}
         </Button>
       </WizardFooter>
     </>

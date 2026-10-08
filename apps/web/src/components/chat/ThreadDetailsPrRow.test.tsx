@@ -95,7 +95,7 @@ it("requires a new merge click after passing checks become pending and pass agai
     act(() => {
       renderer.root
         .findAllByType("button")
-        .find((button) => button.children.includes("Merge"))!
+        .find((button) => button.children.includes("合并"))!
         .props.onClick();
     });
   const dialogs = () => renderer.root.findAllByProps({ role: "alertdialog" });

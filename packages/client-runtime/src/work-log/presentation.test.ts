@@ -213,13 +213,13 @@ describe("summarizeToolGroup", () => {
     });
     const command = entry("command", { itemType: "command_execution", command: "vp test run" });
     expect(summarizeToolGroup([thought, command, { ...thought, id: "thought-2" }])).toEqual({
-      summary: "Ran 1 command",
+      summary: "已运行 1 条命令",
       hasFailure: false,
     });
     expect(toolGroupSummaryKind([thought, command])).toBe("command");
-    expect(summarizeToolGroup([thought]).summary).toBe("Thought");
+    expect(summarizeToolGroup([thought]).summary).toBe("已思考");
     expect(summarizeToolGroup([thought, { ...thought, id: "thought-2" }]).summary).toBe(
-      "Thought (×2)",
+      "已思考（×2）",
     );
     expect(toolGroupSummaryKind([thought])).toBe("reasoning");
   });
@@ -234,7 +234,7 @@ describe("summarizeToolGroup", () => {
           label: "Created thread",
         }),
       ]).summary,
-    ).toBe("Ran 1 command and created 1 thread");
+    ).toBe("已运行 1 条命令；已创建 1 个会话");
   });
 
   it("deduplicates named sources ahead of ordinary actions", () => {
@@ -249,7 +249,7 @@ describe("summarizeToolGroup", () => {
           command: "git status",
         }),
       ]).summary,
-    ).toBe("Used Chrome integration and ran 1 command");
+    ).toBe("已使用 Chrome 集成；已运行 1 条命令");
   });
 
   it("omits the integration suffix for special browser and computer sources", () => {
@@ -264,7 +264,7 @@ describe("summarizeToolGroup", () => {
           toolSource: { key: "computer-use", name: "Computer Use", kind: "computer" },
         }),
       ]).summary,
-    ).toBe("Used Browser and Computer Use");
+    ).toBe("已使用 Browser和Computer Use");
   });
 });
 
@@ -285,28 +285,26 @@ describe("resolveWorkEntryToolPresentation", () => {
       expect(presentation, tool).not.toBeNull();
       expect(presentation?.displayName, tool).not.toContain(tool);
       const summary = summarizeToolGroup([entry]);
-      expect(summary.summary, tool).not.toMatch(/Used (?:1 tool|FR Code integration)/);
+      expect(summary.summary, tool).not.toMatch(/已使用 (?:1 个工具|FR Code 集成)/);
       expect(summary.hasFailure, tool).toBe(false);
       const failed = { ...entry, toolLifecycleStatus: "failed" as const };
-      expect(resolveWorkEntryToolPresentation(failed)?.displayName, tool).toMatch(/^Failed to /);
+      expect(resolveWorkEntryToolPresentation(failed)?.displayName, tool).toMatch(/^无法/);
       expect(summarizeToolGroup([failed]).hasFailure, tool).toBe(true);
-      expect(summarizeToolGroup([failed]).summary, tool).toMatch(
-        /^(?:Tried to |Requested thread creation)/,
-      );
+      expect(summarizeToolGroup([failed]).summary, tool).toMatch(/^(?:尝试|已请求创建会话)/);
     }
   });
 
   it.each([
-    ["t3_project_list", "Listing projects", "Listed projects"],
-    ["t3_project_clone", "Cloning a repository", "Cloned a repository"],
-    ["t3_project_create", "Registering a project", "Registered a project"],
-    ["t3_thread_launch", "Launching a project thread", "Launched a project thread"],
-    ["t3_queue_edit", "Editing a queued message", "Edited a queued message"],
-    ["t3_pending_request_respond", "Answering pending questions", "Answered pending questions"],
-    ["t3_thread_configure", "Setting thread model", "Set thread model"],
-    ["t3_thread_fork", "Forking this thread", "Requested a fork of this thread"],
-    ["t3_thread_send_attachments", "Sending attachments", "Sent attachments"],
-    ["run_scheduled_task_now", "Running a scheduled task", "Requested a run of a scheduled task"],
+    ["t3_project_list", "正在列出 项目", "已列出 项目"],
+    ["t3_project_clone", "正在克隆 仓库", "已克隆 仓库"],
+    ["t3_project_create", "正在注册 项目", "已注册 项目"],
+    ["t3_thread_launch", "正在启动 项目会话", "已启动 项目会话"],
+    ["t3_queue_edit", "正在编辑 排队消息", "已编辑 排队消息"],
+    ["t3_pending_request_respond", "正在回答 待回答问题", "已回答 待回答问题"],
+    ["t3_thread_configure", "正在设置 会话模型", "设置 会话模型"],
+    ["t3_thread_fork", "正在分叉 此会话", "已请求分叉 此会话"],
+    ["t3_thread_send_attachments", "正在发送 附件", "已发送 附件"],
+    ["run_scheduled_task_now", "正在运行 定时任务", "已请求运行 定时任务"],
   ])("labels %s through its lifecycle", (tool, running, completed) => {
     expect(resolveWorkEntryToolPresentation({ label: `T3-code.${tool}` })?.displayName).toBe(
       running,
@@ -336,7 +334,7 @@ describe("resolveWorkEntryToolPresentation", () => {
     };
     const list = { ...entry, toolData: { server: "t3-code", tool: "t3_project_list" } };
     expect(summarizeToolGroup([list, entry])).toEqual({
-      summary: "Listed projects 1 time and cloned 1 repository",
+      summary: "已列出 项目 1 次；已克隆 1 个仓库",
       hasFailure: false,
     });
     const failed = {
@@ -344,7 +342,7 @@ describe("resolveWorkEntryToolPresentation", () => {
       toolData: { toolName: "T3-code.t3_project_clone", rawOutput: { isError: true } },
     };
     expect(summarizeToolGroup([entry, failed])).toEqual({
-      summary: "Cloned 1 repository",
+      summary: "已克隆 1 个仓库",
       hasFailure: true,
     });
   });
@@ -358,7 +356,7 @@ describe("resolveWorkEntryToolPresentation", () => {
       toolLifecycleStatus: "completed",
       toolData: { server: "another-server", tool: "t3_project_clone" },
     };
-    expect(summarizeToolGroup([entry]).summary).toBe("Used 1 tool");
+    expect(summarizeToolGroup([entry]).summary).toBe("已使用 1 个工具");
   });
 
   it("shows returned MCP errors as failures even in the live activity row", () => {
@@ -371,9 +369,7 @@ describe("resolveWorkEntryToolPresentation", () => {
       itemType: "dynamic_tool",
       toolData: { output: { isError: true } },
     };
-    expect(resolveWorkEntryToolPresentation(entry)?.displayName).toBe(
-      "Failed to clone a repository",
-    );
+    expect(resolveWorkEntryToolPresentation(entry)?.displayName).toBe("无法克隆 仓库");
     expect(workEntryDisplayIndicatesToolFailure(entry)).toBe(true);
     expect(workEntryIndicatesToolSuccess(entry)).toBe(false);
     const childFailure = {
@@ -395,7 +391,7 @@ describe("resolveWorkEntryToolPresentation", () => {
     "preview_click",
   ])("recognizes browser tool names across providers: %s", (label) => {
     expect(resolveWorkEntryToolPresentation({ label })).toEqual({
-      displayName: "Clicking in the preview browser",
+      displayName: "正在点击 预览浏览器",
       icon: "browser",
     });
   });
@@ -406,9 +402,9 @@ describe("resolveWorkEntryToolPresentation", () => {
         label: "mcp__t3-code__device_open",
         toolLifecycleStatus: "completed",
       }),
-    ).toEqual({ displayName: "Opened a device in the Device panel", icon: "device" });
+    ).toEqual({ displayName: "已打开 设备面板中的设备", icon: "device" });
     expect(resolveWorkEntryToolPresentation({ label: "t3-code · device_screenshot" })).toEqual({
-      displayName: "Taking a screenshot of the device",
+      displayName: "正在截屏 设备",
       icon: "device",
     });
   });
@@ -420,16 +416,16 @@ describe("resolveWorkEntryToolPresentation", () => {
         toolTitle: "Inspect the current page",
         toolData: { server: "t3-code", tool: "preview_snapshot", result: { title: "Example" } },
       }),
-    ).toEqual({ displayName: "Taking a snapshot of the preview page", icon: "browser" });
+    ).toEqual({ displayName: "正在拍摄快照 预览页面", icon: "browser" });
   });
 
   it.each([
-    ["inProgress", "Clicking in the preview browser"],
-    ["completed", "Clicked in the preview browser"],
-    ["failed", "Failed to click in the preview browser"],
-    ["declined", "Declined to click in the preview browser"],
-    ["stopped", "Stopped clicking in the preview browser"],
-    ["unknown", "Clicking in the preview browser"],
+    ["inProgress", "正在点击 预览浏览器"],
+    ["completed", "已点击 预览浏览器"],
+    ["failed", "无法点击 预览浏览器"],
+    ["declined", "已拒绝点击 预览浏览器"],
+    ["stopped", "已停止点击 预览浏览器"],
+    ["unknown", "正在点击 预览浏览器"],
   ] as const)("describes the tool's own %s state", (toolLifecycleStatus, displayName) => {
     expect(
       resolveWorkEntryToolPresentation({
@@ -442,45 +438,29 @@ describe("resolveWorkEntryToolPresentation", () => {
   it("uses the summary's state only when the provider omitted a lifecycle status", () => {
     const entry = { label: "T3-code.preview_click" };
     expect(resolveWorkEntryToolPresentation(entry, "inProgress")?.displayName).toBe(
-      "Clicking in the preview browser",
+      "正在点击 预览浏览器",
     );
     expect(resolveWorkEntryToolPresentation(entry, "completed")?.displayName).toBe(
-      "Clicked in the preview browser",
+      "已点击 预览浏览器",
     );
     expect(
       resolveWorkEntryToolPresentation({ ...entry, toolLifecycleStatus: "completed" }, "inProgress")
         ?.displayName,
-    ).toBe("Clicked in the preview browser");
+    ).toBe("已点击 预览浏览器");
     expect(
       resolveWorkEntryToolPresentation({ ...entry, toolLifecycleStatus: "failed" }, "completed")
         ?.displayName,
-    ).toBe("Failed to click in the preview browser");
+    ).toBe("无法点击 预览浏览器");
   });
 
   it.each([
-    ["preview_type", "Typing in the preview browser", "Typed in the preview browser"],
-    [
-      "preview_set_appearance",
-      "Setting preview browser appearance",
-      "Set preview browser appearance",
-    ],
-    [
-      "preview_snapshot",
-      "Taking a snapshot of the preview page",
-      "Took a snapshot of the preview page",
-    ],
-    [
-      "preview_recording_stop",
-      "Stopping recording the preview browser",
-      "Stopped recording the preview browser",
-    ],
-    ["t3_thread_read", "Reading a T3 thread", "Read a T3 thread"],
-    ["t3_thread_send", "Sending to a T3 thread", "Sent to a T3 thread"],
-    [
-      "t3_worktree_handoff",
-      "Handing off thread to a git worktree",
-      "Handed off thread to a git worktree",
-    ],
+    ["preview_type", "正在输入 预览浏览器", "已输入 预览浏览器"],
+    ["preview_set_appearance", "正在设置 预览浏览器外观", "设置 预览浏览器外观"],
+    ["preview_snapshot", "正在拍摄快照 预览页面", "已拍摄快照 预览页面"],
+    ["preview_recording_stop", "正在停止 预览浏览器录制", "已停止 预览浏览器录制"],
+    ["t3_thread_read", "正在读取 T3 会话", "读取 T3 会话"],
+    ["t3_thread_send", "正在发送 到 T3 会话", "已发送 到 T3 会话"],
+    ["t3_worktree_handoff", "正在移交 会话到 Git 工作树", "已移交 会话到 Git 工作树"],
   ])("preserves verb forms and the rest of %s's label", (tool, running, completed) => {
     const entry = { label: `t3-code.${tool}` };
     expect(
@@ -498,7 +478,7 @@ describe("resolveWorkEntryToolPresentation", () => {
         label: "mcp__t3_code__task_status",
         toolTitle: "Check the child task",
       }),
-    ).toEqual({ displayName: "Getting delegated task status", icon: "t3-code" });
+    ).toEqual({ displayName: "正在获取 委派任务状态", icon: "t3-code" });
   });
 
   it("does not brand unknown tools or another server's matching tool name", () => {
@@ -546,9 +526,7 @@ describe("browser group summaries", () => {
       ...browserEntry,
       toolCallId: `browser-${index}`,
     }));
-    expect(summarizeGroupLabel(entries)).toBe(
-      `Used browser ${count} ${count === 1 ? "time" : "times"}`,
-    );
+    expect(summarizeGroupLabel(entries)).toBe(`已使用 浏览器 ${count} 次`);
     expect(toolGroupSummaryKind(entries)).toBe("browser");
   });
 
@@ -557,7 +535,7 @@ describe("browser group summaries", () => {
       ...Array.from({ length: 4 }, () => commandEntry),
       ...Array.from({ length: 15 }, () => browserEntry),
     ];
-    expect(summarizeGroupLabel(entries)).toBe("Ran 4 commands and used browser 15 times");
+    expect(summarizeGroupLabel(entries)).toBe("已运行 4 条命令；已使用 浏览器 15 次");
     expect(toolGroupSummaryKind(entries)).toBe("mixed");
   });
 
@@ -571,7 +549,7 @@ describe("browser group summaries", () => {
           toolData: { server: "t3-code", tool: "task_status" },
         },
       ]),
-    ).toBe("Used browser 1 time, ran 1 command, and performed 1 other action");
+    ).toBe("已使用 浏览器 1 次；已运行 1 条命令；已执行 1 项其他操作");
   });
 
   it("recognizes Claude browser identity without treating script metadata as a shell command", () => {
@@ -583,7 +561,7 @@ describe("browser group summaries", () => {
           toolData: { toolName: "mcp__t3_code__preview_evaluate" },
         },
       ]),
-    ).toBe("Used browser 1 time");
+    ).toBe("已使用 浏览器 1 次");
   });
 
   it("keeps foreign tools and web searches out of the browser count", () => {
@@ -603,12 +581,12 @@ describe("browser group summaries", () => {
           itemType: "web_search",
         },
       ]),
-    ).toBe("Used browser 1 time, searched the web 1 time, and performed 1 other action");
+    ).toBe("已使用 浏览器 1 次；已搜索网页 1 次；已执行 1 项其他操作");
   });
 
   it("keeps browser screenshots in the browser count while preserving their image path", () => {
     const entry = { ...browserEntry, viewedImagePath: "/workspace/page.png" };
-    expect(summarizeGroupLabel([entry])).toBe("Used browser 1 time");
+    expect(summarizeGroupLabel([entry])).toBe("已使用 浏览器 1 次");
     expect(workEntryViewedImagePath(entry)).toBe("/workspace/page.png");
   });
 });
@@ -834,18 +812,18 @@ describe("pull request tool presentation", () => {
       toolLifecycleStatus: "completed",
     };
     expect(resolveWorkEntryToolPresentation(entry)).toMatchObject({
-      displayName: "Linked a pull request",
+      displayName: "已关联 拉取请求",
       icon: "pull-request",
     });
     expect(toolGroupAction(entry)).toBe("link-pr");
   });
 
   it.each([
-    ["inProgress", "Linking PR #42"],
-    ["completed", "Linked PR #42"],
-    ["failed", "Failed to link PR #42"],
-    ["declined", "Declined to link PR #42"],
-    ["stopped", "Stopped linking PR #42"],
+    ["inProgress", "正在关联 拉取请求 #42"],
+    ["completed", "已关联 拉取请求 #42"],
+    ["failed", "无法关联 拉取请求 #42"],
+    ["declined", "已拒绝关联 拉取请求 #42"],
+    ["stopped", "已停止关联 拉取请求 #42"],
   ] as const)("describes the target and %s status", (toolLifecycleStatus, displayName) => {
     expect(
       resolveWorkEntryToolPresentation({
@@ -871,7 +849,11 @@ describe("pull request tool presentation", () => {
           rawInput: { repository: "acme/web", number: 42 },
         },
       }),
-    ).toMatchObject({ displayName: "Unlinked PR #42", icon: "pull-request", action: "unlink-pr" });
+    ).toMatchObject({
+      displayName: "已取消关联 拉取请求 #42",
+      icon: "pull-request",
+      action: "unlink-pr",
+    });
   });
 
   it("summarizes native PR work separately from ordinary tools and integration metadata", () => {
@@ -889,13 +871,13 @@ describe("pull request tool presentation", () => {
       label: "T3-code · list_thread_pull_requests",
     };
     expect(summarizeToolGroup([link, link, list]).summary).toBe(
-      "Linked 2 pull requests and checked linked pull requests",
+      "已关联 2 个拉取请求；已检查 关联拉取请求",
     );
     expect(summarizeToolGroup([{ ...link, label: "T3-code · unlink_pull_request" }]).summary).toBe(
-      "Unlinked 1 pull request",
+      "已取消关联 1 个拉取请求",
     );
     expect(toolGroupSummaryKind([link, link, list])).toBe("pull-request");
-    expect(summarizeToolGroup([list, list]).summary).toBe("Checked linked pull requests 2 times");
+    expect(summarizeToolGroup([list, list]).summary).toBe("已检查 关联拉取请求 2 次");
     expect(
       resolveWorkEntryToolPresentation({ label: "mcp__another-server__link_pull_request" }),
     ).toBeNull();
@@ -917,7 +899,7 @@ describe("device group summaries", () => {
     "recognizes %s as device controls",
     (tool) => {
       const entry = deviceEntry(tool);
-      expect(summarizeToolGroup([entry]).summary).toBe("Used device controls 1 time");
+      expect(summarizeToolGroup([entry]).summary).toBe("已使用 设备控件 1 次");
       expect(toolGroupSummaryKind([entry])).toBe("device");
     },
   );
@@ -936,7 +918,7 @@ describe("device group summaries", () => {
         deviceEntry("device_list"),
         deviceEntry("device_open"),
       ]).summary,
-    ).toBe("Ran 1 command and used device controls 2 times");
+    ).toBe("已运行 1 条命令；已使用 设备控件 2 次");
   });
 
   it("recognizes Claude tool names and preserves screenshot previews", () => {
@@ -945,7 +927,7 @@ describe("device group summaries", () => {
       toolData: { toolName: "mcp__t3_code__device_screenshot" },
       viewedImagePath: "/workspace/device.png",
     };
-    expect(summarizeToolGroup([entry]).summary).toBe("Used device controls 1 time");
+    expect(summarizeToolGroup([entry]).summary).toBe("已使用 设备控件 1 次");
     expect(workEntryViewedImagePath(entry)).toBe("/workspace/device.png");
   });
 
@@ -957,6 +939,6 @@ describe("device group summaries", () => {
           toolData: { server: "another-server", tool: "device_open" },
         },
       ]).summary,
-    ).toBe("Used 1 tool");
+    ).toBe("已使用 1 个工具");
   });
 });

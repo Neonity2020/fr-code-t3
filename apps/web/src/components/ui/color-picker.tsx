@@ -113,7 +113,7 @@ export function ColorSaturationValuePlane({
 
   return (
     <div
-      aria-label={`${label} saturation and brightness`}
+      aria-label={`${label} 饱和度和亮度`}
       role="group"
       className={cn(
         "relative cursor-crosshair touch-none overflow-hidden bg-[linear-gradient(to_top,#000,transparent),linear-gradient(to_right,#fff,transparent)] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-popover",
@@ -126,13 +126,13 @@ export function ColorSaturationValuePlane({
       {...handlers}
     >
       <span id={instructionsId} className="sr-only">
-        Use arrow keys to adjust the focused value. Hold Shift for larger steps. Use Home and End
-        for the minimum and maximum. Press Tab to move between saturation and brightness.
+        使用方向键调整当前值，按住 Shift 可加大步长。Home 和 End 分别设为最小值与最大值，Tab
+        在饱和度和亮度之间切换。
       </span>
       {(
         [
-          ["s", "Saturation"],
-          ["v", "Brightness"],
+          ["s", "饱和度"],
+          ["v", "亮度"],
         ] as const
       ).map(([axis, axisLabel]) => (
         <label key={axis} className="contents">

@@ -62,8 +62,8 @@ describe("terminal close confirmation", () => {
     await expect(confirmTerminalClose(["Terminal 1", "Development server"])).resolves.toBe(true);
     expect(confirmMock).toHaveBeenCalledWith(
       [
-        "Close 2 terminals?",
-        'This stops their running processes and clears their histories: "Terminal 1", "Development server".',
+        "关闭 2 个终端？",
+        '这会停止正在运行的进程并清除历史记录："Terminal 1", "Development server"。',
       ].join("\n"),
       { variant: "destructive" },
     );

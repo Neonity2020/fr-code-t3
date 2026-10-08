@@ -182,7 +182,7 @@ export function PullRequestThreadDialog({
       : preparePullRequestThreadAction.error instanceof Error
         ? preparePullRequestThreadAction.error.message
         : preparePullRequestThreadAction.error
-          ? `Failed to prepare ${terminology.singular} thread.`
+          ? `准备 ${terminology.singular} 会话失败。`
           : null);
 
   return (
@@ -198,11 +198,11 @@ export function PullRequestThreadDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <SourceControlIcon className="me-2 size-4" />
-            Checkout {terminology.singular}
+            检出 {terminology.singular}
           </DialogTitle>
           <DialogDescription>
-            Resolve a {sourceControlPresentation.providerName} {terminology.singular}, then create
-            the draft thread in the main repo or in a dedicated worktree.
+            解析 {sourceControlPresentation.providerName} {terminology.singular}
+            ，然后在主仓库或独立工作树中新建草稿会话。
           </DialogDescription>
         </DialogHeader>
         <DialogPanel>
@@ -212,7 +212,7 @@ export function PullRequestThreadDialog({
             </span>
             <Input
               ref={referenceInputRef}
-              placeholder={`${terminology.shortLabel} URL, checkout command, or #42`}
+              placeholder={`${terminology.shortLabel} 网址、检出命令或 #42`}
               value={reference}
               onChange={(event) => {
                 setReferenceDirty(true);
@@ -239,7 +239,7 @@ export function PullRequestThreadDialog({
                 <div className="min-w-0">
                   <p className="truncate font-medium text-sm">{resolvedPullRequest.title}</p>
                   <p className="truncate text-muted-foreground text-xs">
-                    #{resolvedPullRequest.number} · {resolvedPullRequest.headBranch} to{" "}
+                    #{resolvedPullRequest.number} · {resolvedPullRequest.headBranch} 至{" "}
                     {resolvedPullRequest.baseBranch}
                   </p>
                 </div>
@@ -253,7 +253,7 @@ export function PullRequestThreadDialog({
           {isResolving ? (
             <div className="flex items-center gap-2 text-muted-foreground text-xs">
               <Spinner size="sm" />
-              Resolving {terminology.singular}...
+              正在解析 {terminology.singular}...
             </div>
           ) : null}
 
@@ -267,7 +267,7 @@ export function PullRequestThreadDialog({
             onClick={() => onOpenChange(false)}
             disabled={preparePullRequestThreadAction.isPending}
           >
-            Cancel
+            取消
           </Button>
           <Button
             type="button"
@@ -283,7 +283,7 @@ export function PullRequestThreadDialog({
               preparePullRequestThreadAction.isPending
             }
           >
-            {preparingMode === "local" ? "Preparing local..." : "Local"}
+            {preparingMode === "local" ? "正在准备本地环境…" : "本地"}
           </Button>
           <Button
             type="button"
@@ -298,7 +298,7 @@ export function PullRequestThreadDialog({
               preparePullRequestThreadAction.isPending
             }
           >
-            {preparingMode === "worktree" ? "Preparing worktree..." : "Worktree"}
+            {preparingMode === "worktree" ? "正在准备工作树…" : "工作树"}
           </Button>
         </DialogFooter>
       </DialogPopup>

@@ -21,24 +21,24 @@ describe("secretRequestDisplay", () => {
     expect(display("saved")).toEqual({
       kind: "answered",
       outcome: "saved",
-      label: "Saved securely and kept private",
+      label: "安全保存并保持私密",
     });
     expect(display("declined")).toEqual({
       kind: "answered",
       outcome: "declined",
-      label: "Declined",
+      label: "已拒绝",
     });
     expect(display("cancelled")).toEqual({
       kind: "answered",
       outcome: "ended",
-      label: "Request ended",
+      label: "请求已结束",
     });
   });
 
   it("never offers the form for a request inherited from another thread", () => {
     expect(secretRequestDisplay({ secretStatus: "pending" }, "inherited")).toEqual({
       kind: "pending-elsewhere",
-      label: "Waiting for an answer in the original thread",
+      label: "等待原会话中的答复",
     });
     expect(secretRequestDisplay({ secretStatus: "saved" }, "inherited")).toMatchObject({
       outcome: "saved",
@@ -68,8 +68,8 @@ describe("secretRequestFailureMessage", () => {
       secretRequestFailureMessage(new SecretRequestError({ reason: "already_answered" })),
     ).toBe("This secret request was already answered.");
     expect(secretRequestFailureMessage(new Error('Expected string, got "whsec_1"'))).toBe(
-      "Could not answer the request. Try again.",
+      "无法回答请求。请重试。",
     );
-    expect(secretRequestFailureMessage(undefined)).toBe("Could not answer the request. Try again.");
+    expect(secretRequestFailureMessage(undefined)).toBe("无法回答请求。请重试。");
   });
 });

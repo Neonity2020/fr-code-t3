@@ -30,7 +30,7 @@ describe("mapManagedRelayError", () => {
     );
     expect(mapped).toMatchObject({
       reason: "timeout",
-      detail: "Relay timed out while contacting the environment endpoint.",
+      detail: "中继服务连接环境端点时超时。",
       traceId: "trace-server-timeout",
     });
   });
@@ -52,7 +52,7 @@ describe("mapManagedRelayError", () => {
     expect(mapped).toMatchObject({
       _tag: "ConnectionBlockedError",
       reason: "authentication",
-      detail: `Relay rejected the DPoP proof. ${DPOP_UNKNOWN_HINT}`,
+      detail: `中继服务拒绝了 DPoP 证明。 ${DPOP_UNKNOWN_HINT}`,
       traceId: "trace-1",
     });
   });
@@ -71,7 +71,7 @@ describe("mapManagedRelayError", () => {
       }),
     );
 
-    expect(mapped.message).toBe(`Relay rejected the DPoP proof. ${DPOP_RETRY_HINT}`);
+    expect(mapped.message).toBe(`中继服务拒绝了 DPoP 证明。 ${DPOP_RETRY_HINT}`);
   });
 });
 
@@ -82,11 +82,9 @@ describe("mapRemoteDpopEnvironmentError", () => {
       reason: "invalid_credential",
       traceId: "trace-descriptor",
     });
-    expect(mapRemoteEnvironmentError(error, "relay").message).toBe(
-      "The environment credential is invalid.",
-    );
+    expect(mapRemoteEnvironmentError(error, "relay").message).toBe("环境凭据无效。");
     expect(mapRemoteDpopEnvironmentError(error).message).toBe(
-      `The environment credential is invalid. ${DPOP_UNKNOWN_HINT}`,
+      `环境凭据无效。 ${DPOP_UNKNOWN_HINT}`,
     );
   });
 
@@ -113,7 +111,7 @@ describe("mapRemoteDpopEnvironmentError", () => {
       }),
     );
 
-    expect(mapped.message).toBe(`The environment credential is invalid. ${DPOP_UNKNOWN_HINT}`);
+    expect(mapped.message).toBe(`环境凭据无效。 ${DPOP_UNKNOWN_HINT}`);
   });
 
   it("uses a neutral hint for a non-clock DPoP error from a new server", () => {
@@ -126,6 +124,6 @@ describe("mapRemoteDpopEnvironmentError", () => {
       }),
     );
 
-    expect(mapped.message).toBe(`The environment credential is invalid. ${DPOP_RETRY_HINT}`);
+    expect(mapped.message).toBe(`环境凭据无效。 ${DPOP_RETRY_HINT}`);
   });
 });

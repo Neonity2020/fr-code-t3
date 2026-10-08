@@ -16,7 +16,7 @@ describe("toolActivity", () => {
     expect(
       deriveToolActivityPresentation({
         itemType: "command_execution",
-        title: "Terminal",
+        title: "终端",
         detail: "Terminal",
         data: {
           command: "bun run lint",
@@ -24,7 +24,7 @@ describe("toolActivity", () => {
         fallbackSummary: "Terminal",
       }),
     ).toEqual({
-      summary: "Ran command",
+      summary: "运行了命令",
       detail: "bun run lint",
     });
   });
@@ -42,7 +42,7 @@ describe("toolActivity", () => {
         fallbackSummary: "Read File",
       }),
     ).toEqual({
-      summary: "Read /tmp/app.ts",
+      summary: "读取了 /tmp/app.ts",
     });
   });
 
@@ -59,7 +59,7 @@ describe("toolActivity", () => {
         fallbackSummary: "Read File",
       }),
     ).toEqual({
-      summary: "Read file",
+      summary: "读取文件",
     });
   });
 
@@ -83,28 +83,28 @@ describe("toolActivity", () => {
   });
 
   it("formats read and search labels from structured input", () => {
-    expect(formatReadToolLabel("src/env.ts")).toBe("Read src/env.ts");
-    expect(formatReadToolLabel("src/env.ts", 2)).toBe("Read src/env.ts +2 more");
-    expect(formatReadToolLabel("")).toBe("Read file");
+    expect(formatReadToolLabel("src/env.ts")).toBe("读取了 src/env.ts");
+    expect(formatReadToolLabel("src/env.ts", 2)).toBe("读取了 src/env.ts，另有 2 项");
+    expect(formatReadToolLabel("")).toBe("读取文件");
     expect(
       formatSearchToolLabel({
         input: { pattern: "TODO", path: "apps/web" },
       }),
-    ).toBe("Searched TODO in web");
+    ).toBe("在 web 中搜索了 TODO");
     expect(
       formatSearchToolLabel({
         input: { glob: "*.ts", path: "/tmp/t3chat-new" },
       }),
-    ).toBe("Searched files *.ts in t3chat-new");
+    ).toBe("在 t3chat-new 中搜索了文件 *.ts");
     expect(
       formatSearchToolLabel({ rawInput: {}, input: { pattern: "TODO", path: "apps/web" } }),
-    ).toBe("Searched TODO in web");
+    ).toBe("在 web 中搜索了 TODO");
     expect(formatSearchToolLabel({ input: { globPattern: "*.tsx", path: "apps/web" } })).toBe(
-      "Searched files *.tsx in web",
+      "在 web 中搜索了文件 *.tsx",
     );
     expect(
       formatSearchToolLabel({ input: { pattern: "TODO", glob: "*.ts", path: "apps/web" } }),
-    ).toBe("Searched TODO in web");
+    ).toBe("在 web 中搜索了 TODO");
   });
 
   it("keeps bare filenames from explicit path fields", () => {
@@ -124,7 +124,7 @@ describe("toolActivity", () => {
   });
 
   it("titles Claude skill calls with the skill they load", () => {
-    expect(dynamicToolTitle("Skill", { skill: "full-send" })).toBe("Skill: full-send");
+    expect(dynamicToolTitle("Skill", { skill: "full-send" })).toBe("技能：full-send");
     expect(claudeSkillInvocation("Skill", { skill: "claude-api", args: " pricing " })).toEqual({
       name: "claude-api",
       args: "pricing",

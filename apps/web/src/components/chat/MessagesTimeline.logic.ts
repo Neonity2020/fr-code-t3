@@ -79,14 +79,14 @@ function workEntryIsActiveTurnActivity(entry: WorkLogEntry): boolean {
 }
 
 function singleToolCallLabel(entry: WorkLogEntry): string {
-  if (entry.itemType === "reasoning") return entry.detail?.trim().replace(/\s+/g, " ") || "Thought";
+  if (entry.itemType === "reasoning") return entry.detail?.trim().replace(/\s+/g, " ") || "思考";
   const toolPresentation = resolveWorkEntryToolPresentation(entry, "completed");
   if (toolPresentation) return toolPresentation.displayName;
   const item = entry.structuredPayload;
   const title = item?.type === "dynamic_tool" ? dynamicToolTitle(item.toolName, item.input) : null;
   if (title) return title;
   // A lone web search keeps its heading; the query stays in its detail.
-  if (entry.itemType === "web_search") return entry.toolTitle ?? "Web search";
+  if (entry.itemType === "web_search") return entry.toolTitle ?? "网页搜索";
   return workEntryDisplayLabel(entry, undefined);
 }
 
@@ -156,10 +156,10 @@ export function workEntryDisplayLabel(entry: WorkLogEntry, workspaceRoot: string
     const path = formatWorkspaceRelativePath(firstPath, workspaceRoot);
     return entry.changedFiles!.length === 1
       ? path
-      : `${path} +${entry.changedFiles!.length - 1} more`;
+      : `${path}，另有 ${entry.changedFiles!.length - 1} 项`;
   }
   if (action === "read" && !entry.viewedImagePath) {
-    return "Read file";
+    return "读取文件";
   }
   const heading = normalizeCompactToolLabel(entry.toolTitle || entry.label);
   return `${heading.charAt(0).toUpperCase()}${heading.slice(1)}`;
@@ -202,8 +202,7 @@ export function liveWorkEntryLabel(
   const status = liveActivityToolStatus(entry.toolLifecycleStatus, active);
   if (entry.itemType === "reasoning") {
     return (
-      entry.detail?.trim().replace(/\s+/g, " ") ||
-      (status === "inProgress" ? "Thinking" : "Thought")
+      entry.detail?.trim().replace(/\s+/g, " ") || (status === "inProgress" ? "正在思考" : "思考")
     );
   }
   const toolPresentation = resolveWorkEntryToolPresentation({
@@ -215,7 +214,7 @@ export function liveWorkEntryLabel(
   if (command) {
     const verb =
       status === "inProgress"
-        ? "Running"
+        ? "正在运行"
         : status === "failed"
           ? "Failed"
           : status === "declined"
@@ -1031,11 +1030,11 @@ function deriveTurnFolds(input: {
     const duration = elapsedMs !== null ? formatDuration(elapsedMs) : null;
     const label = isLatestInterruptedTurn
       ? duration
-        ? `You stopped after ${duration}`
-        : "You stopped this response"
+        ? `你在 ${duration} 后停止了回复`
+        : "你停止了此回复"
       : duration
-        ? `Worked for ${duration}`
-        : "Worked";
+        ? `已工作 ${duration}`
+        : "已工作";
 
     foldsByAnchorEntryId.set(group.anchorEntryId, {
       runId,
@@ -1430,7 +1429,7 @@ export function deriveMessagesTimelineRows(input: {
         createdAt: supersededFold.createdAt,
         runId: supersededFold.runId,
         attemptId: supersededFold.attemptId,
-        label: "Superseded attempt",
+        label: "已被替代的尝试",
         expanded: input.expandedAttemptIds?.has(supersededFold.attemptId) ?? false,
       });
     }

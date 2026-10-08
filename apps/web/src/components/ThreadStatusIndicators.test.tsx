@@ -17,9 +17,7 @@ describe("ThreadWorktreeIndicator", () => {
     );
 
     expect(markup).toContain('role="img"');
-    expect(markup).toContain(
-      'aria-label="Worktree: sidebar-indicator (feature/sidebar-indicator)"',
-    );
+    expect(markup).toContain('aria-label="工作树：sidebar-indicator（feature/sidebar-indicator）"');
     expect(markup).toContain('data-testid="thread-worktree-thread-1"');
   });
 
@@ -57,7 +55,7 @@ describe("linked pull request snapshots", () => {
       ...link,
       snapshot: {
         state: "merged",
-        title: "Change",
+        title: "更改",
         headBranch: "feature",
         baseBranch: "main",
         isDraft: false,
@@ -69,7 +67,7 @@ describe("linked pull request snapshots", () => {
       pr: {
         number: 42,
         url: link.url,
-        title: "Change",
+        title: "更改",
         state: "merged",
         isDraft: false,
         headRef: "feature",

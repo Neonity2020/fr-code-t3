@@ -65,7 +65,7 @@ export class PortalCaptureShortcut {
   state: PortalShortcutState = {
     shortcutRegistered: false,
     shortcutPending: true,
-    shortcutMessage: "Waiting for shortcut permission. Approve the desktop prompt if one appears.",
+    shortcutMessage: "正在等待快捷键权限。如果出现桌面提示，请批准。",
   };
   readonly ready: Promise<void>;
   private closed = false;
@@ -99,7 +99,7 @@ export class PortalCaptureShortcut {
       this.state = {
         shortcutRegistered: false,
         shortcutPending: true,
-        shortcutMessage: "Connecting to Hyprland shortcuts…",
+        shortcutMessage: "正在连接 Hyprland 快捷键…",
       };
     this.stopped = new Promise((_, reject) => {
       this.rejectStopped = reject;
@@ -131,12 +131,9 @@ export class PortalCaptureShortcut {
   }
 
   async configure() {
-    if (this.managedByHyprland)
-      throw new Error("Change the capture binding in your Hyprland config, then save it.");
+    if (this.managedByHyprland) throw new Error("请在 Hyprland 配置中更改截图快捷键，然后保存。");
     if (!this.hasSession || this.version < 2)
-      throw new Error(
-        "Open your desktop's shortcut settings and allow FR Code's capture shortcut.",
-      );
+      throw new Error("请打开桌面的快捷键设置，并允许 FR Code 的截图快捷键。");
     await this.call({
       destination: this.owner,
       path: PATH,
@@ -164,10 +161,10 @@ export class PortalCaptureShortcut {
       // This failed session is closing, so retry can register a fresh one.
       shortcutCanRetry: !this.managedByHyprland,
       shortcutMessage: this.managedByHyprland
-        ? "Couldn't connect to Hyprland shortcuts. Make sure xdg-desktop-portal-hyprland is running, then restart FR Code."
+        ? "无法连接 Hyprland 快捷键。请确认 xdg-desktop-portal-hyprland 正在运行，然后重启 FR Code。"
         : error instanceof Error
           ? error.message
-          : "Could not register the capture shortcut.",
+          : "无法注册截图快捷键。",
     });
     this.close();
   };
@@ -179,10 +176,7 @@ export class PortalCaptureShortcut {
         promise,
         this.stopped,
         new Promise<never>((_, reject) => {
-          timer = setTimeout(
-            () => reject(new Error("Shortcut permission request timed out. Try again.")),
-            timeoutMs,
-          );
+          timer = setTimeout(() => reject(new Error("快捷键权限请求超时，请重试。")), timeoutMs);
         }),
       ]);
     } finally {
@@ -218,7 +212,7 @@ export class PortalCaptureShortcut {
       message.body[0] === PORTAL &&
       message.body[1] === this.owner
     ) {
-      this.failed(new Error("The desktop shortcut service restarted. Retry the shortcut request."));
+      this.failed(new Error("桌面快捷键服务已重启，请重新请求快捷键。"));
       return;
     }
     if (!this.owner || message.sender !== this.owner) return;
@@ -237,9 +231,7 @@ export class PortalCaptureShortcut {
       message.interface === SESSION &&
       message.member === "Closed"
     ) {
-      this.failed(
-        new Error("Your desktop closed the capture shortcut. Retry the shortcut request."),
-      );
+      this.failed(new Error("桌面环境已关闭截图快捷键，请重新请求快捷键。"));
       return;
     }
     if (
@@ -303,12 +295,12 @@ export class PortalCaptureShortcut {
             shortcutPending: false,
             shortcutMessage:
               this.version >= 2
-                ? "Shortcut permission wasn't granted. Open shortcut permissions to allow it."
-                : "Shortcut permission wasn't granted. Allow FR Code in your desktop's shortcut settings.",
+                ? "尚未获得快捷键权限。请打开快捷键权限设置并允许访问。"
+                : "尚未获得快捷键权限。请在桌面快捷键设置中允许 FR Code。",
           });
           return undefined;
         }
-        throw new Error("Your desktop could not create a capture shortcut session.");
+        throw new Error("桌面环境无法创建截图快捷键会话。");
       }
       return results;
     } finally {
@@ -326,8 +318,8 @@ export class PortalCaptureShortcut {
         shortcutActionRegistered: Boolean(shortcut),
         shortcutPending: false,
         shortcutMessage: shortcut
-          ? "Managed by Hyprland. Add the binding to your config and save it."
-          : "Hyprland did not register the capture action. Check that xdg-desktop-portal-hyprland is running, then restart FR Code.",
+          ? "由 Hyprland 管理。请将快捷键绑定加入配置并保存。"
+          : "Hyprland 未注册截图操作。请确认 xdg-desktop-portal-hyprland 正在运行，然后重启 FR Code。",
       });
       return;
     }
@@ -337,10 +329,10 @@ export class PortalCaptureShortcut {
       shortcutPending: false,
       ...(label ? { shortcutLabel: label } : {}),
       shortcutMessage: label
-        ? `Desktop shortcut: ${label}`
+        ? `桌面快捷键：${label}`
         : this.version >= 2
-          ? "No shortcut is assigned. Open shortcut permissions to choose one."
-          : "No shortcut is assigned. Choose one in your desktop's shortcut settings.",
+          ? "尚未分配快捷键。请打开快捷键权限设置并选择一个快捷键。"
+          : "尚未分配快捷键。请在桌面快捷键设置中选择一个快捷键。",
     });
   }
 
@@ -417,7 +409,7 @@ export class PortalCaptureShortcut {
         [
           this.shortcutId,
           {
-            description: new Variant("s", "Capture a window"),
+            description: new Variant("s", "截取窗口"),
             ...(!this.managedByHyprland ? { preferred_trigger: new Variant("s", trigger) } : {}),
           },
         ],

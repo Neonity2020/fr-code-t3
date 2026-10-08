@@ -21,58 +21,58 @@ import type { DeviceControls } from "./useDeviceControls";
 import { type DeviceEventLogEntry, subscribeDeviceEventLog } from "./deviceHubApi";
 
 const TEXT_SIZES: ReadonlyArray<{ value: DeviceTextSize; label: string }> = [
-  { value: "small", label: "Small" },
-  { value: "default", label: "Default" },
-  { value: "large", label: "Large" },
-  { value: "extra-large", label: "Extra large" },
+  { value: "small", label: "小" },
+  { value: "default", label: "默认" },
+  { value: "large", label: "大" },
+  { value: "extra-large", label: "特大" },
 ];
 
 const COLOR_FILTERS = [
-  { value: "none", label: "None" },
-  { value: "grayscale", label: "Grayscale" },
-  { value: "red-green", label: "Red / green (protanopia)" },
-  { value: "green-red", label: "Green / red (deuteranopia)" },
-  { value: "blue-yellow", label: "Blue / yellow (tritanopia)" },
+  { value: "none", label: "无" },
+  { value: "grayscale", label: "灰度" },
+  { value: "red-green", label: "红 / 绿（红色盲）" },
+  { value: "green-red", label: "绿 / 红（绿色盲）" },
+  { value: "blue-yellow", label: "蓝 / 黄（蓝色盲）" },
 ] as const;
 
 const ORIENTATIONS = [
-  { value: "portrait", label: "Portrait" },
-  { value: "landscape_left", label: "Landscape left" },
-  { value: "portrait_upside_down", label: "Upside down" },
-  { value: "landscape_right", label: "Landscape right" },
+  { value: "portrait", label: "竖屏" },
+  { value: "landscape_left", label: "向左横屏" },
+  { value: "portrait_upside_down", label: "倒置" },
+  { value: "landscape_right", label: "向右横屏" },
 ] as const;
 
 const IOS_PERMISSIONS: ReadonlyArray<{ value: DevicePermission; label: string }> = [
-  { value: "camera", label: "Camera" },
-  { value: "microphone", label: "Microphone" },
-  { value: "photos", label: "Photos" },
-  { value: "contacts", label: "Contacts" },
-  { value: "calendar", label: "Calendar" },
-  { value: "reminders", label: "Reminders" },
-  { value: "location", label: "Location" },
-  { value: "notifications", label: "Notifications" },
-  { value: "motion", label: "Motion" },
-  { value: "media-library", label: "Media library" },
-  { value: "faceid", label: "Face ID" },
+  { value: "camera", label: "相机" },
+  { value: "microphone", label: "麦克风" },
+  { value: "photos", label: "照片" },
+  { value: "contacts", label: "通讯录" },
+  { value: "calendar", label: "日历" },
+  { value: "reminders", label: "提醒事项" },
+  { value: "location", label: "位置" },
+  { value: "notifications", label: "通知" },
+  { value: "motion", label: "运动" },
+  { value: "media-library", label: "媒体库" },
+  { value: "faceid", label: "面容 ID" },
 ];
 
 const ANDROID_PERMISSIONS: ReadonlyArray<{ value: DevicePermission; label: string }> = [
-  { value: "camera", label: "Camera" },
-  { value: "microphone", label: "Microphone" },
-  { value: "photos", label: "Photos" },
-  { value: "contacts", label: "Contacts" },
-  { value: "calendar", label: "Calendar" },
-  { value: "location", label: "Location" },
-  { value: "notifications", label: "Notifications" },
-  { value: "motion", label: "Physical activity" },
+  { value: "camera", label: "相机" },
+  { value: "microphone", label: "麦克风" },
+  { value: "photos", label: "照片" },
+  { value: "contacts", label: "通讯录" },
+  { value: "calendar", label: "日历" },
+  { value: "location", label: "位置" },
+  { value: "notifications", label: "通知" },
+  { value: "motion", label: "身体活动" },
 ];
 
 const LOCATION_PRESETS = [
-  { label: "San Francisco", latitude: 37.7749, longitude: -122.4194 },
-  { label: "New York", latitude: 40.7128, longitude: -74.006 },
-  { label: "London", latitude: 51.5074, longitude: -0.1278 },
-  { label: "Stockholm", latitude: 59.3293, longitude: 18.0686 },
-  { label: "Tokyo", latitude: 35.6762, longitude: 139.6503 },
+  { label: "旧金山", latitude: 37.7749, longitude: -122.4194 },
+  { label: "纽约", latitude: 40.7128, longitude: -74.006 },
+  { label: "伦敦", latitude: 51.5074, longitude: -0.1278 },
+  { label: "斯德哥尔摩", latitude: 59.3293, longitude: 18.0686 },
+  { label: "东京", latitude: 35.6762, longitude: 139.6503 },
 ] as const;
 
 /**
@@ -101,12 +101,12 @@ export function DeviceToolsPanel(props: {
       className={cn("flex min-h-0 flex-col border-border bg-background text-sm", props.className)}
     >
       <div className="flex h-9 shrink-0 items-center gap-2 border-b px-3">
-        <span className="font-medium">Tools</span>
+        <span className="font-medium">工具</span>
         {pending ? <Spinner size="sm" /> : null}
         <Button
           size="icon-xs"
           variant="ghost-muted"
-          aria-label="Close tools"
+          aria-label="关闭工具"
           className="ml-auto"
           onClick={props.onClose}
         >
@@ -119,20 +119,20 @@ export function DeviceToolsPanel(props: {
         ) : null}
         {detail === null && !error ? (
           <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
-            <Spinner size="sm" /> Reading device settings…
+            <Spinner size="sm" /> 正在读取设备设置…
           </div>
         ) : null}
 
         {props.hostDiagnostics ? (
-          <Section title="Host diagnostics">
+          <Section title="主机诊断">
             <p className="whitespace-pre-line text-xs text-muted-foreground">
               {props.hostDiagnostics}
             </p>
           </Section>
         ) : null}
 
-        <Section title="App">
-          <Row label="Foreground">
+        <Section title="应用">
+          <Row label="前台">
             <span className="truncate font-mono text-xs">{foregroundApp?.id ?? "—"}</span>
           </Row>
           {foregroundApp ? (
@@ -143,7 +143,7 @@ export function DeviceToolsPanel(props: {
                 disabled={disabled}
                 onClick={() => void act({ type: "terminateApp", appId: foregroundApp.id })}
               >
-                Terminate
+                终止
               </Button>
               <Button
                 size="xs"
@@ -151,7 +151,7 @@ export function DeviceToolsPanel(props: {
                 disabled={disabled}
                 onClick={() => void act({ type: "launchApp", appId: foregroundApp.id })}
               >
-                Relaunch
+                重新启动
               </Button>
             </div>
           ) : null}
@@ -162,17 +162,17 @@ export function DeviceToolsPanel(props: {
             onSubmit={(url) => act({ type: "openUrl", url })}
           />
           <SubmitRow
-            placeholder={isIos ? "Bundle ID to launch" : "Package name to launch"}
-            action="Launch"
+            placeholder={isIos ? "要启动的应用 Bundle ID" : "要启动的应用包名"}
+            action="启动"
             disabled={disabled}
             onSubmit={(appId) => act({ type: "launchApp", appId })}
           />
         </Section>
 
-        <Section title={isIos ? "Simulator" : "Emulator"}>
-          <Row label="Appearance">
+        <Section title="模拟器">
+          <Row label="外观">
             <ToggleGroup
-              aria-label="Appearance"
+              aria-label="外观"
               value={settings?.appearance ? [settings.appearance] : []}
               disabled={disabled}
               onValueChange={(value) => {
@@ -181,13 +181,13 @@ export function DeviceToolsPanel(props: {
                   void act({ type: "setAppearance", value: next });
               }}
             >
-              <Toggle value="light">Light</Toggle>
-              <Toggle value="dark">Dark</Toggle>
+              <Toggle value="light">浅色</Toggle>
+              <Toggle value="dark">深色</Toggle>
             </ToggleGroup>
           </Row>
-          <Row label="Text size">
+          <Row label="文字大小">
             <ChoiceSelect
-              ariaLabel="Text size"
+              ariaLabel={"文字大小"}
               value={settings?.textSize ?? null}
               options={TEXT_SIZES}
               disabled={disabled}
@@ -196,9 +196,9 @@ export function DeviceToolsPanel(props: {
           </Row>
           {isIos ? (
             <>
-              <Row label="Liquid Glass">
+              <Row label="液态玻璃">
                 <ToggleGroup
-                  aria-label="Liquid Glass"
+                  aria-label="液态玻璃"
                   value={settings?.liquidGlass ? [settings.liquidGlass] : []}
                   disabled={disabled || settings?.liquidGlass === undefined}
                   onValueChange={(value) => {
@@ -208,13 +208,13 @@ export function DeviceToolsPanel(props: {
                     }
                   }}
                 >
-                  <Toggle value="clear">Clear</Toggle>
-                  <Toggle value="tinted">Tinted</Toggle>
+                  <Toggle value="clear">透明</Toggle>
+                  <Toggle value="tinted">着色</Toggle>
                 </ToggleGroup>
               </Row>
-              <Row label="Color filter">
+              <Row label="色彩滤镜">
                 <ChoiceSelect
-                  ariaLabel="Color filter"
+                  ariaLabel={"色彩滤镜"}
                   value={settings?.colorFilter ?? null}
                   options={COLOR_FILTERS}
                   disabled={disabled}
@@ -223,11 +223,11 @@ export function DeviceToolsPanel(props: {
               </Row>
             </>
           ) : (
-            <Row label="Orientation">
+            <Row label="屏幕方向">
               <ChoiceSelect
-                ariaLabel="Orientation"
+                ariaLabel="屏幕方向"
                 value={null}
-                placeholder="Rotate to…"
+                placeholder="旋转为…"
                 options={ORIENTATIONS}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setOrientation", value })}
@@ -235,7 +235,7 @@ export function DeviceToolsPanel(props: {
             </Row>
           )}
           <SwitchRow
-            label="Reduce Motion"
+            label="减弱动态效果"
             checked={settings?.reduceMotion}
             disabled={disabled}
             onChange={(value) => act({ type: "setToggle", setting: "reduceMotion", value })}
@@ -243,13 +243,13 @@ export function DeviceToolsPanel(props: {
           {isIos ? (
             <>
               <SwitchRow
-                label="Increase Contrast"
+                label="增强对比度"
                 checked={settings?.increaseContrast}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setToggle", setting: "increaseContrast", value })}
               />
               <SwitchRow
-                label="Reduce Transparency"
+                label="降低透明度"
                 checked={settings?.reduceTransparency}
                 disabled={disabled}
                 onChange={(value) =>
@@ -257,13 +257,13 @@ export function DeviceToolsPanel(props: {
                 }
               />
               <SwitchRow
-                label="Show Borders"
+                label="显示边框"
                 checked={settings?.showBorders}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setToggle", setting: "showBorders", value })}
               />
               <SwitchRow
-                label="VoiceOver"
+                label="旁白"
                 checked={settings?.voiceOver}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setToggle", setting: "voiceOver", value })}
@@ -271,7 +271,7 @@ export function DeviceToolsPanel(props: {
             </>
           ) : (
             <SwitchRow
-              label="Network"
+              label="网络"
               checked={settings?.networkEnabled}
               disabled={disabled}
               onChange={(value) => act({ type: "setToggle", setting: "networkEnabled", value })}
@@ -279,9 +279,9 @@ export function DeviceToolsPanel(props: {
           )}
         </Section>
 
-        <Section title="Accessibility">
+        <Section title="辅助功能">
           <SwitchRow
-            label="Overlay element frames"
+            label="叠加显示元素边框"
             checked={props.axOverlay}
             disabled={props.access === null}
             onChange={(value) => {
@@ -309,10 +309,10 @@ export function DeviceToolsPanel(props: {
         />
 
         {isIos ? (
-          <Section title="Push notification">
+          <Section title="推送通知">
             <SubmitRow
-              placeholder="Alert text"
-              action="Send"
+              placeholder="提示文字"
+              action="发送"
               disabled={disabled || !foregroundApp}
               onSubmit={(payload) =>
                 foregroundApp
@@ -321,7 +321,7 @@ export function DeviceToolsPanel(props: {
               }
             />
             {!foregroundApp ? (
-              <p className="text-xs text-muted-foreground">Open an app first.</p>
+              <p className="text-xs text-muted-foreground">请先打开一个应用。</p>
             ) : null}
           </Section>
         ) : null}
@@ -391,7 +391,7 @@ function ChoiceSelect<V extends string>(props: {
           {current ? (
             current.label
           ) : (
-            <span className="text-muted-foreground">{props.placeholder ?? "Unknown"}</span>
+            <span className="text-muted-foreground">{props.placeholder ?? "未知"}</span>
           )}
         </SelectValue>
       </SelectTrigger>
@@ -462,13 +462,13 @@ function LocationSection(props: {
     Math.abs(parsed.latitude) <= 90 &&
     Math.abs(parsed.longitude) <= 180;
   return (
-    <Section title="Location">
+    <Section title="位置">
       <div className="flex gap-1.5">
         <Input
           size="compact"
           font="mono"
           className="min-w-0 flex-1"
-          placeholder="Latitude"
+          placeholder="纬度"
           inputMode="decimal"
           value={latitude}
           disabled={props.disabled}
@@ -478,7 +478,7 @@ function LocationSection(props: {
           size="compact"
           font="mono"
           className="min-w-0 flex-1"
-          placeholder="Longitude"
+          placeholder="经度"
           inputMode="decimal"
           value={longitude}
           disabled={props.disabled}
@@ -497,9 +497,9 @@ function LocationSection(props: {
             void props.onSet(preset.latitude, preset.longitude);
           }}
         >
-          <SelectTrigger size="xs" className="w-32" aria-label="Location preset">
+          <SelectTrigger size="xs" className="w-32" aria-label="位置预设">
             <SelectValue>
-              <span className="text-muted-foreground">Preset…</span>
+              <span className="text-muted-foreground">预设…</span>
             </SelectValue>
           </SelectTrigger>
           <SelectPopup align="start" alignItemWithTrigger={false}>
@@ -516,7 +516,7 @@ function LocationSection(props: {
           disabled={props.disabled || !valid}
           onClick={() => void props.onSet(parsed.latitude, parsed.longitude)}
         >
-          Set
+          设置
         </Button>
         {props.canClear ? (
           <Button
@@ -529,7 +529,7 @@ function LocationSection(props: {
               void props.onClear();
             }}
           >
-            Clear
+            清空
           </Button>
         ) : null}
       </div>
@@ -554,18 +554,18 @@ function PermissionsSection(props: {
   const decide = (decision: "grant" | "revoke" | "reset") =>
     void props.onDecide(resolvedAppId, permission, decision);
   return (
-    <Section title="Permissions">
+    <Section title="权限">
       <Input
         size="compact"
         font="mono"
-        placeholder={props.defaultAppId || "App ID"}
+        placeholder={props.defaultAppId || "应用 ID"}
         value={appId}
         disabled={props.disabled}
         onChange={(event) => setAppId(event.target.value)}
       />
       <div className="flex flex-wrap items-center gap-1.5">
         <ChoiceSelect
-          ariaLabel="Permission"
+          ariaLabel="权限"
           value={permission}
           options={props.permissions}
           disabled={props.disabled}
@@ -580,7 +580,7 @@ function PermissionsSection(props: {
           disabled={props.disabled || !resolvedAppId}
           onClick={() => decide("grant")}
         >
-          Grant
+          授予
         </Button>
         <Button
           size="xs"
@@ -588,7 +588,7 @@ function PermissionsSection(props: {
           disabled={props.disabled || !resolvedAppId}
           onClick={() => decide("revoke")}
         >
-          Revoke
+          撤销
         </Button>
         {props.canReset ? (
           <Button
@@ -597,7 +597,7 @@ function PermissionsSection(props: {
             disabled={props.disabled || !resolvedAppId}
             onClick={() => decide("reset")}
           >
-            Reset
+            重置
           </Button>
         ) : null}
       </div>
@@ -634,7 +634,7 @@ function EventLogSection(props: {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="flex w-full items-center gap-1.5 border-b px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">
-        Event log
+        事件日志
         <ChevronDown
           className={cn("ml-auto size-3.5 transition-transform", open && "rotate-180")}
         />
@@ -642,7 +642,7 @@ function EventLogSection(props: {
       <CollapsiblePanel>
         <ol className="max-h-64 overflow-y-auto px-3 py-2 font-mono text-2xs leading-relaxed">
           {entries.length === 0 ? (
-            <li className="text-muted-foreground">No events yet.</li>
+            <li className="text-muted-foreground">暂无事件。</li>
           ) : (
             entries.map((entry) => (
               <li key={entry.id} className="flex gap-2">

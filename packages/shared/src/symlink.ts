@@ -43,7 +43,7 @@ export const resolveSymlinkTarget = (filePath: string) =>
       _tag: "Unknown",
       module: "FileSystem",
       method: "readLink",
-      description: "Too many levels of symbolic links",
+      description: "符号链接层级过多",
       pathOrDescriptor: filePath,
     });
   });

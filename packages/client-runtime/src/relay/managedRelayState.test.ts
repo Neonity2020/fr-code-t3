@@ -392,7 +392,7 @@ describe("createManagedRelayQueryManager", () => {
     registry.get(atom);
     await vi.waitFor(() => {
       expect(readManagedRelaySnapshotState(registry.get(atom)).error).toBe(
-        "Relay returned status for a different environment.",
+        "中继返回了其他环境的状态。",
       );
     });
   });
@@ -442,7 +442,7 @@ describe("createManagedRelayQueryManager", () => {
     registry.get(atom);
     await vi.waitFor(() => {
       expect(readManagedRelaySnapshotState(registry.get(atom)).error).toBe(
-        `Relay rejected the DPoP proof. ${DPOP_UNKNOWN_HINT}`,
+        `中继服务拒绝了 DPoP 证明。 ${DPOP_UNKNOWN_HINT}`,
       );
     });
   });

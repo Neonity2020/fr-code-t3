@@ -137,7 +137,7 @@ vi.mock("./PullRequestCodeTab", () => ({
         })
       }
     >
-      Add to agent
+      添加到智能体
     </button>
   ),
 }));
@@ -241,12 +241,12 @@ async function click(label: string) {
 }
 
 const actions = [
-  "Resolve conflicts",
-  "Ask a question",
-  "Explain this PR",
-  "Fix findings in this thread",
+  "解决冲突",
+  "提问",
+  "解释此拉取请求",
+  "在此会话中修复审查问题",
   "Fix check",
-  "Add to agent",
+  "添加到智能体",
 ];
 
 // The surface ChatView opens for `detail`, and the thread states it can be opened beside. The
@@ -307,22 +307,22 @@ describe.each([
     await act(async () => render());
     const checkout = renderer.root
       .findAllByType("button")
-      .filter((node) => node.props["aria-label"] === "Check out");
+      .filter((node) => node.props["aria-label"] === "检出");
     expect(checkout).toHaveLength(thread === stackThread ? 0 : 1);
   });
 
   it.each(actions)("%s writes to the correct composer", async (action) => {
     if (target) useComposerDraftStore.getState().setPrompt(target, "Keep my draft");
     await act(async () => render());
-    if (action === "Add to agent") await click("Code");
-    await click(target ? action : action.replace("in this thread", "in a thread"));
+    if (action === "添加到智能体") await click("代码");
+    await click(target ? action : action.replace("此会话", "会话"));
     const draft = useComposerDraftStore.getState().getComposerDraft(target ?? newDraftId);
-    if (action === "Resolve conflicts") expect(draft?.prompt).toContain("resolve every conflict");
+    if (action === "解决冲突") expect(draft?.prompt).toContain("resolve every conflict");
     else if (action === "Fix check") expect(draft?.prompt).toContain("Fix the failing check");
-    else if (action.startsWith("Fix findings"))
+    else if (action.startsWith("在此会话中修复审查问题"))
       expect(draft?.prompt).toContain("Fix the actionable findings");
     else expect(draft?.reviewComments?.length).toBeGreaterThan(0);
-    if (action === "Add to agent") {
+    if (action === "添加到智能体") {
       expect(draft?.prompt).toContain("Fix this line");
       expect(draft?.reviewComments).toEqual(
         expect.arrayContaining([expect.objectContaining({ id: "note-1", diff: "+broken()" })]),

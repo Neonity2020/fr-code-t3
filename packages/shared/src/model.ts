@@ -251,17 +251,17 @@ export function getProviderOptionCurrentLabel(
   if (descriptor.type === "boolean") {
     return typeof descriptor.currentValue === "boolean"
       ? descriptor.currentValue
-        ? "On"
-        : "Off"
+        ? "开启"
+        : "关闭"
       : undefined;
   }
   const currentValue = getProviderOptionCurrentValue(descriptor, selection, reportedSelection);
   return (
     descriptor.options.find((option) => option.id === currentValue)?.label ??
     (getReportedOptionValue(descriptor.id, selection, reportedSelection) === "default"
-      ? "Default"
+      ? "默认"
       : descriptor.id === "variant"
-        ? "Unknown"
+        ? "未知"
         : undefined)
   );
 }

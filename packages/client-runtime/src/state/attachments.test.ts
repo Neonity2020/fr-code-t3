@@ -178,25 +178,25 @@ describe("file attachment limits", () => {
 
   it("formats small upload limits without rounding them to zero MB", () => {
     expect(fileAttachmentTooLargeMessage("tiny.txt", 1)).toBe(
-      "'tiny.txt' exceeds the 1 byte attachment limit.",
+      "“tiny.txt”超过 1 byte 的附件大小限制。",
     );
     expect(fileAttachmentTooLargeMessage("small.txt", 1024)).toBe(
-      "'small.txt' exceeds the 1 KB attachment limit.",
+      "“small.txt”超过 1 KB 的附件大小限制。",
     );
     expect(fileAttachmentTooLargeMessage("exact.txt", 1025)).toBe(
-      "'exact.txt' exceeds the 1025 bytes attachment limit.",
+      "“exact.txt”超过 1025 bytes 的附件大小限制。",
     );
     expect(fileAttachmentTooLargeMessage("medium.zip", 512 * 1024)).toBe(
-      "'medium.zip' exceeds the 512 KB attachment limit.",
+      "“medium.zip”超过 512 KB 的附件大小限制。",
     );
   });
 
   it("keeps whole-MB upload limits for standard server caps", () => {
     expect(fileAttachmentTooLargeMessage("one.bin", 1024 * 1024)).toBe(
-      "'one.bin' exceeds the 1 MB attachment limit.",
+      "“one.bin”超过 1 MB 的附件大小限制。",
     );
     expect(fileAttachmentTooLargeMessage("big.zip", 50 * 1024 * 1024)).toBe(
-      "'big.zip' exceeds the 50 MB attachment limit.",
+      "“big.zip”超过 50 MB 的附件大小限制。",
     );
   });
 });

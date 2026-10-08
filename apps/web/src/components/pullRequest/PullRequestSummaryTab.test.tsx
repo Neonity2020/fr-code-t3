@@ -112,26 +112,26 @@ it("toggles checks from their heading and resets sections for another pull reque
   expect(
     renderer.root.findAllByType("span").some((span) => span.children.includes("Unit tests")),
   ).toBe(false);
-  click("Checks");
+  click("检查");
   expect(
     renderer.root.findAllByType("span").some((span) => span.children.includes("Unit tests")),
   ).toBe(true);
-  click("Checks");
-  expect(heading("Checks").props["aria-expanded"]).toBe(false);
-  click("Checks");
-  click("Description");
+  click("检查");
+  expect(heading("检查").props["aria-expanded"]).toBe(false);
+  click("检查");
+  click("描述");
   act(() =>
     renderer.update(render({ ...detail, url: "https://github.com/owner/repo/pull/2", number: 2 })),
   );
-  expect(heading("Checks").props["aria-expanded"]).toBe(false);
-  expect(heading("Description").props["aria-expanded"]).toBe(true);
+  expect(heading("检查").props["aria-expanded"]).toBe(false);
+  expect(heading("描述").props["aria-expanded"]).toBe(true);
 });
 
 it("keeps an unsaved description when collapsed and reopened", () => {
   act(() => {
     renderer = create(render());
   });
-  act(() => renderer.root.findByProps({ "aria-label": "Edit description" }).props.onClick());
+  act(() => renderer.root.findByProps({ "aria-label": "编辑描述" }).props.onClick());
   act(() =>
     renderer.root.findByType("textarea").props.onChange({
       target: { value: "Unsaved description" },
@@ -139,9 +139,9 @@ it("keeps an unsaved description when collapsed and reopened", () => {
       nativeEvent: {},
     }),
   );
-  click("Description");
-  expect(heading("Description").props["aria-expanded"]).toBe(false);
-  click("Description");
+  click("描述");
+  expect(heading("描述").props["aria-expanded"]).toBe(false);
+  click("描述");
   expect(renderer.root.findByType("textarea").props.value).toBe("Unsaved description");
 });
 
@@ -176,7 +176,7 @@ it("opens bot reports in pages without hiding human comments", () => {
   ).toBe(false);
   const group = renderer.root
     .findAllByType("button")
-    .find((button) => button.props["aria-label"] === "12 bot comments")!;
+    .find((button) => button.props["aria-label"] === "12 条机器人评论")!;
   act(() => group.props.onClick({ nativeEvent: {}, preventDefault() {}, stopPropagation() {} }));
   expect(
     renderer.root.findAllByType("p").filter((p) => p.children.join("").startsWith("Bot report")),
@@ -187,7 +187,7 @@ it("opens bot reports in pages without hiding human comments", () => {
   act(() =>
     renderer.root
       .findAllByType("button")
-      .find((button) => button.children.includes(" older bot comment"))!
+      .find((button) => button.children.includes(" 条较早的机器人评论"))!
       .props.onClick(),
   );
   expect(
@@ -201,7 +201,7 @@ it("opens bot reports in pages without hiding human comments", () => {
   act(() =>
     renderer.root
       .findAllByType("button")
-      .find((button) => button.children.includes(" recent bot comments"))!
+      .find((button) => button.children.includes(" 条最近的机器人评论"))!
       .props.onClick(),
   );
   expect(

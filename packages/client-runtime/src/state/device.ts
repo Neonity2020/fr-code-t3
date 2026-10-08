@@ -73,7 +73,7 @@ export function createDeviceEnvironmentAtoms<R, E>(
 
 /** Unknown inventory is distinct from a completed check that found no install. */
 export function deviceToolVersionLabels(tools: DeviceToolVersions | undefined) {
-  if (!tools) return ["Device tool versions have not been checked."];
+  if (!tools) return ["尚未检查设备工具版本。"];
   return (
     [
       ["Device hub", tools.hub],
@@ -81,7 +81,7 @@ export function deviceToolVersionLabels(tools: DeviceToolVersions | undefined) {
     ] as const
   ).map(([name, tool]) => {
     const installed = tool.installedVersions.length ? tool.installedVersions.join(", ") : "none";
-    return `${name}: installed ${installed}; required ${tool.requiredVersion}${tool.runningVersion ? `; running ${tool.runningVersion}` : ""}.`;
+    return `${name}：已安装 ${installed}；需要 ${tool.requiredVersion}${tool.runningVersion ? `; running ${tool.runningVersion}` : ""}。`;
   });
 }
 

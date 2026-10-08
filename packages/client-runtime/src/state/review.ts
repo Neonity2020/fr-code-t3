@@ -46,7 +46,7 @@ export function createReviewEnvironmentAtoms<R, E>(
                   new VcsUnsupportedOperationError({
                     operation: "review.diffFilePatch",
                     kind: "git",
-                    detail: "Diff no longer available. Refresh the comparison.",
+                    detail: "差异已不可用。请刷新比较。",
                   }),
                 );
           }),

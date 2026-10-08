@@ -222,7 +222,7 @@ function failureFromExit<A>(
     failure: {
       error: new ConnectionTransientError({
         reason: "transport",
-        detail: `${target.label} connection failed unexpectedly.`,
+        detail: `${target.label} 连接意外失败。`,
       }),
       attemptSpan: Option.none(),
     },
@@ -643,7 +643,7 @@ export const make = Effect.fn("EnvironmentSupervisor.make")(function* (
           yield* Fiber.interrupt(probe);
           return yield* new ConnectionTransientError({
             reason: "timeout",
-            detail: `${target.label} did not respond to a connection health check.`,
+            detail: `${target.label} 未响应连接健康检查。`,
           });
         }
         if (probeEvent._tag === "ProbeCompleted") {

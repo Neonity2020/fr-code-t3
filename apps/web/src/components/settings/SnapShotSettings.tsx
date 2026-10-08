@@ -57,7 +57,7 @@ import {
 const soundOptionRowClassName = "grid grid-cols-[1fr_auto]";
 
 function captureSettingsError(title: string, error: unknown) {
-  return { title, message: error instanceof Error ? error.message : "Try again." };
+  return { title, message: error instanceof Error ? error.message : "请重试。" };
 }
 
 type ShortcutCheck =
@@ -103,7 +103,7 @@ export function SnapShotSettings() {
     shortcutChanged && candidateConflict === null && shortcutCheck.availability?.available === true;
   const soundSelection = settings.snapShotPlaySound ? settings.snapShotSound : "off";
   const soundLabel =
-    soundSelection === "off" ? "Off" : soundSelection === "soft-pop" ? "Whoosh (Default)" : "Click";
+    soundSelection === "off" ? "关闭" : soundSelection === "soft-pop" ? "轻风声（默认）" : "点击声";
 
   const refreshState = useCallback(async () => {
     const requestId = ++stateRequestIdRef.current;
@@ -234,7 +234,7 @@ export function SnapShotSettings() {
           status: "checked",
           availability: {
             available: false,
-            message: error instanceof Error ? error.message : "Could not check this shortcut.",
+            message: error instanceof Error ? error.message : "无法检查此快捷键。",
           },
         });
       }
@@ -261,7 +261,7 @@ export function SnapShotSettings() {
   });
 
   const shortcutStatus = recording
-    ? "Press your shortcut. Esc cancels."
+    ? "请按下快捷键，按 Esc 取消。"
     : candidateConflict
       ? `FR Code already uses this for "${commandLabel(candidateConflict)}".`
       : shortcutCheck.status === "checking"
@@ -367,7 +367,7 @@ export function SnapShotSettings() {
 
   return (
     <SettingsPageContainer>
-      <SettingsSection id="snap-shot" title="SnapShots">
+      <SettingsSection id="snap-shot" title="快照">
         <SettingsUnavailableGroup message={unavailableMessage}>
           <SettingsRow
             {...searchableSetting("snap-shot-enabled")}
@@ -375,7 +375,7 @@ export function SnapShotSettings() {
             status={
               bridge
                 ? setupBusy && !wizard
-                  ? "Updating capture settings…"
+                  ? "正在更新捕获设置…"
                   : snapShotStatus(state, settings.snapShotEnabled)
                 : undefined
             }
@@ -395,7 +395,7 @@ export function SnapShotSettings() {
                 <Switch
                   checked={settings.snapShotEnabled || Boolean(wizard)}
                   disabled={!captureAvailable || setupBusy}
-                  aria-label="Enable snapshots"
+                  aria-label="启用快照"
                   onCheckedChange={(checked) => {
                     if (!checked) void save({ snapShotEnabled: false });
                     else if (state?.windows) void save({ snapShotEnabled: true });
@@ -409,7 +409,7 @@ export function SnapShotSettings() {
             <>
               <SettingsRow
                 {...searchableSetting("snap-shot-accessibility")}
-                description="Include text and controls when the app makes them available."
+                description="应用支持时，包含文字和控件。"
                 status={snapShotAccessibilityUnavailableMessage(state)}
                 control={
                   <Switch
@@ -420,7 +420,7 @@ export function SnapShotSettings() {
                     disabled={
                       !captureAvailable || Boolean(snapShotAccessibilityUnavailableMessage(state))
                     }
-                    aria-label="Include app text in snapshots"
+                    aria-label="在快照中包含应用文字"
                     onCheckedChange={(checked) => void saveIncludeAccessibility(checked)}
                   />
                 }
@@ -429,8 +429,8 @@ export function SnapShotSettings() {
                 {...searchableSetting("snap-shot-shortcut")}
                 description={
                   state?.linuxBackend === "picker"
-                    ? "Choose a window to capture from any app."
-                    : "Capture the window you're using without switching apps."
+                    ? "在任何应用中选择要捕获的窗口。"
+                    : "无需切换应用即可捕获当前窗口。"
                 }
                 status={managedShortcut ? undefined : shortcutStatus}
                 control={
@@ -441,7 +441,7 @@ export function SnapShotSettings() {
                       disabled={setupBusy}
                       onClick={() => void openSetup("shortcut")}
                     >
-                      Change shortcut
+                      更改快捷键
                     </Button>
                   ) : (
                     <>
@@ -453,7 +453,7 @@ export function SnapShotSettings() {
                             disabled={!canSaveShortcut || setupBusy}
                             onClick={() => void saveShortcut()}
                           >
-                            {setupBusy ? "Saving…" : "Save"}
+                            {setupBusy ? "正在保存…" : "保存"}
                           </Button>
                           <Button
                             size="xs"
@@ -466,7 +466,7 @@ export function SnapShotSettings() {
                               setShortcutCheck({ status: "idle", availability: null });
                             }}
                           >
-                            Cancel
+                            取消
                           </Button>
                         </>
                       ) : state?.mode === "portal" &&
@@ -478,7 +478,7 @@ export function SnapShotSettings() {
                           disabled={setupBusy || state.shortcutPending}
                           onClick={() => void setup("retry-shortcut")}
                         >
-                          Shortcut permissions
+                          快捷键权限
                         </Button>
                       ) : null}
                     </>
@@ -487,7 +487,7 @@ export function SnapShotSettings() {
               />
               <SettingsRow
                 {...searchableSetting("snap-shot-sound")}
-                description="Choose the sound played when capture starts."
+                description="选择开始捕获时播放的声音。"
                 control={
                   <Menu>
                     <MenuTrigger
@@ -497,13 +497,13 @@ export function SnapShotSettings() {
                       disabled={!captureAvailable}
                     >
                       {soundSelection === "off" ? (
-                        "Off"
+                        "关闭"
                       ) : soundSelection === "soft-pop" ? (
                         <>
-                          Whoosh <span className="text-muted-foreground">(Default)</span>
+                          呼啸声 <span className="text-muted-foreground">（默认）</span>
                         </>
                       ) : (
-                        "Click"
+                        "点击声"
                       )}
                     </MenuTrigger>
                     <MenuPopup align="end">
@@ -514,14 +514,14 @@ export function SnapShotSettings() {
                         value={soundSelection}
                       >
                         <MenuRadioItem closeOnClick value="off">
-                          Off
+                          关闭
                         </MenuRadioItem>
                         <div className={soundOptionRowClassName}>
                           <MenuRadioItem closeOnClick value="soft-pop">
-                            Whoosh <span className="text-muted-foreground">(Default)</span>
+                            呼啸声 <span className="text-muted-foreground">（默认）</span>
                           </MenuRadioItem>
                           <MenuItem
-                            aria-label="Play Whoosh"
+                            aria-label="播放轻风声"
                             closeOnClick={false}
                             onClick={() => playSnapShotSound("soft-pop")}
                           >
@@ -530,10 +530,10 @@ export function SnapShotSettings() {
                         </div>
                         <div className={soundOptionRowClassName}>
                           <MenuRadioItem closeOnClick value="camera-shutter">
-                            Click
+                            点击声
                           </MenuRadioItem>
                           <MenuItem
-                            aria-label="Play Click"
+                            aria-label="播放点击声"
                             closeOnClick={false}
                             onClick={() => playSnapShotSound("camera-shutter")}
                           >
@@ -547,26 +547,26 @@ export function SnapShotSettings() {
               />
               <SettingsRow
                 {...searchableSetting("snap-shot-flash")}
-                description="Show a gentle cue on the captured window."
+                description="在捕获窗口上显示轻微提示。"
                 status={feedbackUnavailable}
                 control={
                   <Switch
                     checked={!feedbackUnavailable && settings.snapShotFlash}
                     disabled={!captureAvailable || Boolean(feedbackUnavailable)}
-                    aria-label="Flash captured window"
+                    aria-label="闪烁捕获窗口"
                     onCheckedChange={(checked) => void save({ snapShotFlash: checked })}
                   />
                 }
               />
               <SettingsRow
                 {...searchableSetting("snap-shot-animations")}
-                description="Animate captured windows into your draft."
+                description="以动画将捕获窗口放入草稿。"
                 status={feedbackUnavailable}
                 control={
                   <Switch
                     checked={!feedbackUnavailable && settings.snapShotAnimations}
                     disabled={!captureAvailable || Boolean(feedbackUnavailable)}
-                    aria-label="Animate snapshots"
+                    aria-label="快照动画"
                     onCheckedChange={(checked) => void save({ snapShotAnimations: checked })}
                   />
                 }

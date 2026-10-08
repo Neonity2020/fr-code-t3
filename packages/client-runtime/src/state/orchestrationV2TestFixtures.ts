@@ -16,7 +16,7 @@ const v2ProviderInstanceId = ProviderInstanceId.make("codex");
 
 export const v2Project: OrchestrationProjectShell = {
   id: v2ProjectId,
-  title: "Project",
+  title: "项目",
   workspaceRoot: "/workspace/project",
   repositoryIdentity: null,
   defaultModelSelection: null,
@@ -28,7 +28,7 @@ export const v2Project: OrchestrationProjectShell = {
 export const v2ThreadShell: OrchestrationV2ThreadShell = {
   id: v2ThreadId,
   projectId: v2ProjectId,
-  title: "Thread",
+  title: "会话",
   providerInstanceId: v2ProviderInstanceId,
   modelSelection: { instanceId: v2ProviderInstanceId, model: "gpt-5.4" },
   runtimeMode: "full-access",

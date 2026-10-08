@@ -84,12 +84,12 @@ it("suppresses capture while recording and uses the physical key for shifted dig
 it("lets users replace an unrecognized desktop label without displaying guessed keys", async () => {
   const label = "Use the shortcut assigned in desktop settings";
   let recorder = render(false, label);
-  expect(recorder.input.props.children).toBe("Change shortcut");
-  expect(recorder.input.props["aria-label"]).toBe("Change snapshot shortcut");
+  expect(recorder.input.props.children).toBe("更改快捷键");
+  expect(recorder.input.props["aria-label"]).toBe("更改快照快捷键");
   recorder.input.props.onClick();
   await suppress.mock.results.at(-1)!.value;
   recorder = render(false, label);
-  expect(recorder.input.props.children).toBe("Press shortcut…");
+  expect(recorder.input.props.children).toBe("按下快捷键…");
   recorder.input.props.onKeyDown(event("@", "Digit2", { ctrlKey: true, shiftKey: true }));
   expect(recorded).toHaveBeenCalledWith(
     expect.objectContaining({ key: "2", modKey: true, shiftKey: true }),

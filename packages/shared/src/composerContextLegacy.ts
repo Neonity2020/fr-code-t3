@@ -209,7 +209,7 @@ function previewRecord(body: string, index: number): PreviewAnnotationContextRec
     version: 1,
     contextId: legacyId("preview-annotation", index),
     kind: "preview-annotation",
-    label: page || "Preview annotation",
+    label: page || "预览批注",
     annotationId: read("Id: "),
     pageUrl: pageIsUrl ? page : (elements[0]?.pageUrl ?? ""),
     pageTitle: pageIsUrl ? null : page || null,

@@ -1248,8 +1248,8 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
   const RuntimeModeIcon = runtimeModeOption.icon;
   const interactionModeTooltip =
     props.interactionMode === "plan"
-      ? "Plan mode — click to return to normal build mode"
-      : "Default mode — click to enter plan mode";
+      ? "计划模式，点击返回正常构建模式"
+      : "默认模式，点击进入计划模式";
 
   const interactionModeToggle = props.showInteractionModeToggle ? (
     <>
@@ -1281,7 +1281,7 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
             />
           )}
           <span data-composer-control-label className="sr-only sm:not-sr-only">
-            {props.interactionMode === "plan" ? "Plan" : "Build"}
+            {props.interactionMode === "plan" ? "计划" : "构建"}
           </span>
         </TooltipTrigger>
         <TooltipPopup side="top">{interactionModeTooltip}</TooltipPopup>
@@ -1305,7 +1305,7 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
               <ComposerSelectControl
                 data-composer-shortcut="composer.mode"
                 size={size}
-                aria-label="Runtime mode"
+                aria-label="运行模式"
               />
             }
           >
@@ -2642,7 +2642,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
           type: "slash-command",
           command: "model",
           label: "/model",
-          description: "Switch response model for this thread",
+          description: "切换此会话的回复模型",
         },
         ...(planModeUiEnabled
           ? ([
@@ -2651,14 +2651,14 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                 type: "slash-command",
                 command: "plan",
                 label: "/plan",
-                description: "Switch this thread into plan mode",
+                description: "将此会话切换到计划模式",
               },
               {
                 id: "slash:default",
                 type: "slash-command",
                 command: "default",
                 label: "/default",
-                description: "Switch this thread back to normal build mode",
+                description: "将此会话切换回正常构建模式",
               },
             ] as const)
           : []),
@@ -2676,7 +2676,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         provider: selectedProvider,
         command,
         label: `/${command.name}`,
-        description: command.description ?? command.input?.hint ?? "Run provider command",
+        description: command.description ?? command.input?.hint ?? "运行提供方命令",
       }));
       const query = composerTrigger.query.trim().toLowerCase();
       const skillItems = slashMenuSkills.map((skill) => ({
@@ -2686,9 +2686,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         skill,
         label: `/skill:${skill.name}`,
         description:
-          skill.shortDescription ??
-          skill.description ??
-          (skill.scope ? `${skill.scope} skill` : ""),
+          skill.shortDescription ?? skill.description ?? (skill.scope ? `${skill.scope} 技能` : ""),
       }));
       const visibleProviderSlashCommandItems = providerSlashCommandItems.filter(
         (item) => item.command.name !== "compact" || compactSlashCommandAvailable,
@@ -2709,7 +2707,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         description:
           skill.shortDescription ??
           skill.description ??
-          (skill.scope ? `${skill.scope} skill` : "Run provider skill"),
+          (skill.scope ? `${skill.scope} 技能` : "运行提供方技能"),
       }));
     }
     if (
@@ -2864,7 +2862,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         exactPullRequestLookup.isPending));
   const composerMenuEmptyState = useMemo(() => {
     if (composerTriggerKind === "skill") {
-      return "No skills found. Try / to browse provider commands.";
+      return "未找到技能，可输入 / 浏览提供方命令。";
     }
     if (composerTriggerKind === "pull-request") {
       if (pullRequestProjectId === null || pullRequestRepository === null) {
@@ -2880,9 +2878,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         ? `No pull request matches ${composerTrigger.query}.`
         : "No pull requests found in this repository.";
     }
-    return composerTriggerKind === "path"
-      ? "No matching files or folders."
-      : "No matching command.";
+    return composerTriggerKind === "path" ? "没有匹配的文件或文件夹。" : "没有匹配的命令。";
   }, [
     composerTrigger,
     composerTriggerKind,
@@ -2990,7 +2986,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     projectSelectionRequired ||
     environmentUnavailable !== null ||
     (!composerSendState.hasSendableContent && !showResumeAction);
-  const collapsedComposerPrimaryActionLabel = showResumeAction ? "Resume thread" : "Send message";
+  const collapsedComposerPrimaryActionLabel = showResumeAction ? "继续会话" : "发送消息";
   const showMobilePendingAnswerActions =
     isMobileViewport && !isComposerCollapsedMobile && pendingPrimaryAction !== null;
 
@@ -3143,8 +3139,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       const fail = (reason: string) => {
         toastManager.add({
           type: "error",
-          title: `Couldn't bring ${record.name} into this message`,
-          description: `${reason} Remove the chip or attach the file again.`,
+          title: `无法将 ${record.name} 添加到此消息`,
+          description: `${reason} 请移除附件标记或重新添加文件。`,
         });
       };
       const sourceConnection = readPreparedConnection(sourceEnvironmentId);
@@ -4162,8 +4158,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         event?.preventDefault();
         toastManager.add({
           type: "info",
-          title: "Still compressing a pasted image.",
-          description: "Send again once its thumbnail appears.",
+          title: "仍在压缩粘贴的图片。",
+          description: "请在缩略图出现后再次发送。",
         });
         return;
       }
@@ -4173,8 +4169,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         event?.preventDefault();
         toastManager.add({
           type: "info",
-          title: "Still bringing a pasted attachment into this message.",
-          description: "Send again once its chip resolves.",
+          title: "仍在将粘贴的附件添加到此消息。",
+          description: "请在附件标记就绪后再次发送。",
         });
         return;
       }
@@ -4491,8 +4487,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (filesToVerify.some((file) => file.environmentId !== environmentId)) {
         toastManager.add({
           type: "error",
-          title: "Stashed files belong to another environment",
-          description: "Restore this prompt in the environment that received its files.",
+          title: "暂存文件属于另一个环境",
+          description: "请在接收这些文件的环境中恢复提示词。",
         });
         return;
       }
@@ -4531,9 +4527,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!durable) {
         toastManager.add({
           type: "warning",
-          title: "Restored prompt may reappear in the stash",
-          description:
-            "Browser storage rejected the update, so this entry could still be there after a reload.",
+          title: "恢复的提示词可能重新出现在暂存列表",
+          description: "浏览器拒绝更新存储，重新加载后此条目可能仍然存在。",
           data: { hideCopyButton: true },
         });
       }
@@ -4759,7 +4754,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (missingImageReasons.length > 0) {
         toastManager.add({
           type: "warning",
-          title: "Some attachments were not restored",
+          title: "部分附件未恢复",
           description: missingImageReasons.join(" "),
         });
       }
@@ -4805,9 +4800,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!durable) {
         toastManager.add({
           type: "warning",
-          title: "Stash entry may come back",
-          description:
-            "Browser storage rejected the delete, so this prompt could reappear after a reload.",
+          title: "暂存条目可能重新出现",
+          description: "浏览器拒绝删除存储，重新加载后此提示词可能再次出现。",
           data: { hideCopyButton: true },
         });
       }
@@ -4821,8 +4815,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     if (pendingDraftWork.has(attachmentTargetKeyRef.current)) {
       toastManager.add({
         type: "info",
-        title: "Still bringing a pasted attachment into this message.",
-        description: "Stash again once its chip resolves.",
+        title: "仍在将粘贴的附件添加到此消息。",
+        description: "请在附件标记就绪后重新暂存。",
       });
       return;
     }
@@ -4857,7 +4851,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (composerFileNeedsReattach(file)) {
         toastManager.add({
           type: "error",
-          title: "Attach dropped files again or remove them before stashing",
+          title: "暂存前请重新添加或移除拖放的文件",
         });
         return;
       }
@@ -4865,7 +4859,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (upload?.status !== "ready" || upload.environmentId !== environmentId) {
         toastManager.add({
           type: "error",
-          title: "Wait for file uploads before stashing this prompt",
+          title: "暂存此提示词前请等待文件上传完成",
         });
         return;
       }
@@ -4919,9 +4913,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!written) {
         toastManager.add({
           type: "error",
-          title: "Could not stash this prompt",
-          description:
-            "Browser storage rejected the write, so the composer was left as-is. Free up site data and try again.",
+          title: "无法暂存此提示词",
+          description: "浏览器拒绝写入存储，输入框保持原样。请释放网站存储空间后重试。",
           data: { hideCopyButton: true },
         });
         return;
@@ -4932,9 +4925,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!durable) {
         toastManager.add({
           type: "warning",
-          title: "Stashed prompt will not survive a reload",
-          description:
-            "Browser storage is unavailable, so this stash is kept in memory only for this session.",
+          title: "重新加载后暂存提示词将丢失",
+          description: "浏览器存储不可用，暂存内容仅保留在此会话的内存中。",
           data: { hideCopyButton: true },
         });
       }
@@ -4968,8 +4960,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         }
         toastManager.add({
           type: "warning",
-          title: "Oldest stashed prompt discarded",
-          description: `The stash holds ${MAX_STASH_ENTRIES} prompts; the oldest was removed to make room.`,
+          title: "已移除最早的暂存提示词",
+          description: `暂存列表最多保留 ${MAX_STASH_ENTRIES} 个提示词，已移除最早的一项以腾出空间。`,
           data: { hideCopyButton: true },
         });
       }
@@ -5019,9 +5011,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         if (!imagesDurable && durable && images.length > 0) {
           toastManager.add({
             type: "warning",
-            title: "Stashed images were not saved",
-            description:
-              "The prompt was stashed, but browser storage rejected its images. They will be missing if you reload.",
+            title: "暂存图片未保存",
+            description: "提示词已暂存，但浏览器拒绝存储图片，重新加载后图片将丢失。",
             data: { hideCopyButton: true },
           });
         }
@@ -5031,8 +5022,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         // them evaporate.
         toastManager.add({
           type: "warning",
-          title: "Stashed images did not attach",
-          description: `That prompt was restored or deleted before ${kept.length} image${kept.length === 1 ? "" : "s"} finished saving. Re-attach ${kept.length === 1 ? "it" : "them"} if you still need ${kept.length === 1 ? "it" : "them"}.`,
+          title: "暂存图片未添加成功",
+          description: `${kept.length} 张图片保存完成前，提示词已被恢复或删除。如仍需要这些图片，请重新添加。`,
           data: { hideCopyButton: true },
         });
       }
@@ -5161,7 +5152,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
             key={image.id}
             type="button"
             className="relative size-7 shrink-0 cursor-zoom-in overflow-hidden rounded-md border border-border/70 bg-muted/60"
-            aria-label={`Preview ${image.name}`}
+            aria-label={`预览 ${image.name}`}
             onPointerDown={(event) => event.preventDefault()}
             onClick={() => {
               const preview = buildExpandedImagePreview(composerImages, image.id);
@@ -5196,7 +5187,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
           <button
             type="button"
             className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-border/70 bg-muted/60 font-medium text-secondary-label text-xs tabular-nums outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
-            aria-label={`Show ${String(restingImagePreviewCounts.overflowCount)} more image attachments`}
+            aria-label={`显示另外 ${String(restingImagePreviewCounts.overflowCount)} 个图片附件`}
             onPointerDown={(event) => event.preventDefault()}
             onClick={() => {
               if (isComposerCollapsedMobile) {
@@ -5393,7 +5384,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       className="shrink-0"
     >
       <CircleAlertIcon className="size-4" />
-      {providerSetupInstanceId ? "Open provider settings" : "No provider available"}
+      {providerSetupInstanceId ? "打开提供方设置" : "没有可用的提供方"}
     </ComposerControl>
   ) : (
     <>
@@ -5686,7 +5677,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     ) {
       toastManager.add({
         type: "error",
-        title: "This question cannot accept attachments.",
+        title: "此问题不接受附件。",
       });
       return false;
     }
@@ -5804,10 +5795,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         const attached = storedFiles[0]!;
         toastManager.add({
           type: "info",
-          title: `Large paste attached as ${attached.name}`,
-          description: `${formatAttachmentSize(attached.sizeBytes)} · Use ${
-            isMacPlatform(navigator.platform) ? "⌘⇧V" : "Ctrl+Shift+V"
-          } to keep a large paste inline.`,
+          title: `大段粘贴内容已作为 ${attached.name} 添加`,
+          description: `${formatAttachmentSize(attached.sizeBytes)} · 使用 ${isMacPlatform(navigator.platform) ? "⌘⇧V" : "Ctrl+Shift+V"} 将大段粘贴保留为内联文本。`,
           data: { hideCopyButton: true },
         });
       }
@@ -5980,8 +5969,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       }
       toastManager.add({
         type: "error",
-        title: "Pasted text is too large for this message",
-        description: "Remove some text or an attachment, then paste again.",
+        title: "粘贴的文本超过此消息的大小限制",
+        description: "请移除部分文本或附件后重新粘贴。",
         data: { hideCopyButton: true },
       });
       return true;
@@ -6002,8 +5991,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!wouldExceedInputLimit) return false;
       toastManager.add({
         type: "error",
-        title: "Pasted text is too large to attach",
-        description: "Reduce the clipboard contents or save a smaller excerpt as a file.",
+        title: "粘贴的文本过大，无法添加为附件",
+        description: "请减少剪贴板内容，或将较短的摘录保存为文件。",
         data: { hideCopyButton: true },
       });
       return true;
@@ -6142,8 +6131,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     onInsertRejected: () => {
       toastManager.add({
         type: "error",
-        title: "Unable to add to chat",
-        description: "The composer is busy; try again once it is ready.",
+        title: "无法添加到对话",
+        description: "输入框正忙，请稍后重试。",
       });
     },
   });
@@ -6157,8 +6146,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (refs.some((ref) => ref.environmentId !== environmentId)) {
         toastManager.add({
           type: "error",
-          title: "Use threads from this environment",
-          description: "The agent can only read threads on its own server.",
+          title: "使用此环境的会话",
+          description: "智能体只能读取其所在服务器的会话。",
         });
         return;
       }
@@ -6298,7 +6287,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         if (target === "remote") {
           toastManager.add({
             type: "error",
-            title: "Folders can't be dropped into remote environments",
+            title: "无法将文件夹拖放到远程环境",
           });
           return;
         }
@@ -6307,8 +6296,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
           if (path === null) {
             toastManager.add({
               type: "error",
-              title: `Couldn't get the path of "${folder.name}"`,
-              description: "Type the folder path with @ instead.",
+              title: `无法获取“${folder.name}”的路径`,
+              description: "请改用 @ 输入文件夹路径。",
             });
             continue;
           }
@@ -6715,9 +6704,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                               )}
                               onPointerDown={(event) => event.preventDefault()}
                               onClick={expandMobileComposer}
-                              aria-label="Write custom answer"
+                              aria-label="自定义回答"
                             >
-                              {activePendingProgress?.customAnswer || "Write custom answer"}
+                              {activePendingProgress?.customAnswer || "自定义回答"}
                             </button>
                           ) : null}
                           {activePendingProgress?.activeQuestion?.multiSelect ? (
@@ -6821,17 +6810,14 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                   onPointerDown={(event) => event.preventDefault()}
                   onClick={isChoiceOnlyPendingQuestion ? undefined : expandMobileComposer}
                   disabled={isChoiceOnlyPendingQuestion}
-                  aria-label="Expand composer"
+                  aria-label="展开输入框"
                 >
                   {activePendingProgress
                     ? isChoiceOnlyPendingQuestion
-                      ? "Choose an option above"
-                      : activePendingProgress.customAnswer ||
-                        "Type your own answer, or leave this blank to use the selected option"
+                      ? "请选择上方选项"
+                      : activePendingProgress.customAnswer || "输入自定义回答，或留空使用所选选项"
                     : prompt.trim() ||
-                      (showProviderUnavailable
-                        ? "Enable a provider in Settings"
-                        : "Ask anything...")}
+                      (showProviderUnavailable ? "请在设置中启用提供方" : "尽管提问…")}
                 </button>
                 {collapsedComposerImagePreviews}
                 <button
@@ -6897,8 +6883,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                 {composerSuggestionsVisible && composerMenuItems.length === 0
                   ? isComposerMenuLoading
                     ? composerTriggerKind === "pull-request"
-                      ? "Finding pull request..."
-                      : "Searching workspace files..."
+                      ? "正在查找拉取请求…"
+                      : "正在搜索工作区文件…"
                     : composerMenuEmptyState
                   : ""}
               </div>
@@ -6945,7 +6931,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                           size="icon-xs"
                           className="absolute right-1 top-1"
                           onClick={() => onRemoveEditingQueuedAttachment(attachment.id)}
-                          aria-label={`Remove ${attachment.name}`}
+                          aria-label={`移除 ${attachment.name}`}
                         >
                           <XIcon />
                         </Button>
@@ -7005,7 +6991,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                               <button
                                 type="button"
                                 className="h-full w-full cursor-zoom-in"
-                                aria-label={`Preview ${image.name}`}
+                                aria-label={`预览 ${image.name}`}
                                 onClick={() => {
                                   const preview = buildExpandedImagePreview(
                                     composerImages,
@@ -7046,7 +7032,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                                   render={
                                     <span
                                       role="img"
-                                      aria-label="Draft attachment may not persist"
+                                      aria-label="草稿附件可能无法持久保存"
                                       className="absolute left-1 top-1 inline-flex items-center justify-center rounded bg-background/85 p-0.5 text-warning-foreground"
                                     >
                                       <CircleAlertIcon className="size-3" />
@@ -7054,8 +7040,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                                   }
                                 />
                                 <TooltipPopup side="top">
-                                  Draft attachment could not be saved locally and may be lost on
-                                  navigation.
+                                  无法在本地保存草稿附件，切换页面时可能丢失。
                                 </TooltipPopup>
                               </Tooltip>
                             )}
@@ -7079,7 +7064,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                                           draftTarget: attachmentDraftTarget,
                                         })
                                       }
-                                      aria-label={`Retry upload for ${image.name}`}
+                                      aria-label={`重试上传 ${image.name}`}
                                     />
                                   }
                                 >
@@ -7100,7 +7085,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                                 variant="media-close"
                                 size="icon-xs"
                                 onClick={() => removeComposerImage(image.id)}
-                                aria-label={`Remove ${image.name}`}
+                                aria-label={`移除 ${image.name}`}
                               >
                                 <XIcon />
                               </Button>
@@ -7139,7 +7124,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                           <button
                             type="button"
                             className="flex h-full w-full cursor-zoom-in flex-col items-center justify-center gap-1 px-1 text-white"
-                            aria-label={`Play ${file.name}`}
+                            aria-label={`播放 ${file.name}`}
                             onClick={() => {
                               if (file.file !== null) {
                                 const preview = buildExpandedImagePreview([file], file.id);
@@ -7178,7 +7163,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                                         draftTarget: attachmentDraftTarget,
                                       })
                                     }
-                                    aria-label={`Retry upload for ${file.name}`}
+                                    aria-label={`重试上传 ${file.name}`}
                                   />
                                 }
                               >
@@ -7192,7 +7177,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                             size="icon-xs"
                             className="absolute right-1 top-1"
                             onClick={() => removeComposerFileFromDraft(file.id)}
-                            aria-label={`Remove ${file.name}`}
+                            aria-label={`移除 ${file.name}`}
                           >
                             <XIcon />
                           </Button>
@@ -7236,8 +7221,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                           <span className="shrink-0 text-xs text-secondary-label">
                             {needsReattach
                               ? canReattachFile
-                                ? "Attach again"
-                                : "Remove to send"
+                                ? "重新添加"
+                                : "移除后发送"
                               : upload?.status === "uploading"
                                 ? formatAttachmentUploadProgress(upload.progress)
                                 : formatAttachmentSize(file.sizeBytes)}
@@ -7256,7 +7241,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                                         draftTarget: attachmentDraftTarget,
                                       })
                                     }
-                                    aria-label={`Retry upload for ${file.name}`}
+                                    aria-label={`重试上传 ${file.name}`}
                                   />
                                 }
                               >
@@ -7269,7 +7254,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                             variant="ghost"
                             size="icon-xs"
                             onClick={() => removeComposerFileFromDraft(file.id)}
-                            aria-label={`Remove ${file.name}`}
+                            aria-label={`移除 ${file.name}`}
                           >
                             <XIcon />
                           </Button>
@@ -7331,7 +7316,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                 ) : null}
                 <ComposerContextActionsContext value={composerContextActions}>
                   <ComposerPromptEditor
-                    ariaLabel="Message"
+                    ariaLabel="消息"
                     suggestionListId={composerSuggestionListId}
                     activeSuggestionId={
                       composerSuggestionListVisible && activeComposerMenuItem
@@ -7376,20 +7361,20 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                     onPaste={onComposerPaste}
                     placeholder={
                       isComposerApprovalState
-                        ? "Resolve this approval request to continue"
+                        ? "请处理此审批请求以继续"
                         : activePendingProgress
                           ? isChoiceOnlyPendingQuestion
-                            ? "Choose an option above"
-                            : "Type your own answer, or leave this blank to use the selected option"
+                            ? "请选择上方选项"
+                            : "输入自定义回答，或留空使用所选选项"
                           : showPlanFollowUpPrompt && activeProposedPlan
-                            ? "Add feedback to refine the plan, or leave this blank to implement it"
+                            ? "添加反馈以完善计划，或留空直接实施"
                             : projectSelectionRequired
-                              ? "Choose a project above to start a thread"
+                              ? "请在上方选择项目以新建会话"
                               : showProviderUnavailable
-                                ? "Enable a provider in Settings to send a message"
+                                ? "请在设置中启用提供方以发送消息"
                                 : phase === "disconnected"
                                   ? DISCONNECTED_COMPOSER_PLACEHOLDER
-                                  : "Ask anything, @tag files/folders, $use skills, or / for commands"
+                                  : "尽管提问，使用 @ 引用文件/文件夹、$ 使用技能，或 / 选择命令"
                     }
                     disabled={
                       isConnecting ||
@@ -7501,13 +7486,13 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                               size="icon-sm"
                               onPointerDown={(event) => event.preventDefault()}
                               onClick={() => attachmentInputRef.current?.click()}
-                              aria-label="Attach files"
+                              aria-label="添加文件"
                             />
                           }
                         >
                           <PaperclipIcon />
                         </TooltipTrigger>
-                        <TooltipPopup>Attach files</TooltipPopup>
+                        <TooltipPopup>添加文件</TooltipPopup>
                       </Tooltip>
                     </>
                   ) : null}

@@ -64,18 +64,17 @@ export function ChatGptWelcomeCoordinator() {
       <DialogPopup>
         <DialogHeader>
           <OpenAI className="mb-2 size-8" aria-hidden="true" />
-          <DialogTitle>Your ChatGPT plan is connected</DialogTitle>
+          <DialogTitle>您的 ChatGPT 订阅已连接</DialogTitle>
           <DialogDescription>
-            Eligible usage in FR Code uses your ChatGPT plan. Manage your shared usage and any
-            credit settings in ChatGPT.
+            FR Code 中符合条件的用量使用您的 ChatGPT 订阅。请在 ChatGPT 管理共享用量及额度设置。
           </DialogDescription>
           <p className="text-xs text-muted-foreground">
-            {next?.providerName} on {next?.environmentLabel}
+            {next?.providerName} 在 {next?.environmentLabel}
           </p>
         </DialogHeader>
         <DialogFooter>
           <ChatGptUsageButton />
-          <Button onClick={dismiss}>Continue</Button>
+          <Button onClick={dismiss}>继续</Button>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

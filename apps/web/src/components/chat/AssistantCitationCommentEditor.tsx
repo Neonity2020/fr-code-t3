@@ -46,10 +46,10 @@ export function AssistantCitationCommentEditor({
     >
       <textarea
         ref={inputRef}
-        aria-label="Comment on selected text"
-        aria-description="Enter to save the citation comment; Command/Ctrl+Enter to save and send; Shift+Enter for a new line."
+        aria-label="评论选中文本"
+        aria-description="Enter 保存引用评论；Command/Ctrl + Enter 保存并发送；Shift + Enter 换行。"
         aria-invalid={commentTooLong || undefined}
-        placeholder="Add an optional comment..."
+        placeholder="添加评论（可选）…"
         rows={2}
         className="field-sizing-content block max-h-40 min-h-16 w-full resize-none bg-transparent px-1 py-1.5 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
         value={comment}
@@ -75,8 +75,7 @@ export function AssistantCitationCommentEditor({
       />
       {commentTooLong ? (
         <p role="status" className="pt-1 text-xs text-destructive">
-          Comments can contain up to {ASSISTANT_CITATION_MAX_COMMENT_LENGTH.toLocaleString()}{" "}
-          characters.
+          评论最多可包含 {ASSISTANT_CITATION_MAX_COMMENT_LENGTH.toLocaleString()} 个字符。
         </p>
       ) : null}
       <div className="mt-2 flex items-center justify-end gap-2">
@@ -86,7 +85,7 @@ export function AssistantCitationCommentEditor({
           onPointerDown={(event) => event.preventDefault()}
           onClick={onCancel}
         >
-          Cancel
+          取消
         </Button>
         <Button
           size="xs"
@@ -94,7 +93,7 @@ export function AssistantCitationCommentEditor({
           onPointerDown={(event) => event.preventDefault()}
           onClick={submit}
         >
-          {commentTooLong ? "Shorten comment" : "Save"}
+          {commentTooLong ? "缩短评论" : "保存"}
         </Button>
       </div>
     </div>

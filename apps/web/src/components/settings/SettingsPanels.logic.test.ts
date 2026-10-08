@@ -29,7 +29,7 @@ describe("typography settings restore", () => {
         fontSizeInterface: 18,
         fontFamilyCode: "Fira Code",
       }),
-    ).toEqual(["Interface font", "Code font"]);
+    ).toEqual(["界面字体", "代码字体"]);
   });
 });
 
@@ -161,7 +161,7 @@ describe("formatDiagnosticsDescription", () => {
         otlpMetricsEnabled: true,
         otlpMetricsUrl: "http://localhost:4318/v1/metrics",
       }),
-    ).toBe("Local trace file. Exporting OTEL to http://localhost:4318/v1/{traces,metrics}.");
+    ).toBe("本地跟踪文件。正在向 http://localhost:4318/v1/{traces,metrics} 导出 OTEL。");
   });
 
   it("keeps separate trace and metric URLs when their base paths differ", () => {
@@ -174,7 +174,7 @@ describe("formatDiagnosticsDescription", () => {
         otlpMetricsUrl: "http://localhost:9000/v1/metrics",
       }),
     ).toBe(
-      "Local trace file. Exporting OTEL traces to http://localhost:4318/v1/traces and metrics to http://localhost:9000/v1/metrics.",
+      "本地跟踪文件。正在向 http://localhost:4318/v1/traces 导出 OTEL 跟踪，向 http://localhost:9000/v1/metrics 导出指标。",
     );
   });
 
@@ -185,7 +185,7 @@ describe("formatDiagnosticsDescription", () => {
         otlpTracesEnabled: false,
         otlpMetricsEnabled: false,
       }),
-    ).toBe("Local trace file.");
+    ).toBe("本地跟踪文件.");
   });
 });
 
@@ -274,14 +274,14 @@ describe("getChangedBrowserSettingLabels", () => {
         browserAutoShowFloatingPreview: !DEFAULT_UNIFIED_SETTINGS.browserAutoShowFloatingPreview,
       }),
     ).toEqual([
-      "Browser viewport",
-      "Browser zoom",
-      "Browser appearance",
-      "Recording frame rate",
-      "Recording key presses",
-      "Recording mouse presses",
-      "Open links in",
-      "Floating preview",
+      "浏览器视口",
+      "浏览器缩放",
+      "浏览器外观",
+      "录制帧率",
+      "录制按键",
+      "录制鼠标点击",
+      "链接打开位置",
+      "悬浮预览",
     ]);
   });
 });

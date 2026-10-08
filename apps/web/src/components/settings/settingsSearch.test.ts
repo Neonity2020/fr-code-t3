@@ -16,19 +16,19 @@ import {
 const ITEMS: ReadonlyArray<SettingsSearchItem> = [
   {
     id: "word-wrap",
-    title: "Word wrap",
+    title: "Word Wrap",
     to: "/settings/general",
     searchTerms: ["long lines in code previews"],
   },
   {
     id: "network-access",
-    title: "Network access",
+    title: "Network Access",
     to: "/settings/connections",
     searchTerms: ["remote pairing backend"],
   },
   {
     id: "providers",
-    title: "Providers",
+    title: "提供方",
     to: "/settings/providers",
     searchTerms: ["claude codex agents"],
   },
@@ -45,23 +45,27 @@ const ITEMS: ReadonlyArray<SettingsSearchItem> = [
 ];
 
 describe("searchSettings", () => {
-  it.each(["send shortcut", "multiline", "new line"])("finds Send shortcut for %s", (query) => {
+  it.each(["发送快捷键", "multiline", "new line"])("finds Send shortcut for %s", (query) => {
     expect(searchSettings(query).map((item) => item.id)).toContain("send-shortcut");
   });
 
   it("matches titles, sections, and remembered setting details", () => {
     expect(searchSettings("word", ITEMS).map((item) => item.id)).toEqual(["word-wrap"]);
     expect(searchSettings("network", ITEMS).map((item) => item.id)).toEqual(["network-access"]);
-    expect(searchSettings("connections", ITEMS).map((item) => item.id)).toEqual(["network-access"]);
+    expect(searchSettings("连接", ITEMS).map((item) => item.id)).toEqual(["network-access"]);
     expect(searchSettings("claude", ITEMS).map((item) => item.id)).toEqual(["providers"]);
     expect(searchSettings("long lines", ITEMS).map((item) => item.id)).toEqual(["word-wrap"]);
   });
 
   it("matches normalized title substrings", () => {
     expect(searchSettings("  WORD   WRAP  ", ITEMS).map((item) => item.id)).toEqual(["word-wrap"]);
-    expect(searchSettings("glass").map((item) => item.id)).toEqual(["setting-glass-opacity"]);
-    expect(searchSettings("panel animations").map((item) => item.id)).toEqual(["panel-animations"]);
-    expect(searchSettings("thè\u{1ab0}mes")[0]?.id).toBe("theme");
+    expect(searchSettings("玻璃").map((item) => item.id)).toEqual(["setting-glass-opacity"]);
+    expect(searchSettings("面板动画").map((item) => item.id)).toEqual(["panel-animations"]);
+    expect(
+      searchSettings("thè\u{1ab0}mes", [
+        { id: "theme", title: "Themes", to: "/settings/appearance" },
+      ])[0]?.id,
+    ).toBe("theme");
     const localeLowerCase = vi.spyOn(String.prototype, "toLocaleLowerCase").mockReturnValue("gıt");
     try {
       expect(searchSettings("GIT")[0]?.id).toBe("git-fetch-interval");
@@ -91,7 +95,7 @@ describe("searchSettings", () => {
   });
 
   it("finds settings that used to be reachable only through their section", () => {
-    expect(searchSettings("pull request template")[0]?.id).toBe("follow-change-request-templates");
+    expect(searchSettings("遵循变更请求模板")[0]?.id).toBe("follow-change-request-templates");
     expect(searchSettings("git security keys")[0]?.id).toBe("git-fetch-interval");
     expect(searchSettings("push notifications")[0]?.id).toBe("publish-agent-activity");
     expect(searchSettings("battery saver")[0]?.id).toBe("background-activity");
@@ -103,14 +107,14 @@ describe("searchSettings", () => {
   });
 
   it("lists thread confirmations in panel order", () => {
-    expect(searchSettings("confirmation").map((item) => item.id)).toEqual([
+    expect(searchSettings("确认").map((item) => item.id)).toEqual([
       "unpin-confirmation",
       "archive-confirmation",
       "delete-confirmation",
     ]);
   });
 
-  it.each(["usage providers", "CLIProxyAPI", "CLI proxy hub", "management key"])(
+  it.each(["用量提供方", "CLIProxyAPI", "CLI proxy hub", "management key"])(
     "finds usage-provider management by %s",
     (query) => {
       expect(searchSettings(query)[0]).toMatchObject({
@@ -142,7 +146,7 @@ describe("searchSettings", () => {
   it("registers the WSL backend as a desktop-only setting", () => {
     expect(SETTINGS_SEARCH_ITEMS.find((item) => item.id === "wsl-backend")).toMatchObject({
       id: "wsl-backend",
-      title: "WSL backend",
+      title: "WSL 后端",
       to: "/settings/connections",
       desktopOnly: true,
       windowsOnly: true,
@@ -251,7 +255,7 @@ describe("searchSettings", () => {
       hasThreadAutoSettlement: true,
     });
 
-    expect(searchSettings("auto-settle", available).map((item) => item.id)).toEqual([
+    expect(searchSettings("自动 完成", available).map((item) => item.id)).toEqual([
       "auto-settle-inactive-threads",
       "auto-settle-merged-threads",
       "days-before-auto-settle",
@@ -259,17 +263,17 @@ describe("searchSettings", () => {
   });
 
   it("finds keybinding commands by label, command id, and default key", () => {
-    expect(searchSettings("toggle sidebar")[0]?.id).toBe("keybinding-sidebar.toggle");
+    expect(searchSettings("侧边栏 切换")[0]?.id).toBe("keybinding-sidebar.toggle");
     expect(searchSettings("sidebar.toggle")[0]?.id).toBe("keybinding-sidebar.toggle");
     expect(searchSettings("mod+b")[0]?.id).toBe("keybinding-sidebar.toggle");
-    expect(searchSettings("copy link")[0]).toMatchObject({
+    expect(searchSettings("复制链接")[0]).toMatchObject({
       id: "keybinding-thread.copyReference",
       to: "/settings/keybindings",
     });
   });
 
   it("ranks keybinding commands after other settings", () => {
-    const ids = searchSettings("model").map((item) => item.id);
+    const ids = searchSettings("模型").map((item) => item.id);
     expect(ids[0]).toBe("default-model");
     expect(ids.indexOf("keybinding-modelPicker.toggle")).toBeGreaterThan(
       ids.indexOf("text-generation-model"),
@@ -290,24 +294,24 @@ describe("searchSettings", () => {
   });
 
   it("serves anchor props to panels from the catalog", () => {
-    expect(searchableSetting("word-wrap")).toEqual({ id: "word-wrap", title: "Word wrap" });
-    expect(searchableSetting("archive")).toEqual({ id: "archive", title: "Archived threads" });
+    expect(searchableSetting("word-wrap")).toEqual({ id: "word-wrap", title: "自动换行" });
+    expect(searchableSetting("archive")).toEqual({ id: "archive", title: "已归档会话" });
   });
 
   it("routes appearance settings to their current section", () => {
-    expect(searchSettings("theme")[0]).toMatchObject({
+    expect(searchSettings("主题")[0]).toMatchObject({
       id: "theme",
       to: "/settings/appearance",
     });
-    expect(searchSettings("word wrap")[0]).toMatchObject({
+    expect(searchSettings("自动换行")[0]).toMatchObject({
       id: "word-wrap",
       to: "/settings/appearance",
     });
-    expect(searchSettings("composer context")[0]).toMatchObject({
+    expect(searchSettings("输入框上下文")[0]).toMatchObject({
       id: "composer-context",
       to: "/settings/appearance",
     });
-    expect(searchSettings("environment identification")[0]).toMatchObject({
+    expect(searchSettings("环境标识")[0]).toMatchObject({
       id: "environment-identification",
       to: "/settings/appearance",
       targetId: "appearance-interface",
@@ -317,10 +321,10 @@ describe("searchSettings", () => {
   it("routes conditional window capture settings to the stable toggle row", () => {
     const targets = [
       "capture accessibility data",
-      "capture shortcut",
-      "capture sound",
-      "capture flash",
-      "capture animations",
+      "捕获快捷键",
+      "捕获声音",
+      "捕获闪烁",
+      "捕获动画",
     ].map((query) => {
       const match = searchSettings(query)[0];
       return [match?.id, match?.targetId];
@@ -336,7 +340,7 @@ describe("searchSettings", () => {
   });
 
   it("routes browser recording quality to integrations", () => {
-    const result = searchSettings("recording frame rate")[0];
+    const result = searchSettings("录制帧率")[0];
     expect(result).toMatchObject({
       id: "browser-recording-frame-rate",
       to: "/settings/integrations",
@@ -353,7 +357,7 @@ describe("searchSettings", () => {
   });
 
   it("finds the default browser profile action in the profiles list", () => {
-    expect(searchSettings("default profile")[0]).toMatchObject({
+    expect(searchSettings("默认浏览器配置文件")[0]).toMatchObject({
       id: "browser-default-profile",
       to: "/settings/integrations",
       targetId: "browser-profiles",
@@ -361,12 +365,12 @@ describe("searchSettings", () => {
   });
 
   it.each([
-    ["default model", "default-model", "/settings/general"],
-    ["new threads", "new-threads", "/settings/general"],
-    ["agent browser access", "agent-browser-access", "/settings/integrations"],
-    ["automatically pull", "automatic-pull", "/settings/source-control"],
-    ["actions", "project-actions", "/settings/projects"],
-    ["project overview", "project-overview", "/settings/projects"],
+    ["默认模型", "default-model", "/settings/general"],
+    ["新会话", "new-threads", "/settings/general"],
+    ["智能体浏览器访问", "agent-browser-access", "/settings/integrations"],
+    ["自动拉取", "automatic-pull", "/settings/source-control"],
+    ["操作", "project-actions", "/settings/projects"],
+    ["项目概览", "project-overview", "/settings/projects"],
   ])("routes %s to its owning category", (query, id, to) => {
     expect(searchSettings(query)[0]).toMatchObject({ id, to });
   });
@@ -381,8 +385,8 @@ describe("searchSettings", () => {
       isWslSettingsRowVisible: false,
       hasThreadAutoSettlement: true,
     });
-    expect(searchSettings("writing style", available)[0]?.id).toBe("source-control-writing-style");
-    expect(searchSettings("auto-settle", available)).toHaveLength(3);
+    expect(searchSettings("写作风格", available)[0]?.id).toBe("source-control-writing-style");
+    expect(searchSettings("自动 完成", available)).toHaveLength(3);
   });
 });
 
@@ -400,7 +404,7 @@ describe("settings search targets", () => {
 
   it("treats device-local rows as reachable from every selection", () => {
     const setting = getSettingsSearchTargetScope("time-format")!;
-    expect(setting).toEqual({ title: "Time format", scope: null });
+    expect(setting).toEqual({ title: "时间格式", scope: null });
     expect(isSettingsSearchScopeAvailable(setting.scope, "project")).toBe(true);
     expect(isSettingsSearchScopeAvailable(setting.scope, "all")).toBe(true);
     expect(getSettingsSearchTargetScope("appearance")).toMatchObject({ scope: null });
@@ -476,7 +480,7 @@ describe("auto-settlement search availability", () => {
       isWslSettingsRowVisible: false,
       hasThreadAutoSettlement: availability.eligibleEnvironmentIds.length > 0,
     });
-    expect(searchSettings("auto-settle", items).map((item) => item.id)).toEqual([
+    expect(searchSettings("自动 完成", items).map((item) => item.id)).toEqual([
       "auto-settle-inactive-threads",
       "auto-settle-merged-threads",
       "days-before-auto-settle",

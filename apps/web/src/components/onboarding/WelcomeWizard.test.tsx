@@ -137,9 +137,9 @@ it("enters the workspace after a partial import and warns after navigation finis
   });
   const onDone = vi.fn(() => navigation);
   await act(async () => root.render(<WelcomeWizard localAvailable onDone={onDone} />));
-  await click("Continue");
-  await click("Continue");
-  await click("Import 1 project");
+  await click("继续");
+  await click("继续");
+  await click("导入 1 个项目");
   expect(onDone).toHaveBeenCalledWith({
     environmentId: EnvironmentId.make("test-env"),
     projectId: ProjectId.make("test-project"),
@@ -149,7 +149,7 @@ it("enters the workspace after a partial import and warns after navigation finis
   expect(mocks.toast).toHaveBeenCalledWith(
     expect.objectContaining({
       type: "warning",
-      description: "Imported 28 threads. 1 thread could not be imported.",
+      description: "已导入 28 个会话，1 个会话无法导入。",
     }),
   );
   expect(mocks.toast.mock.invocationCallOrder[0]).toBeGreaterThan(
@@ -161,8 +161,8 @@ it.each([
   [0, 0, null],
   [29, 0, null],
   [1, 0, null],
-  [0, 1, "1 thread could not be imported."],
-  [0, 2, "2 threads could not be imported."],
+  [0, 1, "1 个会话无法导入。"],
+  [0, 2, "2 个会话无法导入。"],
 ] as const)(
   "finishes setup with %i imported and %i skipped threads",
   async (importedCount, skippedCount, warning) => {
@@ -172,14 +172,14 @@ it.each([
     });
     const onDone = vi.fn();
     await act(async () => root.render(<WelcomeWizard localAvailable onDone={onDone} />));
-    await click("Continue");
-    await click("Continue");
-    await click("Import 1 project");
+    await click("继续");
+    await click("继续");
+    await click("导入 1 个项目");
     expect(onDone).toHaveBeenCalledOnce();
     if (warning === null && importedCount > 0) {
       expect(mocks.toast).toHaveBeenCalledWith({
         type: "success",
-        title: `Imported ${importedCount} ${importedCount === 1 ? "thread" : "threads"}`,
+        title: `已导入 ${importedCount} 个会话`,
       });
     } else if (warning === null) {
       expect(mocks.toast).not.toHaveBeenCalled();
@@ -195,20 +195,20 @@ it("keeps setup open when saving completion fails and preserves the import warni
   mocks.complete.mockRejectedValueOnce(new Error("settings unavailable"));
   const onDone = vi.fn();
   await act(async () => root.render(<WelcomeWizard localAvailable onDone={onDone} />));
-  await click("Continue");
-  await click("Continue");
-  await click("Import 1 project");
+  await click("继续");
+  await click("继续");
+  await click("导入 1 个项目");
   expect(onDone).not.toHaveBeenCalled();
   expect(mocks.toast).toHaveBeenCalledWith(
-    expect.objectContaining({ type: "error", title: "Could not finish setup" }),
+    expect.objectContaining({ type: "error", title: "无法完成设置" }),
   );
-  await click("Do not import projects");
+  await click("不导入项目");
   expect(onDone).toHaveBeenCalledOnce();
   expect(mocks.importThreads).toHaveBeenCalledOnce();
   expect(mocks.toast).toHaveBeenLastCalledWith(
     expect.objectContaining({
       type: "warning",
-      description: "Imported 28 threads. 1 thread could not be imported.",
+      description: "已导入 28 个会话，1 个会话无法导入。",
     }),
   );
 });

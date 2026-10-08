@@ -29,20 +29,20 @@ const VERDICTS: ReadonlyArray<{
 }> = [
   {
     value: "comment",
-    label: "Comment",
+    label: "评论",
     sent: "Review submitted",
     icon: <MessageSquareIcon className="size-3" />,
   },
   {
     value: "approve",
-    label: "Approve",
+    label: "批准",
     sent: "Pull request approved",
     icon: <CheckIcon className="size-3" />,
   },
   {
     value: "request-changes",
-    label: "Request changes",
-    sent: "Changes requested",
+    label: "要求修改",
+    sent: "要求修改",
     icon: <XCircleIcon className="size-3" />,
   },
 ];
@@ -101,7 +101,7 @@ export function PullRequestReviewForm({
     onPendingChange(false);
     if (result._tag === "Failure") {
       // The draft is kept: whatever went wrong, retyping the review is not the answer.
-      toastManager.add({ type: "error", title: "The review could not be submitted" });
+      toastManager.add({ type: "error", title: "无法提交审查" });
       return;
     }
     // More remarks may have been added while the host was accepting this snapshot. Leave those,
@@ -129,10 +129,10 @@ export function PullRequestReviewForm({
         value={body}
         placeholder={
           requestChangesSummaryRequired && verdicts.includes("request-changes")
-            ? "Summarize your review (required to request changes)"
-            : "Summarize your review (optional)"
+            ? "总结审查意见（要求修改时必填）"
+            : "总结审查意见（可选）"
         }
-        aria-label="Review summary"
+        aria-label="审查摘要"
         onChange={(event) => setSummary(reviewKey, event.target.value)}
       />
       <div className="mt-2 flex justify-between gap-2">
@@ -143,7 +143,7 @@ export function PullRequestReviewForm({
             if (value !== null) setRequestedVerdict(value);
           }}
         >
-          <SelectTrigger size="xs" className="w-auto min-w-0" aria-label="Review verdict">
+          <SelectTrigger size="xs" className="w-auto min-w-0" aria-label="审查结论">
             <span className="flex items-center gap-1.5">
               {selectedVerdict?.icon}
               {selectedVerdict?.label}
@@ -167,7 +167,7 @@ export function PullRequestReviewForm({
             if (selectedVerdict !== undefined) void submit(selectedVerdict);
           }}
         >
-          {pending ? "Submitting..." : "Submit review"}
+          {pending ? "正在提交…" : "提交审查"}
         </Button>
       </div>
     </>

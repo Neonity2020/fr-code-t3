@@ -55,7 +55,7 @@ export function hasDismissedResumeCompaction(
     return Object.entries(answers).some(
       ([question, answer]) =>
         isClaudeResumeCompactionQuestion(question) &&
-        answer === CLAUDE_RESUME_COMPACTION_NEVER_ANSWER,
+        (answer === CLAUDE_RESUME_COMPACTION_NEVER_ANSWER || answer === "Don't ask again"),
     );
   });
 }
@@ -102,11 +102,11 @@ export function formatContextWindowCompactionMessage(
   autoCompactThreshold?: number | null,
 ): string {
   if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
-    return `Compacts automatically at ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
+    return `达到 ${autoCompactThreshold.toLocaleString("en-US")} 个 token 时自动压缩。`;
   }
   return modelDisplayName
-    ? `Context for ${modelDisplayName} compacts automatically when needed.`
-    : "Context compacts automatically when needed.";
+    ? `${modelDisplayName} 的上下文会在需要时自动压缩。`
+    : "上下文会在需要时自动压缩。";
 }
 
 /**

@@ -21,7 +21,7 @@ export class PreferredEditorEnvironmentRequiredError extends Schema.TaggedError<
   },
 ) {
   override get message(): string {
-    return `Cannot open ${this.targetPath} because no environment is selected.`;
+    return `未选择环境，无法打开 ${this.targetPath}。`;
   }
 }
 

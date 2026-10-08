@@ -25,8 +25,6 @@ describe("summarizeLoadPreferences", () => {
   });
 
   it("lists only the machines that differ from Normal, in list order", () => {
-    expect(summarizeLoadPreferences(machines, { b: 100, c: 0 })).toBe(
-      "bb-1 prefer · ProMini manual only",
-    );
+    expect(summarizeLoadPreferences(machines, { b: 100, c: 0 })).toBe("bb-1 优先 · ProMini 仅手动");
   });
 });

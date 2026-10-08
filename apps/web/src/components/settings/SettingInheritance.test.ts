@@ -17,7 +17,7 @@ describe("settingInheritanceLayers", () => {
     );
     expect(layers.map((layer) => [layer.label, layer.value, layer.effective])).toEqual([
       ["Laptop", "Inherits", false],
-      ["Default", "Off", true],
+      ["默认", "关闭", true],
     ]);
   });
 
@@ -34,9 +34,9 @@ describe("settingInheritanceLayers", () => {
       "defaultAutoPull",
     );
     expect(layers.map((layer) => [layer.label, layer.value, layer.effective])).toEqual([
-      ["Project", "Off", true],
-      ["Laptop", "On", false],
-      ["Default", "Off", false],
+      ["项目", "关闭", true],
+      ["Laptop", "开启", false],
+      ["默认", "关闭", false],
     ]);
     const inherited = settingInheritanceLayers(
       {
@@ -50,8 +50,8 @@ describe("settingInheritanceLayers", () => {
     );
     expect(inherited.map((layer) => [layer.value, layer.effective])).toEqual([
       ["Inherits", false],
-      ["On", true],
-      ["Off", false],
+      ["开启", true],
+      ["关闭", false],
     ]);
   });
 
@@ -68,10 +68,10 @@ describe("settingInheritanceLayers", () => {
       "defaultThreadEnvMode",
     );
     expect(fromFile.map((layer) => [layer.label, layer.value, layer.effective])).toEqual([
-      ["Project", "Inherits", false],
+      ["项目", "Inherits", false],
       ["Laptop", "Inherits", false],
-      ["t3.json", "New worktree", true],
-      ["Default", "Current checkout", false],
+      ["t3.json", "新工作树", true],
+      ["默认", "当前工作目录", false],
     ]);
     const settings = { ...DEFAULT_SERVER_SETTINGS, defaultThreadEnvMode: "local" as const };
     const fromEnvironment = settingInheritanceLayers(
@@ -86,9 +86,9 @@ describe("settingInheritanceLayers", () => {
     );
     expect(fromEnvironment.map((layer) => [layer.value, layer.effective])).toEqual([
       ["Inherits", false],
-      ["Current checkout", true],
+      ["当前工作目录", true],
       ["Inherits", false],
-      ["Current checkout", false],
+      ["当前工作目录", false],
     ]);
   });
 });

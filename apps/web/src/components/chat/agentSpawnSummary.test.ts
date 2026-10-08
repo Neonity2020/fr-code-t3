@@ -9,14 +9,14 @@ describe("deriveAgentSpawnSummary", () => {
   it("counts a native batch without claiming the number of children", () => {
     expect(deriveAgentSpawnSummary({ agents: [batch("running")], agentCount: 1 })).toEqual({
       live: true,
-      lead: "Launched 1 subagent batch",
-      status: "1 working",
+      lead: "已启动 1 批子智能体",
+      status: "1 个正在工作",
       tone: "working",
     });
     expect(deriveAgentSpawnSummary({ agents: [batch("idle")], agentCount: 1 })).toEqual({
       live: false,
-      lead: "Launched 1 subagent batch",
-      status: "1 idle",
+      lead: "已启动 1 批子智能体",
+      status: "1 个空闲",
       tone: "inactive",
     });
   });
@@ -27,15 +27,15 @@ describe("deriveAgentSpawnSummary", () => {
         agents: [agent("running"), batch("running"), batch("idle")],
         agentCount: 3,
       }).lead,
-    ).toBe("Launched 1 subagent and 2 batches");
+    ).toBe("已启动 1 个子智能体 和 2 批子智能体");
   });
 
   it.each([
-    ["idle", "1 idle", "inactive"],
-    ["cancelled", "1 stopped", "inactive"],
-    ["interrupted", "1 stopped", "inactive"],
-    ["failed", "1 failed", "failed"],
-    ["completed", "✓ completed", "completed"],
+    ["idle", "1 个空闲", "inactive"],
+    ["cancelled", "1 个已停止", "inactive"],
+    ["interrupted", "1 个已停止", "inactive"],
+    ["failed", "1 个失败", "failed"],
+    ["completed", "✓ 已完成", "completed"],
   ] as const)("reports %s accurately alongside a completed agent", (state, status, tone) => {
     expect(
       deriveAgentSpawnSummary({ agents: [agent("completed"), agent(state)], agentCount: 2 }),
@@ -44,7 +44,7 @@ describe("deriveAgentSpawnSummary", () => {
 
   it("does not claim completion when the roster is missing a member", () => {
     expect(deriveAgentSpawnSummary({ agents: [agent("completed")], agentCount: 2 })).toMatchObject({
-      status: "Status unavailable",
+      status: "状态不可用",
       tone: "inactive",
     });
   });
@@ -56,12 +56,12 @@ describe("deriveAgentSpawnSummary", () => {
         agentCount: 1,
         coordinatorStatus: "running",
       }),
-    ).toMatchObject({ live: true, status: "working", tone: "working" });
+    ).toMatchObject({ live: true, status: "正在工作", tone: "working" });
   });
 
   it.each([
-    ["failed", "Workflow failed", "failed"],
-    ["cancelled", "Workflow stopped", "inactive"],
+    ["failed", "工作流失败", "failed"],
+    ["cancelled", "工作流已停止", "inactive"],
   ] as const)(
     "preserves a %s workflow outcome when its children completed",
     (coordinatorStatus, status, tone) => {

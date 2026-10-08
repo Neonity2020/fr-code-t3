@@ -19,7 +19,7 @@ export class DesktopUpdateStateReadError extends Schema.TaggedError<DesktopUpdat
   },
 ) {
   override get message(): string {
-    return `Failed to read the initial desktop update state after ${this.attemptCount} attempts.`;
+    return `尝试 ${this.attemptCount} 次后仍无法读取桌面更新的初始状态。`;
   }
 }
 

@@ -517,7 +517,7 @@ export function buildLocalDraftThread(
   return presentThreadShell(draftThread.environmentId, {
     id: threadId,
     projectId: draftThread.projectId,
-    title: "New thread",
+    title: "新建会话",
     providerInstanceId: fallbackModelSelection.instanceId,
     modelSelection: fallbackModelSelection,
     runtimeMode: draftThread.runtimeMode,
@@ -766,7 +766,7 @@ export async function prepareRevertedMessageAttachments(input: {
       const url = resolveAssetUrl(input.httpBaseUrl, result.value.relativeUrl);
       if (url === null) throw new Error("The environment returned an invalid attachment URL.");
       const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-      if (!response.ok) throw new Error(`Could not restore attachment: ${attachment.name}`);
+      if (!response.ok) throw new Error(`无法恢复附件：${attachment.name}`);
       return new File([await response.blob()], attachment.name, { type: attachment.mimeType });
     }),
   );
@@ -897,13 +897,13 @@ export function buildExpiredTerminalContextToastCopy(
   const noun = count === 1 ? "Expired terminal context" : "Expired terminal contexts";
   if (variant === "empty") {
     return {
-      title: `${noun} won't be sent`,
-      description: "Remove it or re-add it to include terminal output.",
+      title: `不会发送 ${noun}`,
+      description: "请移除或重新添加，以包含终端输出。",
     };
   }
   return {
-    title: `${noun} omitted from message`,
-    description: "Re-add it if you want that terminal output included.",
+    title: `消息中已省略 ${noun}`,
+    description: "如需包含该终端输出，请重新添加。",
   };
 }
 
@@ -1069,8 +1069,8 @@ export function getStartedThreadModelChangeBlockReason(input: {
       return null;
     }
     return {
-      title: "Start a new chat to switch providers",
-      description: "This thread does not support switching providers after it has started.",
+      title: "新建对话以切换提供方",
+      description: "此会话开始后不支持切换提供方。",
     };
   }
   const currentProvider = input.providers.find(
@@ -1086,8 +1086,8 @@ export function getStartedThreadModelChangeBlockReason(input: {
     return null;
   }
   return {
-    title: "Start a new chat to change models",
-    description: "This provider does not allow switching models after a conversation has started.",
+    title: "新建对话以更改模型",
+    description: "此提供方不允许在对话开始后切换模型。",
   };
 }
 
@@ -1121,7 +1121,7 @@ export async function waitForRevertedMessage(
   const readProjection = () => Option.getOrNull(appAtomRegistry.get(threadAtom).data);
   const initial = readProjection();
   if (!initial?.messages.some((message) => message.id === messageId)) {
-    throw new Error("The message to rewind is no longer available.");
+    throw new Error("要回退的消息已不可用。");
   }
   const messageRunId = initial.messages.find((message) => message.id === messageId)?.runId;
   return new Promise<void>((resolve, reject) => {

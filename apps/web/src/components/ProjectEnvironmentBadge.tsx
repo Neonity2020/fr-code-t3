@@ -30,7 +30,7 @@ export function ProjectEnvironmentBadge(props: {
     .filter((label, index, all) => all.indexOf(label) === index)
     .join(", ");
   const alsoHere = remoteMembers.length < props.group.memberProjects.length;
-  const description = `${alsoHere ? "Also on" : "On"} ${labels}`;
+  const description = `${alsoHere ? "也位于" : "位于"} ${labels}`;
   return (
     <Tooltip>
       <TooltipTrigger

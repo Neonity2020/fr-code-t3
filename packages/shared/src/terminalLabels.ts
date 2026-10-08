@@ -4,7 +4,7 @@ import type { TerminalSummary } from "@t3tools/contracts";
 export function getTerminalLabel(terminalId: string): string {
   const numericSuffix = /^term(?:inal)?-(\d+)$/i.exec(terminalId)?.[1];
   if (numericSuffix) {
-    return `Terminal ${numericSuffix}`;
+    return `终端 ${numericSuffix}`;
   }
 
   return terminalId;

@@ -82,8 +82,6 @@ describe("discardComposerDraft", () => {
     await undoNotice().undo();
     expect(useComposerDraftStore.getState().getComposerDraft(threadRef)?.prompt).toBe("new reply");
     expect(releaseDraftAttachments).toHaveBeenCalledOnce();
-    expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Failed to restore draft" }),
-    );
+    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "恢复草稿失败" }));
   });
 });

@@ -28,7 +28,7 @@ export function ProjectsSettings() {
         </SettingsPageContainer>
       ) : (
         <SettingsScopeNotice target="project">
-          Choose a project to manage its name, icon, checkouts and actions.
+          选择项目以管理名称、图标、工作目录和操作。
         </SettingsScopeNotice>
       )}
     </div>

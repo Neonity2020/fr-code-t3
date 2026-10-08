@@ -114,7 +114,7 @@ export function resolveDesktopAppBranding(input: {
   return {
     baseName: APP_BASE_NAME,
     stageLabel,
-    displayName: `${APP_BASE_NAME} (${stageLabel})`,
+    displayName: `${APP_BASE_NAME} (${stageLabel === "Dev" ? "开发版" : stageLabel === "Nightly" ? "每日构建版" : "测试版"})`,
   };
 }
 

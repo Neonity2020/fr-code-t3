@@ -90,7 +90,7 @@ export class HyprlandCaptureSetup {
       if (!installed)
         return {
           status: "not-installed",
-          message: "Install the bundled helper to capture the window you're using.",
+          message: "安装内置辅助程序以截取当前窗口。",
         };
       const bundle = await regularFile(this.paths.bundle);
       if (!bundle)
@@ -100,18 +100,17 @@ export class HyprlandCaptureSetup {
       if (!installed.equals(bundle))
         return {
           status: "update-required",
-          message: "Update the bundled capture helper to continue.",
+          message: "请更新内置截图辅助程序以继续。",
         };
       return {
         status: "ready",
-        message:
-          "Helper ready. Hyprland may ask for screen-sharing permission on your first capture.",
+        message: "辅助程序已就绪。首次截图时，Hyprland 可能请求屏幕共享权限。",
         ...decodeCapabilities(await run(hyprlandCaptureExecutable(this.paths), ["check"])),
       };
     } catch (error) {
       return {
         status: "error",
-        message: error instanceof Error ? error.message : "Couldn't check Hyprland capture access.",
+        message: error instanceof Error ? error.message : "无法检查 Hyprland 截图权限。",
       };
     }
   }

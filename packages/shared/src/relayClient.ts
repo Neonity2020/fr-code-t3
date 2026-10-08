@@ -288,7 +288,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
         (cause) =>
           new RelayClientInstallError({
             reason: "download_failed",
-            message: "Could not download the relay client.",
+            message: "无法下载中继客户端。",
             cause,
           }),
       ),
@@ -299,7 +299,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
           (cause) =>
             new RelayClientInstallError({
               reason: "download_failed",
-              message: "Could not read the downloaded relay client binary.",
+              message: "无法读取下载的中继客户端可执行文件。",
               cause,
             }),
         ),
@@ -311,7 +311,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
         (cause) =>
           new RelayClientInstallError({
             reason: "validation_failed",
-            message: "Could not verify the downloaded relay client checksum.",
+            message: "无法验证下载的中继客户端校验和。",
             cause,
           }),
       ),
@@ -319,7 +319,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
     if (Hex.encode(checksum) !== asset.sha256) {
       return yield* new RelayClientInstallError({
         reason: "invalid_checksum",
-        message: "Downloaded relay client checksum did not match the pinned release.",
+        message: "下载的中继客户端校验和与指定版本不匹配。",
       });
     }
     return bytes;
@@ -346,7 +346,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
     }
     return yield* new RelayClientInstallError({
       reason: "install_locked",
-      message: "Another relay client installation is still in progress.",
+      message: "另一项中继客户端安装仍在进行。",
     });
   });
 
@@ -360,13 +360,13 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
     if (Option.isSome(config.executableOverride)) {
       return yield* new RelayClientInstallError({
         reason: "override_missing",
-        message: `${CLOUDFLARED_PATH_ENV_NAME} does not point to an executable file.`,
+        message: `${CLOUDFLARED_PATH_ENV_NAME} 未指向可执行文件。`,
       });
     }
     if (!releaseAsset) {
       return yield* new RelayClientInstallError({
         reason: "unsupported_platform",
-        message: `FR Code does not provide a managed relay client binary for ${platform}-${arch}.`,
+        message: `FR Code 不提供适用于 ${platform}-${arch} 的托管中继客户端可执行文件。`,
       });
     }
 
@@ -384,7 +384,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
           Effect.fail(
             new RelayClientInstallError({
               reason: "write_failed",
-              message: "Could not acquire the relay client installation lock.",
+              message: "无法获取中继客户端安装锁。",
               cause,
             }),
           ),
@@ -450,7 +450,7 @@ export const makeCloudflaredRelayClient = Effect.fn("cloudflared.make")(function
           Effect.fail(
             new RelayClientInstallError({
               reason: "write_failed",
-              message: "Could not install the relay client.",
+              message: "无法安装中继客户端。",
               cause,
             }),
           ),

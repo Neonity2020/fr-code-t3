@@ -3174,18 +3174,18 @@ describe("ClaudeAdapterV2 background wake turns", () => {
       assert.equal(image?.type, "dynamic_tool");
       if (image?.type === "dynamic_tool")
         assert.equal(image.viewedImagePath, "/workspace/reference.png");
-      assert.equal(image?.title, "Read /workspace/reference.png");
+      assert.equal(image?.title, "读取了 /workspace/reference.png");
       assert.equal(
         items.find((item) => item.nativeItemRef?.nativeId === "text")?.title,
-        "Read /workspace/README.md",
+        "读取了 /workspace/README.md",
       );
       assert.equal(
         items.find((item) => item.nativeItemRef?.nativeId === "search")?.title,
-        "Searched TODO in src",
+        "在 src 中搜索了 TODO",
       );
       assert.equal(
         items.find((item) => item.nativeItemRef?.nativeId === "skill")?.title,
-        "Skill: full-send",
+        "技能：full-send",
       );
       for (const item of items.filter((item) => item.nativeItemRef?.nativeId !== "image"))
         assert.notProperty(item, "viewedImagePath");

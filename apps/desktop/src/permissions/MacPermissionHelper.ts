@@ -112,7 +112,7 @@ export class MacPermissionHelper {
       fullscreenable: false,
       alwaysOnTop: true,
       skipTaskbar: true,
-      title: `Set up ${MAC_PERMISSION_TITLES[permission]}`,
+      title: `配置 ${MAC_PERMISSION_TITLES[permission]}`,
       webPreferences: { preload, sandbox: true, contextIsolation: true, nodeIntegration: false },
     });
     this.window = window;

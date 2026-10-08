@@ -138,21 +138,21 @@ export class DesktopSnapShotError extends Schema.TaggedError<DesktopSnapShotErro
   override get message(): string {
     switch (this.operation) {
       case "list-pending":
-        return "Could not list pending snapshots.";
+        return "无法列出待处理的截图。";
       case "read":
-        return "Could not read the snapshot.";
+        return "无法读取截图。";
       case "acknowledge":
-        return "Could not remove the snapshot.";
+        return "无法删除截图。";
       case "unsupported":
-        return "SnapShots are not supported here.";
+        return "此处不支持截图。";
       case "disabled":
-        return "Enable SnapShots in Settings first.";
+        return "请先在设置中启用截图。";
       case "no-window-selected":
-        return "No window was selected.";
+        return "未选择窗口。";
       case "window-unavailable":
-        return "The active window is not available for capture.";
+        return "无法截取当前窗口。";
       case "capture":
-        return "Could not capture the active window.";
+        return "无法截取当前窗口。";
     }
   }
 }
@@ -230,12 +230,12 @@ export class DesktopSnapShotSetupError extends Schema.TaggedError<DesktopSnapSho
         : kde
           ? "Helper setup requires a KDE Plasma Wayland session outside a sandbox."
           : "Extension setup requires a GNOME Wayland session outside a sandbox.";
-    if (this.reason === "shortcut-permissions") return "Could not open shortcut permissions.";
+    if (this.reason === "shortcut-permissions") return "无法打开快捷键权限设置。";
     return hyprland
-      ? "Could not set up Hyprland capture."
+      ? "无法配置 Hyprland 截图功能。"
       : kde
-        ? "Could not set up KDE capture."
-        : "Could not set up the GNOME extension.";
+        ? "无法配置 KDE 截图功能。"
+        : "无法配置 GNOME 扩展。";
   }
 }
 
@@ -678,12 +678,12 @@ function observedPairMessage(
 ): string {
   const modifier = snapShotShortcutModifierPair(shortcut);
   const label = snapShotModifierPairLabel(modifier, platform === "darwin");
-  const base = `${label} is observed and cannot be reserved exclusively.`;
+  const base = `${label} 的按键可被监听，但无法独占。`;
   if (modifier === "meta" && platform !== "darwin") {
-    return `${base} This key can also open the system's own menu.`;
+    return `${base} 此按键也可能打开系统菜单。`;
   }
   if (modifier === "alt" && platform === "win32") {
-    return `${base} This key can also activate app menu bars.`;
+    return `${base} 此按键也可能激活应用菜单栏。`;
   }
   return base;
 }
@@ -693,13 +693,13 @@ function probeGlobalShortcut(accelerator: string): DesktopSnapShotShortcutAvaila
     if (!Electron.globalShortcut.register(accelerator, () => undefined)) {
       return {
         available: false,
-        message: "This shortcut is already used by the system or another app.",
+        message: "此快捷键已被系统或其他应用占用。",
       };
     }
     Electron.globalShortcut.unregister(accelerator);
     return { available: true, message: null };
   } catch {
-    return { available: false, message: "The system could not register this shortcut." };
+    return { available: false, message: "系统无法注册此快捷键。" };
   }
 }
 
@@ -1011,18 +1011,18 @@ export const make = Effect.gen(function* () {
   ) {
     const mode = captureMode(environment.platform);
     if (mode === "unavailable") {
-      return { available: false, message: "SnapShots are not supported on this platform." };
+      return { available: false, message: "此平台不支持截图。" };
     }
     if (mode === "portal" && niriSocketPath()) {
       return {
         available: false,
-        message: "Configure the capture shortcut in your Niri config, not in FR Code.",
+        message: "请在 Niri 配置中设置截图快捷键，而不是在 FR Code 中设置。",
       };
     }
     if (mode === "portal" && isHyprlandCaptureSession()) {
       return {
         available: false,
-        message: "Change the capture binding in your Hyprland config, then save it.",
+        message: "请在 Hyprland 配置中更改截图快捷键，然后保存。",
       };
     }
     if (isModifierPairShortcut(shortcut)) {
@@ -1054,11 +1054,11 @@ export const make = Effect.gen(function* () {
         Effect.match({
           onSuccess: () => ({
             available: true,
-            message: "Your desktop will confirm this shortcut when you save it.",
+            message: "保存时，桌面环境会请求确认此快捷键。",
           }),
           onFailure: (error) => ({
             available: false,
-            message: error.cause instanceof Error ? error.cause.message : "Unsupported shortcut.",
+            message: error.cause instanceof Error ? error.cause.message : "不支持此快捷键。",
           }),
         }),
       );
@@ -1139,8 +1139,8 @@ export const make = Effect.gen(function* () {
         message:
           mode === "unavailable"
             ? environment.platform === "linux"
-              ? "SnapShots require a Wayland session. X11 capture is not supported."
-              : "SnapShots are not supported on this platform."
+              ? "截图需要 Wayland 会话，不支持 X11。"
+              : "此平台不支持截图。"
             : null,
       });
       return;
@@ -1187,8 +1187,8 @@ export const make = Effect.gen(function* () {
         shortcutConfigPath: niriCaptureConfigPath(),
         shortcutActionRegistered: registered,
         shortcutMessage: registered
-          ? "Set up the shortcut to add it to your Niri config."
-          : "Could not start the Niri capture endpoint. Another FR Code instance may be using it.",
+          ? "请配置快捷键以将其添加到 Niri 配置。"
+          : "无法启动 Niri 截图服务，另一个 FR Code 实例可能正在使用它。",
         message: null,
       });
       return;
@@ -1245,9 +1245,7 @@ export const make = Effect.gen(function* () {
           Ref.update(stateRef, (state) => ({
             ...state,
             shortcutMessage:
-              error.cause instanceof Error
-                ? error.cause.message
-                : "Could not connect to your desktop's shortcut service.",
+              error.cause instanceof Error ? error.cause.message : "无法连接桌面的快捷键服务。",
           })),
         ),
       );
@@ -1532,7 +1530,7 @@ export const make = Effect.gen(function* () {
                   message:
                     error.cause instanceof Error
                       ? error.cause.message
-                      : "Could not check desktop capture support. Check your desktop session and try again.",
+                      : "无法检查桌面截图支持。请检查桌面会话后重试。",
                 }),
               ),
             )

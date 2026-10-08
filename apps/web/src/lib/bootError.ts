@@ -9,7 +9,7 @@ export function showBootError(error: unknown) {
   content.setAttribute("role", "alert");
 
   const message = document.createElement("p");
-  message.textContent = "FR Code could not load.";
+  message.textContent = "无法加载 FR Code。";
   content.append(message);
 
   if (import.meta.env.DEV && error instanceof Error) {
@@ -20,7 +20,7 @@ export function showBootError(error: unknown) {
 
   const reload = document.createElement("button");
   reload.type = "button";
-  reload.textContent = "Reload";
+  reload.textContent = "重新加载";
   reload.addEventListener("click", () => window.location.reload());
   content.append(reload);
   bootShell.replaceChildren(content);

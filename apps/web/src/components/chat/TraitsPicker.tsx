@@ -44,10 +44,10 @@ import { useComposerMenuState } from "./useComposerMenuState";
 type ProviderOptions = ReadonlyArray<ProviderOptionSelection>;
 
 const SAVED_OPTION_LABELS: Readonly<Record<string, string>> = {
-  agent: "Agent",
-  effort: "Effort",
-  reasoningEffort: "Reasoning effort",
-  variant: "Reasoning",
+  agent: "智能体",
+  effort: "推理强度",
+  reasoningEffort: "推理强度",
+  variant: "推理",
 };
 
 function savedOptionLabel(id: string): string {
@@ -95,7 +95,7 @@ const ULTRATHINK_PROMPT_PREFIX = "Ultrathink:\n";
 function DefaultBadge() {
   return (
     <Badge variant="outline" size="sm" className="min-w-0">
-      Default
+      默认
     </Badge>
   );
 }
@@ -407,8 +407,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
               </div>
               {ultrathinkInBodyText && descriptor.id === primarySelectDescriptor?.id ? (
                 <div className="px-2 pb-1.5 text-muted-foreground/80 text-xs">
-                  Your prompt contains &quot;ultrathink&quot; in the text. Remove it to change this
-                  option.
+                  提示词中包含“ultrathink”。请先移除它再更改此选项。
                 </div>
               ) : null}
               <MenuRadioGroup
@@ -471,7 +470,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
                 {(["on", "off"] as const).map((value) => (
                   <MenuRadioItem key={value} value={value} hideIndicator closeOnClick>
                     <span className="flex w-full min-w-0 items-center justify-between gap-3">
-                      <span>{value === "on" ? "On" : "Off"}</span>
+                      <span>{value === "on" ? "开启" : "关闭"}</span>
                     </span>
                   </MenuRadioItem>
                 ))}
@@ -531,7 +530,7 @@ export function buildTraitsTriggerDisplay(input: {
       input.ultrathinkPromptControlled && descriptor.id === input.primarySelectDescriptorId
         ? "Ultrathink"
         : descriptor.type === "boolean"
-          ? `${descriptor.label} ${descriptor.currentValue === true ? "On" : "Off"}`
+          ? `${descriptor.label} ${descriptor.currentValue === true ? "开启" : "关闭"}`
           : getProviderOptionCurrentLabel(
               descriptor,
               input.modelSelection,

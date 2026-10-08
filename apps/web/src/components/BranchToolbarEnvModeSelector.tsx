@@ -87,7 +87,7 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
     event.preventDefault();
     event.stopPropagation();
     void api.contextMenu
-      .show([{ id: "copy-path", label: "Copy full path", icon: "copy" }], {
+      .show([{ id: "copy-path", label: "复制完整路径", icon: "copy" }], {
         x: event.clientX,
         y: event.clientY,
       })
@@ -98,7 +98,7 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
             if (didCopy) {
               toastManager.add({
                 type: "success",
-                title: "Path copied",
+                title: "路径已复制",
                 description: workspacePath,
               });
             }
@@ -107,8 +107,8 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Failed to copy path",
-                description: error instanceof Error ? error.message : "An error occurred.",
+                title: "复制路径失败",
+                description: error instanceof Error ? error.message : "发生错误。",
               }),
             );
           },
@@ -164,7 +164,7 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
         <TooltipTrigger render={lockedRow} />
         <TooltipPopup side={displayMode === "panel" ? "left" : undefined}>
           {forceNewWorktree
-            ? "Each model starts in its own worktree."
+            ? "每个模型都在独立工作树中运行。"
             : (workspacePath ?? resolveLockedWorkspaceLabel(activeWorktreePath, effectiveEnvMode))}
         </TooltipPopup>
       </Tooltip>
@@ -190,7 +190,7 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
             <ThreadDetailsSelectControl
               panel={displayMode === "panel"}
               className="min-w-0 shrink"
-              aria-label="Workspace"
+              aria-label="工作区"
               data-composer-shortcut="composer.workspace"
               data-composer-context-control
               onMouseDownCapture={stopContextMenuMouseDown}
@@ -239,7 +239,7 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
         }
       >
         <SelectGroup>
-          <SelectGroupLabel>Workspace</SelectGroupLabel>
+          <SelectGroupLabel>工作区</SelectGroupLabel>
           <SelectItem value="local">
             <span className="inline-flex items-center gap-1.5">
               {activeWorktreePath ? (

@@ -74,7 +74,10 @@ describe("ProjectFaviconPickerDialog", () => {
       readonly onPickExternal: () => Promise<string | null>;
     }) as ReactElement<Record<string, unknown>>;
 
-    const button = visitElements(picker, (element) => element.props.children === "Open in Finder");
+    const button = visitElements(
+      picker,
+      (element) => element.props.children === "在 Finder 中打开",
+    );
     expect(button).not.toBeNull();
 
     (button?.props.onClick as (() => void) | undefined)?.();
@@ -108,7 +111,10 @@ describe("ProjectFaviconPickerDialog", () => {
 
     hooks.beginRender();
     const picker = ProjectFaviconPickerDialog(props) as ReactElement<Record<string, unknown>>;
-    const button = visitElements(picker, (element) => element.props.children === "Open in Finder");
+    const button = visitElements(
+      picker,
+      (element) => element.props.children === "在 Finder 中打开",
+    );
 
     (button?.props.onClick as (() => void) | undefined)?.();
     await Promise.resolve();
@@ -118,7 +124,7 @@ describe("ProjectFaviconPickerDialog", () => {
     expect(onSelect).not.toHaveBeenCalled();
     expect(toastManager.add).toHaveBeenCalledWith({
       type: "error",
-      title: "Could not open image picker",
+      title: "无法打开图片选择器",
       description: "picker failed",
     });
   });

@@ -28,7 +28,7 @@ function Spinner({
 }: React.ComponentPropsWithoutRef<typeof LoaderCircleIcon> & VariantProps<typeof spinnerVariants>) {
   return (
     <LoaderCircleIcon
-      aria-label="Loading"
+      aria-label="正在加载"
       ref={observeVisibleAnimation}
       className={cn(spinnerVariants({ size, tone }), className)}
       role="status"

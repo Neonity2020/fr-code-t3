@@ -140,7 +140,7 @@ export function PullRequestLinkPreview({
                   <span className="min-w-0 truncate">{authorLabel}</span>
                   <span aria-hidden>·</span>
                   <span className="shrink-0">
-                    opened {formatRelativeTimeLabel(detail.createdAt)}
+                    已创建 {formatRelativeTimeLabel(detail.createdAt)}
                   </span>
                 </div>
               </div>

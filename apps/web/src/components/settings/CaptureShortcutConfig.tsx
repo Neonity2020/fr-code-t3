@@ -105,7 +105,7 @@ export function CaptureShortcutConfig({
       );
     } catch (cause) {
       setError({
-        message: "Couldn't prepare the changes. Check Advanced for help.",
+        message: "无法准备更改。请查看高级设置获取帮助。",
         ...(cause instanceof Error ? { detail: cause.message } : {}),
       });
     } finally {
@@ -122,14 +122,14 @@ export function CaptureShortcutConfig({
       if (!applied.warning && preview.operation === "install" && onComplete) {
         toastManager.add({
           type: "success",
-          title: "Shortcut saved",
-          description: `Use ${preview.shortcut} from another app.`,
+          title: "快捷键已保存",
+          description: `可在其他应用中使用 ${preview.shortcut}。`,
         });
         await onComplete();
       }
     } catch (cause) {
       setError({
-        message: "Couldn't save your shortcut. Review the changes and try again.",
+        message: "无法保存快捷键。请检查更改后重试。",
         ...(cause instanceof Error ? { detail: cause.message } : {}),
       });
       setPreview(null);
@@ -142,38 +142,38 @@ export function CaptureShortcutConfig({
     <div className="space-y-4 text-sm">
       {!result ? (
         <div className="flex items-center justify-between gap-3">
-          <span>Shortcut</span>
+          <span>快捷键</span>
           {recorder.input}
         </div>
       ) : null}
       {recorder.recording ? (
         <p role="status" className="text-xs text-muted-foreground">
-          Press your shortcut. Esc cancels.
+          请按下快捷键，按 Esc 取消。
         </p>
       ) : null}
       {result ? (
         <p role="status">
           {result.warning
-            ? "Saved, but the shortcut needs attention. Check Advanced for help."
+            ? "已保存，但快捷键需要处理。请查看高级设置获取帮助。"
             : preview?.operation === "remove"
-              ? "Shortcut removed."
-              : `Use ${preview?.shortcut} from another app to capture a window.`}
+              ? "快捷键已移除。"
+              : `可在其他应用中使用 ${preview?.shortcut} 捕获窗口。`}
         </p>
       ) : preview ? (
         <>
           <p className="text-muted-foreground">
             {changed
               ? preview.operation === "remove"
-                ? "Review the change below to remove your shortcut."
-                : "Review the change below, then save your shortcut."
+                ? "检查下方更改以移除快捷键。"
+                : "检查下方更改后保存快捷键。"
               : preview.operation === "remove"
-                ? "There's no capture shortcut to remove."
-                : "This shortcut is already set up."}
+                ? "没有可移除的捕获快捷键。"
+                : "此快捷键已设置。"}
           </p>
           {diff ? (
             <div
               className="max-h-80 overflow-auto rounded-lg border text-xs"
-              aria-label="Shortcut changes"
+              aria-label="快捷键更改"
             >
               <FileDiff
                 fileDiff={diff}
@@ -186,9 +186,7 @@ export function CaptureShortcutConfig({
             </div>
           ) : null}
           {changed ? (
-            <p className="text-xs text-muted-foreground">
-              Only these changes will be saved. We'll keep a backup.
-            </p>
+            <p className="text-xs text-muted-foreground">仅保存这些更改，并保留备份。</p>
           ) : null}
           <div className="flex gap-2">
             {changed || preview.operation === "install" ? (
@@ -201,36 +199,33 @@ export function CaptureShortcutConfig({
                 onClick={() => void apply()}
               >
                 {working === "writing"
-                  ? "Saving…"
+                  ? "正在保存…"
                   : changed
                     ? preview.operation === "install"
-                      ? "Save shortcut"
-                      : "Remove shortcut"
-                    : "Done"}
+                      ? "保存快捷键"
+                      : "移除快捷键"
+                    : "完成"}
               </Button>
             ) : null}
             <Button variant="ghost" disabled={actionBusy} onClick={() => setPreview(null)}>
-              Cancel
+              取消
             </Button>
           </div>
         </>
       ) : (
         <>
           <p className="text-muted-foreground">
-            Allow FR Code to read your desktop settings. You'll review any changes here before
-            saving.
+            允许 FR Code 读取桌面设置。保存前，您可在此检查全部更改。
           </p>
           <Button
             disabled={actionBusy || !supported}
             aria-busy={working === "reading"}
             onClick={() => void read()}
           >
-            {working === "reading" ? "Preparing changes…" : "Review changes"}
+            {working === "reading" ? "正在准备更改…" : "检查更改"}
           </Button>
           {!supported ? (
-            <p className="text-xs text-muted-foreground">
-              Update FR Code to finish setting up your shortcut.
-            </p>
+            <p className="text-xs text-muted-foreground">请更新 FR Code 以完成快捷键配置。</p>
           ) : null}
         </>
       )}
@@ -241,30 +236,28 @@ export function CaptureShortcutConfig({
       ) : null}
       {state.shortcutActionRegistered === false && state.shortcutMessage ? (
         <p role="status" className="text-muted-foreground">
-          {state.shortcutPending
-            ? "Connecting to your desktop…"
-            : "Restart FR Code to finish connecting your shortcut."}
+          {state.shortcutPending ? "正在连接桌面端…" : "重启 FR Code 以完成快捷键连接。"}
         </p>
       ) : null}
       <details className="text-xs text-muted-foreground">
-        <summary className="cursor-pointer">Advanced</summary>
+        <summary className="cursor-pointer">高级</summary>
         <div className="mt-3 space-y-3">
           {error?.detail || result?.warning ? (
             <div className="space-y-1">
-              <p className="font-medium text-foreground">Troubleshooting</p>
+              <p className="font-medium text-foreground">故障排查</p>
               <p className="break-words">{error?.detail ?? result?.warning}</p>
             </div>
           ) : null}
           <div className="space-y-1">
-            <p className="font-medium text-foreground">Settings file</p>
+            <p className="font-medium text-foreground">设置文件</p>
             <p className="break-all font-mono">
               {preview?.path ??
                 state.shortcutConfigPath ??
                 (niri ? "~/.config/niri/config.kdl" : "~/.config/hypr/hyprland.conf")}
             </p>
-            {niri ? <p>FR Code also reads any files included by this file.</p> : null}
+            {niri ? <p>FR Code 也会读取此文件引用的其他文件。</p> : null}
             {preview && preview.resolvedPath !== preview.path ? (
-              <p className="break-all">Linked to {preview.resolvedPath}. The link will be kept.</p>
+              <p className="break-all">关联到 {preview.resolvedPath}。关联将被保留。</p>
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
@@ -274,7 +267,7 @@ export function CaptureShortcutConfig({
               disabled={actionBusy || !supported}
               onClick={() => void read(true)}
             >
-              Choose a different file…
+              选择其他文件…
             </Button>
             <Button
               size="sm"
@@ -282,7 +275,7 @@ export function CaptureShortcutConfig({
               disabled={actionBusy || !supported}
               onClick={() => void read(customFile, "remove")}
             >
-              Remove shortcut…
+              移除快捷键…
             </Button>
             {result ? (
               <Button
@@ -291,23 +284,23 @@ export function CaptureShortcutConfig({
                 disabled={actionBusy || !supported}
                 onClick={() => void read()}
               >
-                Review changes
+                检查更改
               </Button>
             ) : null}
           </div>
           <p>
-            Use your desktop's shortcut settings file.{" "}
+            使用桌面环境的快捷键设置文件。{" "}
             {niri
-              ? "A custom --config or NIRI_CONFIG can change its location."
-              : "On Omarchy, use your own bindings file, not its defaults."}
+              ? "自定义 --config 或 NIRI_CONFIG 可更改其位置。"
+              : "在 Omarchy 上，请使用自己的快捷键文件。"}
           </p>
-          {result?.backupPath ? <p className="break-all">Backup: {result.backupPath}</p> : null}
-          <p className="font-medium text-foreground">Manual setup</p>
+          {result?.backupPath ? <p className="break-all">备份： {result.backupPath}</p> : null}
+          <p className="font-medium text-foreground">手动配置</p>
           <p>
             {niri
-              ? "Paste this inside binds { … } in your Niri config, then save."
-              : "Add this binding to your Hyprland config, then save."}{" "}
-            Change the keys if needed.
+              ? "将此内容粘贴到 Niri 配置中的 binds { … } 内，然后保存。"
+              : "将此快捷键添加到 Hyprland 配置，然后保存。"}{" "}
+            可按需更改按键。
           </p>
           <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-all rounded-xl bg-muted/50 p-3">
             {state.shortcutBinding}
@@ -320,11 +313,10 @@ export function CaptureShortcutConfig({
               if (state.shortcutBinding) copyToClipboard(state.shortcutBinding);
             }}
           >
-            {isCopied ? "Copied" : "Copy shortcut"}
+            {isCopied ? "已复制" : "复制快捷键"}
           </Button>
           <p>
-            Turn capture off in FR Code to stop it. Remove the shortcut from {desktop} to free up
-            the keys.
+            在 FR Code 中关闭截图可停止该功能。要释放按键，请从以下位置移除快捷键： {desktop} 。
           </p>
           {state.shortcutActionRegistered === false ? (
             <p role="status">{state.shortcutMessage}</p>
@@ -336,7 +328,7 @@ export function CaptureShortcutConfig({
               disabled={actionBusy || state.shortcutActionRegistered === false}
               onClick={() => void onComplete()}
             >
-              I've added the shortcut
+              我已添加快捷键
             </Button>
           ) : null}
         </div>

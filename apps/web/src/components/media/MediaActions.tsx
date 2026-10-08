@@ -88,7 +88,7 @@ export function MediaActions({
     if (!api || menuOpen.current) return;
     menuOpen.current = true;
     setTooltipOpen(false);
-    let failureTitle = "Could not open media menu";
+    let failureTitle = "无法打开媒体菜单";
     let progressToast: ReturnType<typeof toastManager.add> | undefined;
     try {
       const noun = source.kind === "image" ? "image" : "video";
@@ -99,25 +99,24 @@ export function MediaActions({
         typeof ClipboardItem !== "undefined";
       const items: ContextMenuItem<MediaActionId>[] = [];
       if (reference?.kind === "file") {
-        items.push({ id: "copy-full-path", label: "Copy full path" });
-        if (reference.relativePath)
-          items.push({ id: "copy-relative-path", label: "Copy relative path" });
+        items.push({ id: "copy-full-path", label: "复制完整路径" });
+        if (reference.relativePath) items.push({ id: "copy-relative-path", label: "复制相对路径" });
       } else if (reference?.kind === "url") {
-        items.push({ id: "copy-url", label: "Copy URL" });
+        items.push({ id: "copy-url", label: "复制网址" });
       }
-      if (source.onOpenFile) items.push({ id: "open-file", label: "Open in file viewer" });
-      items.push({ id: "save", label: `Save ${noun}`, disabled: unavailable });
+      if (source.onOpenFile) items.push({ id: "open-file", label: "在文件查看器中打开" });
+      items.push({ id: "save", label: `保存${noun}`, disabled: unavailable });
       if (source.kind === "image") {
         items.push({
           id: "copy-image",
-          label: "Copy image",
+          label: "复制图片",
           disabled: unavailable || !canCopyImage,
         });
       }
 
       const action = await api.contextMenu.show(items, position);
       if (!action) return;
-      failureTitle = `Could not ${items.find((item) => item.id === action)?.label.toLowerCase() ?? "complete media action"}`;
+      failureTitle = `无法${items.find((item) => item.id === action)?.label.toLowerCase() ?? "complete media action"}`;
       const text =
         action === "copy-full-path" && reference?.kind === "file"
           ? reference.path
@@ -130,26 +129,26 @@ export function MediaActions({
         await writeTextToClipboard(text, reference?.kind === "file" ? "file path" : "URL");
         toastManager.add({
           type: "success",
-          title: action === "copy-url" ? "URL copied" : "Path copied",
+          title: action === "copy-url" ? "网址已复制" : "路径已复制",
         });
       } else if (action === "open-file") {
         source.onOpenFile?.();
       } else if (action === "save" || action === "copy-image") {
         progressToast = toastManager.add({
           type: "loading",
-          title: action === "save" ? `Preparing ${noun} download…` : "Copying image…",
+          title: action === "save" ? `正在准备下载${noun}…` : "正在复制图片…",
         });
         await (action === "save" ? save() : copyImage());
         toastManager.update(progressToast, {
           type: "success",
-          title: action === "save" ? "Download started" : "Image copied",
+          title: action === "save" ? "下载已开始" : "图片已复制",
         });
       }
     } catch (error) {
       const toast = stackedThreadToast({
         type: "error",
         title: failureTitle,
-        description: error instanceof Error ? error.message : "The media action failed.",
+        description: error instanceof Error ? error.message : "媒体操作失败。",
       });
       if (progressToast) toastManager.update(progressToast, toast);
       else toastManager.add(toast);

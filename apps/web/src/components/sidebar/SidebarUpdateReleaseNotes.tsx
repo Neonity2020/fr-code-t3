@@ -61,9 +61,7 @@ export function SidebarUpdateReleaseNotes({
       <div className="shrink-0 px-1">
         {state.status === "available" ? (
           <div>
-            <div className="whitespace-nowrap text-sm leading-5 font-medium">
-              Update ready to download
-            </div>
+            <div className="whitespace-nowrap text-sm leading-5 font-medium">更新已可下载</div>
             {state.availableVersion ? (
               <div className="mt-0.5 text-xs leading-4 text-muted-foreground">
                 {state.availableVersion}
@@ -80,15 +78,15 @@ export function SidebarUpdateReleaseNotes({
           const omittedItemCount = Math.max(0, releaseNote.totalItems - releaseNote.items.length);
           const linkLabel =
             omittedItemCount === 0
-              ? "View release on GitHub"
-              : `${omittedItemCount} more ${omittedItemCount === 1 ? "change" : "changes"} on GitHub`;
+              ? "在 GitHub 查看发布"
+              : `在 GitHub 查看另外 ${omittedItemCount} 条${omittedItemCount === 1 ? "改动" : "改动"}`;
 
           return (
             <div key={releaseNote.version}>
               {index > 0 && <Separator className="my-3" />}
               <section>
                 <h3 className="text-foreground text-xs leading-4 font-semibold">
-                  {index === 0 ? "What's changed" : `Changes in ${releaseNote.version}`}
+                  {index === 0 ? "更新内容" : `${releaseNote.version} 中的改动`}
                 </h3>
                 <ul className="mt-2 space-y-1.5 pl-4 text-xs leading-5 text-popover-foreground/90">
                   {keyReleaseNoteItems(releaseNote.items).map(({ item, key }) => (
@@ -110,7 +108,7 @@ export function SidebarUpdateReleaseNotes({
           <div>
             <Separator className="my-3" />
             <ReleaseLink releaseUrl={getDesktopUpdateReleaseHistoryUrl()} shell={shell}>
-              {`${state.omittedReleaseCount} older ${state.omittedReleaseCount === 1 ? "release" : "releases"} on GitHub`}
+              {`在 GitHub 查看更早的 ${state.omittedReleaseCount} 个${state.omittedReleaseCount === 1 ? "release" : "releases"}`}
             </ReleaseLink>
           </div>
         ) : null}

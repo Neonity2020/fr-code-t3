@@ -37,7 +37,7 @@ export function DiffCommentAnnotation({
   onCancel,
   onComment,
   onDelete,
-  placeholder = "Add a comment…",
+  placeholder = "添加评论…",
   submitLabel = "Comment",
   pending = false,
   secondaryAction,
@@ -68,12 +68,7 @@ export function DiffCommentAnnotation({
         <p className="min-w-0 flex-1 whitespace-pre-wrap text-sm leading-5">{displayedText}</p>
         {onDelete ? (
           <span className="-my-1 -mr-1 flex shrink-0 opacity-0 transition-opacity group-hover/comment:opacity-100 focus-within:opacity-100 max-sm:opacity-100">
-            <Button
-              variant="ghost-muted"
-              size="icon-xs"
-              aria-label="Delete comment"
-              onClick={onDelete}
-            >
+            <Button variant="ghost-muted" size="icon-xs" aria-label="删除评论" onClick={onDelete}>
               <Trash2 className="size-3" />
             </Button>
           </span>
@@ -95,7 +90,7 @@ export function DiffCommentAnnotation({
         size="sm"
         value={displayedText}
         placeholder={placeholder}
-        aria-label={`Comment on lines ${rangeLabel}`}
+        aria-label={`评论第 ${rangeLabel} 行`}
         onChange={(event) => (onTextChange ?? setLocalDraftText)(event.target.value)}
         onFocus={(event) => {
           const end = event.currentTarget.value.length;
@@ -113,9 +108,9 @@ export function DiffCommentAnnotation({
         }}
       />
       <div className="mt-1.5 flex items-center gap-1">
-        <span className="mr-auto text-3xs text-muted-foreground/70">⌘/Ctrl Enter to send</span>
+        <span className="mr-auto text-3xs text-muted-foreground/70">按 ⌘/Ctrl + Enter 发送</span>
         <Button variant="ghost-muted" size="xs" onClick={onCancel}>
-          Cancel
+          取消
         </Button>
         {secondaryAction ? (
           <Button

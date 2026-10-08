@@ -148,7 +148,7 @@ function PendingSecretRequestForm(props: {
           />
         </div>
         <Button type="submit" disabled={submitting || secret.trim().length === 0}>
-          Save securely
+          安全保存
         </Button>
       </div>
       {error !== null ? (
@@ -171,7 +171,7 @@ function PendingSecretRequestForm(props: {
           disabled={submitting}
           onClick={() => void send({ type: "decline" })}
         >
-          Decline
+          拒绝
         </Button>
       </div>
     </form>

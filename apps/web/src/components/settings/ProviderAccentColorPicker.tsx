@@ -31,15 +31,10 @@ function ProviderCustomColorPanel(props: {
 
   return (
     <div className="w-56 bg-popover">
-      <ColorSaturationValuePlane
-        label="Accent color"
-        value={hsv}
-        onChange={commitHsv}
-        variant="edge"
-      />
+      <ColorSaturationValuePlane label="强调色" value={hsv} onChange={commitHsv} variant="edge" />
       <div className="grid gap-3 p-3">
         <ColorHueSlider
-          label="Accent color hue"
+          label="强调色色相"
           value={hsv.h}
           onChange={(h) => commitHsv({ ...hsv, h })}
         />
@@ -56,7 +51,7 @@ function ProviderCustomColorPanel(props: {
           }}
           onBlur={() => setHexDraft(null)}
           font="mono"
-          aria-label="Custom hex accent color"
+          aria-label="自定义十六进制强调色"
           spellCheck={false}
         />
       </div>
@@ -81,13 +76,9 @@ function ProviderCustomColorPicker(props: {
             size="icon-sm"
             variant="ghost-muted"
             style={normalized ? { backgroundColor: normalized } : undefined}
-            aria-label={`${normalized ? "Change" : "Add"} accent color for ${props.displayName}`}
+            aria-label={`${props.displayName} 的 ${normalized ? "更改" : "添加"} 强调色`}
           >
-            {normalized ? (
-              <span className="sr-only">Change accent color</span>
-            ) : (
-              <PlusIcon aria-hidden />
-            )}
+            {normalized ? <span className="sr-only">更改强调色</span> : <PlusIcon aria-hidden />}
           </Button>
         }
       />
@@ -108,7 +99,7 @@ function ProviderCustomColorPicker(props: {
                   onClick={props.onClear}
                 >
                   <XIcon className="size-3.5" aria-hidden />
-                  Clear color
+                  清除颜色
                 </Button>
               }
             />
@@ -209,7 +200,7 @@ export function ProviderAccentColorPicker(props: {
 
   return (
     <div className="grid gap-2">
-      <span className="text-xs font-medium text-foreground">Accent color</span>
+      <span className="text-xs font-medium text-foreground">强调色</span>
       {picker}
       {description ? <span className="text-xs text-muted-foreground">{description}</span> : null}
     </div>

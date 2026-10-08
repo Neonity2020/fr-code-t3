@@ -299,7 +299,7 @@ describe("buildBulkUnpinContextMenuItem", () => {
   it("counts only the pinned rows of a mixed selection", () => {
     expect(buildBulkUnpinContextMenuItem({ pinnedCount: 2 })).toEqual({
       id: "unpin",
-      label: "Unpin (2)",
+      label: "取消置顶（2）",
     });
   });
 
@@ -317,7 +317,7 @@ describe("buildBulkTitleRegenerationContextMenuItem", () => {
       }),
     ).toEqual({
       id: "regenerate-title",
-      label: "Regenerate titles (3)",
+      label: "重新生成标题（3）",
     });
   });
 
@@ -329,7 +329,7 @@ describe("buildBulkTitleRegenerationContextMenuItem", () => {
       }),
     ).toEqual({
       id: "regenerate-title",
-      label: "Regenerating… (2)",
+      label: "正在重新生成…（2）",
       disabled: true,
     });
   });
@@ -348,13 +348,13 @@ describe("buildMultiSelectThreadContextMenuItems", () => {
   it("offers bulk archive with the selected count", () => {
     expect(
       buildMultiSelectThreadContextMenuItems({ count: 3, hasRunningThread: false }),
-    ).toContainEqual({ id: "archive", label: "Archive (3)", disabled: false });
+    ).toContainEqual({ id: "archive", label: "归档（3）", disabled: false });
   });
 
   it("disables bulk archive when a selected thread is running", () => {
     expect(
       buildMultiSelectThreadContextMenuItems({ count: 2, hasRunningThread: true }),
-    ).toContainEqual({ id: "archive", label: "Archive (2)", disabled: true });
+    ).toContainEqual({ id: "archive", label: "归档（2）", disabled: true });
   });
 });
 
@@ -1191,15 +1191,15 @@ describe("resolveWorkingStartedAt", () => {
 
 describe("formatWorkingDurationLabel", () => {
   it("formats seconds, minutes, and hours", () => {
-    expect(formatWorkingDurationLabel(0)).toBe("0s");
-    expect(formatWorkingDurationLabel(42_000)).toBe("42s");
-    expect(formatWorkingDurationLabel(5 * 60_000)).toBe("5m");
-    expect(formatWorkingDurationLabel(90 * 60_000)).toBe("1h 30m");
+    expect(formatWorkingDurationLabel(0)).toBe("0 秒");
+    expect(formatWorkingDurationLabel(42_000)).toBe("42 秒");
+    expect(formatWorkingDurationLabel(5 * 60_000)).toBe("5 分钟");
+    expect(formatWorkingDurationLabel(90 * 60_000)).toBe("1 小时 30 分钟");
   });
 
   it("clamps negative and non-finite elapsed values to zero", () => {
-    expect(formatWorkingDurationLabel(-5_000)).toBe("0s");
-    expect(formatWorkingDurationLabel(Number.NaN)).toBe("0s");
+    expect(formatWorkingDurationLabel(-5_000)).toBe("0 秒");
+    expect(formatWorkingDurationLabel(Number.NaN)).toBe("0 秒");
   });
 });
 
@@ -1230,7 +1230,7 @@ describe("resolveThreadStatusPill", () => {
           hasPendingUserInput: true,
         },
       }),
-    ).toMatchObject({ label: "Pending Approval", pulse: false });
+    ).toMatchObject({ label: "等待审批", pulse: false });
   });
 
   it("shows awaiting input when plan mode is blocked on user answers", () => {
@@ -1241,7 +1241,7 @@ describe("resolveThreadStatusPill", () => {
           hasPendingUserInput: true,
         },
       }),
-    ).toMatchObject({ label: "Awaiting Input", pulse: false });
+    ).toMatchObject({ label: "等待输入", pulse: false });
   });
 
   it("falls back to working when the thread is actively running without blockers", () => {
@@ -1249,7 +1249,7 @@ describe("resolveThreadStatusPill", () => {
       resolveThreadStatusPill({
         thread: baseThread,
       }),
-    ).toMatchObject({ label: "Working", pulse: true });
+    ).toMatchObject({ label: "正在工作", pulse: true });
   });
 
   it("shows waiting for an idle thread with pending background tasks", () => {
@@ -1266,7 +1266,7 @@ describe("resolveThreadStatusPill", () => {
         },
       }),
     ).toMatchObject({
-      label: "Waiting",
+      label: "等待中",
       colorClass: "text-sidebar-muted-foreground",
       dotClass: "bg-sidebar-muted-foreground",
       pulse: false,
@@ -1281,7 +1281,7 @@ describe("resolveThreadStatusPill", () => {
           pendingBackgroundTasks: [{ taskId: "bg-1", description: "sleep 20", kind: "command" }],
         },
       }),
-    ).toMatchObject({ label: "Working", pulse: true });
+    ).toMatchObject({ label: "正在工作", pulse: true });
   });
 
   it("does not show waiting after the background task roster clears", () => {
@@ -1314,7 +1314,7 @@ describe("resolveThreadStatusPill", () => {
           },
         },
       }),
-    ).toMatchObject({ label: "Plan Ready", pulse: false });
+    ).toMatchObject({ label: "计划已就绪", pulse: false });
   });
 
   it("does not manufacture completed state without a client visit marker", () => {
@@ -1348,7 +1348,7 @@ describe("resolveThreadStatusPill", () => {
           },
         },
       }),
-    ).toMatchObject({ label: "Completed", pulse: false });
+    ).toMatchObject({ label: "已完成", pulse: false });
   });
 });
 
@@ -1361,49 +1361,49 @@ describe("resolveProjectStatusIndicator", () => {
     expect(
       resolveProjectStatusIndicator([
         {
-          label: "Completed",
+          label: "已完成",
           colorClass: "text-emerald-600",
           dotClass: "bg-emerald-500",
           pulse: false,
         },
         {
-          label: "Pending Approval",
+          label: "等待审批",
           colorClass: "text-amber-600",
           dotClass: "bg-amber-500",
           pulse: false,
         },
         {
-          label: "Working",
+          label: "正在工作",
           colorClass: "text-sky-600",
           dotClass: "bg-sky-500",
           pulse: true,
         },
       ]),
-    ).toMatchObject({ label: "Pending Approval", dotClass: "bg-amber-500" });
+    ).toMatchObject({ label: "等待审批", dotClass: "bg-amber-500" });
   });
 
   it("prefers plan-ready over completed when no stronger action is needed", () => {
     expect(
       resolveProjectStatusIndicator([
         {
-          label: "Completed",
+          label: "已完成",
           colorClass: "text-emerald-600",
           dotClass: "bg-emerald-500",
           pulse: false,
         },
         {
-          label: "Plan Ready",
+          label: "计划已就绪",
           colorClass: "text-violet-600",
           dotClass: "bg-violet-500",
           pulse: false,
         },
       ]),
-    ).toMatchObject({ label: "Plan Ready", dotClass: "bg-violet-500" });
+    ).toMatchObject({ label: "计划已就绪", dotClass: "bg-violet-500" });
   });
 
   it("ranks waiting below active work and above plan-ready", () => {
     const waiting = {
-      label: "Waiting" as const,
+      label: "等待中" as const,
       colorClass: "text-sidebar-muted-foreground",
       dotClass: "bg-sidebar-muted-foreground",
       pulse: false,
@@ -1413,24 +1413,24 @@ describe("resolveProjectStatusIndicator", () => {
       resolveProjectStatusIndicator([
         waiting,
         {
-          label: "Working",
+          label: "正在工作",
           colorClass: "text-sky-600",
           dotClass: "bg-sky-500",
           pulse: true,
         },
       ]),
-    ).toMatchObject({ label: "Working" });
+    ).toMatchObject({ label: "正在工作" });
     expect(
       resolveProjectStatusIndicator([
         {
-          label: "Plan Ready",
+          label: "计划已就绪",
           colorClass: "text-violet-600",
           dotClass: "bg-violet-500",
           pulse: false,
         },
         waiting,
       ]),
-    ).toMatchObject({ label: "Waiting" });
+    ).toMatchObject({ label: "等待中" });
   });
 });
 
@@ -1459,7 +1459,7 @@ function makeThread(overrides: ThreadFixtureOverrides = {}): Thread {
     id: ThreadId.make("thread-1"),
     environmentId: localEnvironmentId,
     projectId: ProjectId.make("project-1"),
-    title: "Thread",
+    title: "会话",
     modelSelection: {
       instanceId: ProviderInstanceId.make("codex"),
       model: "gpt-5.4",
@@ -2074,8 +2074,8 @@ describe("navigation after parking a thread", () => {
 
 describe("unseen completion with background work", () => {
   it.each([
-    { kind: "command", status: "ready", topStatus: "done", receded: false, pill: "Completed" },
-    { kind: "monitor", status: "waiting", topStatus: "waiting", receded: true, pill: "Waiting" },
+    { kind: "command", status: "ready", topStatus: "done", receded: false, pill: "已完成" },
+    { kind: "monitor", status: "waiting", topStatus: "waiting", receded: true, pill: "等待中" },
   ] as const)("presents a completed thread with a $kind roster", (expected) => {
     const thread = presentThreadShell(localEnvironmentId, {
       ...makeThreadFixture().source,

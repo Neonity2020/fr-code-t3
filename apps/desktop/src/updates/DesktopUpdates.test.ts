@@ -48,7 +48,7 @@ describe("DesktopUpdates", () => {
     assert.equal(pollerError.message, "Desktop update startup poller failed.");
     assert.strictEqual(eventError.cause, cause);
     assert.equal(eventError.event, "download-progress");
-    assert.equal(eventError.message, "Failed to handle desktop update download-progress event.");
+    assert.equal(eventError.message, "无法处理桌面端更新事件 download-progress。");
     assert.strictEqual(reportedError.cause, cause);
     assert.equal(reportedError.operation, "download");
     assert.equal(reportedError.message, "Desktop updater download operation reported an error.");
@@ -869,7 +869,7 @@ describe("DesktopUpdates", () => {
         assert.equal(error.channel, "nightly");
         assert.strictEqual(error.cause, settingsFailure);
         assert.strictEqual(error.cause.cause, diskFailure);
-        assert.equal(error.message, "Failed to persist the nightly desktop update channel.");
+        assert.equal(error.message, "无法保存桌面端更新渠道 nightly。");
         assert.notInclude(error.message, diskFailure.message);
 
         const checkResult = yield* updates.check("manual");

@@ -30,15 +30,15 @@ export function ProviderAuthCallbackCoordinator() {
         if (result._tag === "Failure")
           toastManager.add({
             type: "error",
-            title: "ChatGPT sign-in couldn't finish",
-            description: "Return to the provider and try again.",
+            title: "无法完成 ChatGPT 登录",
+            description: "返回提供方并重试。",
           });
       })
       .catch(() =>
         toastManager.add({
           type: "error",
-          title: "ChatGPT sign-in couldn't finish",
-          description: "Reconnect to the environment and try again.",
+          title: "无法完成 ChatGPT 登录",
+          description: "重新连接环境后重试。",
         }),
       )
       .finally(() => {

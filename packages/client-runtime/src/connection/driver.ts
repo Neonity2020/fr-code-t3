@@ -130,7 +130,7 @@ export const connectOverRoutes = Effect.fn("ConnectionDriver.connectOverRoutes")
       blocked ??
       new ConnectionTransientError({
         reason: "endpoint-unavailable",
-        detail: `${entry.target.label} did not answer on any saved route.`,
+        detail: `${entry.target.label} 未在任何已保存路由上响应。`,
       })
   );
 });

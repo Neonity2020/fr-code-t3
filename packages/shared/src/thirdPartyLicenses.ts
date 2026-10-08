@@ -98,13 +98,13 @@ export function filterThirdPartyLicenseEntries(
 
 const BUNDLE_LABELS: Readonly<Record<string, string>> = {
   android: "Android",
-  assets: "Assets",
-  desktop: "Desktop",
-  "device-tools": "Device tools",
+  assets: "资源",
+  desktop: "桌面端",
+  "device-tools": "设备工具",
   ios: "iOS",
-  mobile: "Mobile",
-  server: "Server",
-  web: "Web",
+  mobile: "移动端",
+  server: "服务器",
+  web: "网页",
 };
 
 export function formatLicenseBundles(bundles: ReadonlyArray<string>): string {

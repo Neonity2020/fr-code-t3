@@ -46,23 +46,23 @@ function HighlightedFuzzyText(props: {
 function getEmptyStateMessage(query: string, error: string | null, isPending: boolean): string {
   if (error) return error;
   const isSearching = query.trim().length > 0;
-  if (isPending) return isSearching ? "Searching workspace files…" : "Indexing workspace files…";
-  return isSearching ? "No matching files." : "No files found.";
+  if (isPending) return isSearching ? "正在搜索工作区文件…" : "正在建立工作区文件索引…";
+  return isSearching ? "没有匹配的文件。" : "未找到文件。";
 }
 
 function EmptyProjectFilePicker() {
   return (
     <CommandPaletteContent
-      aria-label="File picker"
-      escapeLabel="Back"
-      footerActionLabel="Open file"
-      inputProps={{ disabled: true, placeholder: "Search files…" }}
+      aria-label="文件选择器"
+      escapeLabel="返回"
+      footerActionLabel="打开文件"
+      inputProps={{ disabled: true, placeholder: "搜索文件…" }}
       mode="none"
       testId="project-file-picker"
       value=""
     >
       <div className="py-10 text-center text-sm text-muted-foreground">
-        Open a project to search its files.
+        打开项目以搜索其中的文件。
       </div>
     </CommandPaletteContent>
   );
@@ -117,11 +117,11 @@ function OpenProjectFilePicker(props: ProjectFilePickerProps & { target: ActiveP
 
   return (
     <CommandPaletteContent
-      aria-label="File picker"
+      aria-label="文件选择器"
       autoHighlight="always"
-      escapeLabel="Back"
-      footerActionLabel="Open file"
-      inputProps={{ placeholder: "Search files…" }}
+      escapeLabel="返回"
+      footerActionLabel="打开文件"
+      inputProps={{ placeholder: "搜索文件…" }}
       mode="none"
       onItemHighlighted={(value) => {
         setHighlightedItemValue(typeof value === "string" ? value : null);

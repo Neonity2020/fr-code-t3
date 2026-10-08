@@ -28,8 +28,8 @@ const accessConfig: Record<
   { readonly label: string; readonly description: string; readonly icon: LucideIcon }
 > = {
   "read-only": {
-    label: "Read only",
-    description: "Read projects and threads. Cannot start, message or change anything.",
+    label: "只读",
+    description: "读取项目和会话，无法启动、发送消息或更改内容。",
     icon: EyeIcon,
   },
   ...runtimeModeConfig,
@@ -40,7 +40,7 @@ type Loaded =
   | { readonly status: "invalid"; readonly message: string }
   | { readonly status: "ready"; readonly details: AuthMcpApprovalDetails };
 
-const UNREACHABLE = "Could not reach this environment. Try again.";
+const UNREACHABLE = "无法连接此环境，请重试。";
 const isApprovalError = Schema.is(AuthMcpApprovalError);
 
 type Answer<A> =
@@ -144,7 +144,7 @@ export function ConnectAgentSurface() {
         return;
       }
       setPending(null);
-      setErrorMessage(answer.kind === "error" ? answer.message : "The sign-in could not continue.");
+      setErrorMessage(answer.kind === "error" ? answer.message : "无法继续登录。");
     },
     [access, authorization, loaded, pairingCode],
   );
@@ -153,8 +153,8 @@ export function ConnectAgentSurface() {
     return (
       <AuthSurfaceShell>
         <ConnectAgentHeading
-          title="Checking the sign-in request"
-          description="One moment while this environment verifies the agent's request."
+          title="正在检查登录请求"
+          description="请稍候，环境正在验证智能体的请求。"
         />
         <Spinner className="mt-6" size="lg" tone="muted" />
       </AuthSurfaceShell>
@@ -164,10 +164,8 @@ export function ConnectAgentSurface() {
   if (loaded.status === "invalid") {
     return (
       <AuthSurfaceShell>
-        <ConnectAgentHeading title="This sign-in cannot continue" description={loaded.message} />
-        <p className="mt-4 text-sm text-muted-foreground">
-          Close this page and start the sign-in again from your agent.
-        </p>
+        <ConnectAgentHeading title="无法继续此登录" description={loaded.message} />
+        <p className="mt-4 text-sm text-muted-foreground">请关闭此页面，并从智能体重新发起登录。</p>
       </AuthSurfaceShell>
     );
   }
@@ -179,17 +177,17 @@ export function ConnectAgentSurface() {
   return (
     <AuthSurfaceShell>
       <ConnectAgentHeading
-        title={`Connect ${details.clientName}`}
+        title={`连接 ${details.clientName}`}
         description={
           <>
-            This agent wants to use the threads in every project on{" "}
+            此智能体希望使用以下环境中所有项目的会话：{" "}
             <span className="font-medium text-foreground">{details.environmentHost}</span>.
           </>
         }
       />
       <p className="mt-2 text-xs text-muted-foreground">
-        The name is chosen by the agent. Approval returns to {details.redirectHost} on the computer
-        that opened this page. Only approve a sign-in you just started.
+        名称由智能体指定。授权结果将返回 {details.redirectHost}{" "}
+        在打开此页面的计算机上。请仅批准您刚刚发起的登录。
       </p>
 
       <form
@@ -201,7 +199,7 @@ export function ConnectAgentSurface() {
       >
         <div className="space-y-2">
           <span id="connect-agent-access-label" className="text-sm font-medium">
-            What it may do
+            允许的操作
           </span>
           <RadioGroup
             aria-labelledby="connect-agent-access-label"
@@ -213,15 +211,14 @@ export function ConnectAgentSurface() {
             ))}
           </RadioGroup>
           <p className="text-xs text-muted-foreground">
-            Beyond read only, it can start, message and stop threads, and none of them can run with
-            more than the mode you pick.
+            除读取外，还可启动会话、发送消息和停止会话；运行权限不会超过您选择的模式。
           </p>
         </div>
 
         {oneClick ? null : (
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="connect-agent-pairing-code">
-              Pairing code
+              配对码
             </label>
             <Input
               id="connect-agent-pairing-code"
@@ -231,13 +228,12 @@ export function ConnectAgentSurface() {
               disabled={pending !== null}
               nativeInput
               onChange={(event) => setPairingCode(event.currentTarget.value)}
-              placeholder="Paste a one-time pairing code"
+              placeholder="粘贴一次性配对码"
               spellCheck={false}
               value={pairingCode}
             />
             <p className="text-xs text-muted-foreground">
-              Create one in Settings → Connections, or run <code>t3 auth pairing create</code> on
-              this machine.
+              在“设置 → 连接”中创建，或在此机器上运行 <code>t3 auth pairing create</code> 。
             </p>
           </div>
         )}
@@ -250,7 +246,7 @@ export function ConnectAgentSurface() {
 
         <div className="flex flex-wrap gap-2">
           <Button disabled={!canApprove} type="submit">
-            {pending === "approve" ? "Approving…" : "Approve"}
+            {pending === "approve" ? "正在批准…" : "批准"}
           </Button>
           <Button
             disabled={pending !== null}
@@ -258,7 +254,7 @@ export function ConnectAgentSurface() {
             type="button"
             variant="outline"
           >
-            {pending === "deny" ? "Denying…" : "Deny"}
+            {pending === "deny" ? "正在拒绝…" : "拒绝"}
           </Button>
         </div>
       </form>
@@ -275,7 +271,7 @@ function ConnectAgentHeading({
 }) {
   return (
     <>
-      <p className="text-3xs font-semibold tracking-widest text-primary uppercase">Agent sign-in</p>
+      <p className="text-3xs font-semibold tracking-widest text-primary uppercase">智能体登录</p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
     </>

@@ -43,7 +43,7 @@ describe("formatShortTimestamp", () => {
 
   it.each([
     ["en-GB", "15:44"],
-    ["en-US", "3:44 PM"],
+    ["en-US", "下午3:44"],
   ])("honors %s and the explicit hour-cycle settings", async (locale, localTime) => {
     vi.stubGlobal("window", { desktopBridge: { getSystemLocale: () => locale } });
     vi.resetModules();
@@ -51,7 +51,7 @@ describe("formatShortTimestamp", () => {
     const date = new Date(2026, 3, 7, 15, 44).toISOString();
     // ICU can separate the day period with a narrow no-break space.
     expect(format(date, "locale").replace(/[  ]/g, " ")).toBe(localTime);
-    expect(format(date, "12-hour").replace(/[  ]/g, " ")).toMatch(/^3:44 [ap]m$/i);
+    expect(format(date, "12-hour").replace(/[  ]/g, " ")).toBe("下午3:44");
     expect(format(date, "24-hour")).toBe("15:44");
   });
 });
@@ -88,7 +88,7 @@ describe("formatChatTimestampTooltip", () => {
     vi.resetModules();
   });
 
-  it.each(["de-DE", "it-IT"])("keeps the English date label in a %s runtime", async (locale) => {
+  it.each(["de-DE", "it-IT"])("keeps the Chinese date label in a %s runtime", async (locale) => {
     const DateTimeFormat = Intl.DateTimeFormat;
     vi.spyOn(Intl, "DateTimeFormat").mockImplementation(function (locales, options) {
       return new DateTimeFormat(locales ?? locale, options);
@@ -97,7 +97,7 @@ describe("formatChatTimestampTooltip", () => {
     const { formatChatTimestampTooltip: format } = await import("./timestampFormat");
     const date = new Date(2026, 5, 4, 14, 4).toISOString();
 
-    expect(format(date, "24-hour")).toBe("14:04, 4th June 2026");
+    expect(format(date, "24-hour")).toBe("2026年6月4日 14:04");
   });
 });
 
@@ -112,19 +112,19 @@ describe("formatRelativeTimeUntilLabel", () => {
   });
 
   it("returns Expired when the instant is in the past", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T11:59:00.000Z")).toBe("Expired");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T11:59:00.000Z")).toBe("已过期");
   });
 
   it("formats seconds remaining", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T12:00:45.000Z")).toBe("45s left");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T12:00:45.000Z")).toBe("45 秒 后到期");
   });
 
   it("formats minutes remaining", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T12:15:00.000Z")).toBe("15m left");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T12:15:00.000Z")).toBe("15 分钟 后到期");
   });
 
   it("formats hours remaining", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T18:00:00.000Z")).toBe("6h left");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T18:00:00.000Z")).toBe("6 小时 后到期");
   });
 });
 
@@ -139,21 +139,21 @@ describe("formatExpiresInLabel", () => {
   });
 
   it("returns Expired when the instant is in the past", () => {
-    expect(formatExpiresInLabel("2026-04-07T11:59:00.000Z")).toBe("Expired");
+    expect(formatExpiresInLabel("2026-04-07T11:59:00.000Z")).toBe("已过期");
   });
 
   it("uses sub-minute second count", () => {
-    expect(formatExpiresInLabel("2026-04-07T12:00:45.000Z")).toBe("Expires in 45s");
+    expect(formatExpiresInLabel("2026-04-07T12:00:45.000Z")).toBe("45 秒后到期");
   });
 
   it("uses minutes and seconds under one hour", () => {
-    expect(formatExpiresInLabel("2026-04-07T12:04:12.000Z")).toBe("Expires in 4m 12s");
-    expect(formatExpiresInLabel("2026-04-07T12:15:00.000Z")).toBe("Expires in 15m");
+    expect(formatExpiresInLabel("2026-04-07T12:04:12.000Z")).toBe("4 分 12 秒后到期");
+    expect(formatExpiresInLabel("2026-04-07T12:15:00.000Z")).toBe("15 分钟后到期");
   });
 
   it("uses hours with minute and second remainder", () => {
-    expect(formatExpiresInLabel("2026-04-07T14:02:03.000Z")).toBe("Expires in 2h 2m 3s");
-    expect(formatExpiresInLabel("2026-04-07T18:00:00.000Z")).toBe("Expires in 6h");
+    expect(formatExpiresInLabel("2026-04-07T14:02:03.000Z")).toBe("2 小时 2 分钟 3 秒 后到期");
+    expect(formatExpiresInLabel("2026-04-07T18:00:00.000Z")).toBe("6 小时 后到期");
   });
 });
 
@@ -174,13 +174,13 @@ describe("formatDayAwareTimestamp", () => {
     const messageAt = iso(2026, 7, 13, 23, 30);
     const justPastMidnight = new Date(2026, 7, 14, 0, 30).getTime();
     expect(formatDayAwareTimestamp(messageAt, "12-hour", justPastMidnight)).toBe(
-      `yesterday at ${time(messageAt)}`,
+      `昨天 ${time(messageAt)}`,
     );
   });
 
   it("prefixes older same-year messages with the numeric date", () => {
     const messageAt = iso(2026, 7, 12, 12, 34);
-    const datePart = new Intl.DateTimeFormat(undefined, {
+    const datePart = new Intl.DateTimeFormat("zh-CN", {
       month: "numeric",
       day: "numeric",
     }).format(new Date(messageAt));
@@ -191,7 +191,7 @@ describe("formatDayAwareTimestamp", () => {
 
   it("includes the year once the calendar year differs", () => {
     const messageAt = iso(2025, 11, 31, 18, 0);
-    const datePart = new Intl.DateTimeFormat(undefined, {
+    const datePart = new Intl.DateTimeFormat("zh-CN", {
       month: "numeric",
       day: "numeric",
       year: "numeric",
@@ -210,7 +210,7 @@ describe("formatDayAwareTimestamp", () => {
     const { formatDayAwareTimestamp: formatWithHostLocale } = await import("./timestampFormat");
     const messageAt = iso(2026, 7, 12, 15, 44);
 
-    expect(formatWithHostLocale(messageAt, "locale", now)).toBe("12/08 15:44");
+    expect(formatWithHostLocale(messageAt, "locale", now)).toBe("8/12 15:44");
 
     vi.unstubAllGlobals();
   });
@@ -225,8 +225,8 @@ describe("formatUpcomingTimestamp", () => {
 
   it.each([
     [14, ""],
-    [15, "tomorrow at "],
-    [13, "yesterday at "],
+    [15, "明天 "],
+    [13, "昨天 "],
   ])("keeps the reset day visible for day %i", (day, prefix) => {
     const resetAt = new Date(2026, 7, day, 14, 30).toISOString();
     expect(formatUpcomingTimestamp(resetAt, "12-hour", now)).toBe(
@@ -288,8 +288,8 @@ describe("getRelativeTimeState", () => {
   it("returns relative parts for valid timestamps", () => {
     expect(getRelativeTimeState("2026-04-07T11:45:00.000Z")).toEqual({
       status: "relative",
-      value: "15m",
-      suffix: "ago",
+      value: "15 分钟",
+      suffix: "前",
     });
   });
 });
@@ -305,14 +305,14 @@ describe("formatElapsedDurationLabel", () => {
   });
 
   it("returns just now when the instant is current or in the future", () => {
-    expect(formatElapsedDurationLabel("2026-04-07T12:00:00.000Z")).toBe("just now");
-    expect(formatElapsedDurationLabel("2026-04-07T12:01:00.000Z")).toBe("just now");
+    expect(formatElapsedDurationLabel("2026-04-07T12:00:00.000Z")).toBe("刚刚");
+    expect(formatElapsedDurationLabel("2026-04-07T12:01:00.000Z")).toBe("刚刚");
   });
 
   it("formats seconds, minutes, hours, and days", () => {
-    expect(formatElapsedDurationLabel("2026-04-07T11:59:45.000Z")).toBe("15s");
-    expect(formatElapsedDurationLabel("2026-04-07T11:45:00.000Z")).toBe("15m");
-    expect(formatElapsedDurationLabel("2026-04-07T06:00:00.000Z")).toBe("6h");
-    expect(formatElapsedDurationLabel("2026-04-03T12:00:00.000Z")).toBe("4d");
+    expect(formatElapsedDurationLabel("2026-04-07T11:59:45.000Z")).toBe("15 秒");
+    expect(formatElapsedDurationLabel("2026-04-07T11:45:00.000Z")).toBe("15 分钟");
+    expect(formatElapsedDurationLabel("2026-04-07T06:00:00.000Z")).toBe("6 小时");
+    expect(formatElapsedDurationLabel("2026-04-03T12:00:00.000Z")).toBe("4 天");
   });
 });

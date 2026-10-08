@@ -386,7 +386,7 @@ function formatDiffReviewRangeLabel(lines: ReadonlyArray<DiffReviewLine>): strin
   const firstNumber = firstLine.newLineNumber ?? firstLine.oldLineNumber;
   const lastNumber = lastLine.newLineNumber ?? lastLine.oldLineNumber;
   if (firstNumber === null || lastNumber === null) {
-    return lines.length === 1 ? "line" : `${lines.length} lines`;
+    return lines.length === 1 ? "line" : `${lines.length} 行`;
   }
 
   const firstMarker = getDiffChangeMarker(firstLine.change).trim();
@@ -396,7 +396,7 @@ function formatDiffReviewRangeLabel(lines: ReadonlyArray<DiffReviewLine>): strin
       : "";
   return firstNumber === lastNumber
     ? `${marker}${firstNumber}`
-    : `${marker}${firstNumber} to ${marker}${lastNumber}`;
+    : `${marker}${firstNumber} 至 ${marker}${lastNumber}`;
 }
 
 export function buildDiffReviewComment(input: {

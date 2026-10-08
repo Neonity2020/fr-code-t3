@@ -177,7 +177,7 @@ function sshPreparationError(cause: unknown) {
   }
   return new ConnectionTransientError({
     reason: "remote-unavailable",
-    detail: `Could not prepare the SSH environment: ${message}`,
+    detail: `无法准备 SSH 环境：${message}`,
   });
 }
 
@@ -199,7 +199,7 @@ export const provisionDesktopSshEnvironment = Effect.fn(
   if (pairingToken === null) {
     return yield* new ConnectionBlockedError({
       reason: "authentication",
-      detail: "The SSH environment did not issue a pairing credential.",
+      detail: "SSH 环境未签发配对凭据。",
     });
   }
   const descriptor = yield* Effect.tryPromise({
@@ -209,7 +209,7 @@ export const provisionDesktopSshEnvironment = Effect.fn(
   if (expectedEnvironmentId !== undefined && descriptor.environmentId !== expectedEnvironmentId) {
     return yield* new ConnectionBlockedError({
       reason: "configuration",
-      detail: `That host reaches ${descriptor.label}, a different machine. Add it as its own environment instead.`,
+      detail: `此主机连接的是另一台计算机 ${descriptor.label}。请将其添加为独立环境。`,
     });
   }
   const access = yield* Effect.tryPromise({
@@ -239,7 +239,7 @@ const layerCapabilities = Layer.effectContext(
         if (session === null) {
           return yield* new ConnectionBlockedError({
             reason: "authentication",
-            detail: "Sign in to T3 Connect to connect this environment.",
+            detail: "登录 T3 Connect 以连接此环境。",
           });
         }
         const token = yield* session.readClerkToken().pipe(
@@ -254,7 +254,7 @@ const layerCapabilities = Layer.effectContext(
         if (token === null) {
           return yield* new ConnectionBlockedError({
             reason: "authentication",
-            detail: "The T3 Connect session is unavailable.",
+            detail: "T3 Connect 会话不可用。",
           });
         }
         return token;
@@ -269,7 +269,7 @@ const layerCapabilities = Layer.effectContext(
         catch: (cause) =>
           new ConnectionTransientError({
             reason: "remote-unavailable",
-            detail: `Could not load the desktop primary credential: ${String(cause)}`,
+            detail: `无法加载桌面主凭据：${String(cause)}`,
           }),
       }).pipe(Effect.map(Option.fromNullishOr)),
     });
@@ -280,7 +280,7 @@ const layerCapabilities = Layer.effectContext(
           if (bridge === undefined) {
             return yield* new ConnectionBlockedError({
               reason: "unsupported",
-              detail: "SSH environments are only available in the desktop app.",
+              detail: "SSH 环境仅在桌面应用可用。",
             });
           }
           return yield* provisionDesktopSshEnvironment(bridge, target, expectedEnvironmentId);
@@ -291,7 +291,7 @@ const layerCapabilities = Layer.effectContext(
         if (bridge === undefined) {
           return yield* new ConnectionBlockedError({
             reason: "unsupported",
-            detail: "SSH environments are only available in the desktop app.",
+            detail: "SSH 环境仅在桌面应用可用。",
           });
         }
         const bootstrap = yield* Effect.tryPromise({
@@ -304,7 +304,7 @@ const layerCapabilities = Layer.effectContext(
         if (bootstrap.pairingToken === null) {
           return yield* new ConnectionBlockedError({
             reason: "authentication",
-            detail: "The SSH environment did not issue a pairing credential.",
+            detail: "SSH 环境未签发配对凭据。",
           });
         }
         const access = yield* Effect.tryPromise({
@@ -327,7 +327,7 @@ const layerCapabilities = Layer.effectContext(
           catch: (cause) =>
             new ConnectionTransientError({
               reason: "remote-unavailable",
-              detail: `Could not disconnect the SSH environment: ${String(cause)}`,
+              detail: `无法断开 SSH 环境：${String(cause)}`,
             }),
         });
       }),
@@ -374,7 +374,7 @@ const loadSecondaryConnectionRegistration = Effect.fn(
   ) {
     return yield* new ConnectionTransientError({
       reason: "endpoint-unavailable",
-      detail: `Desktop-local backend ${entry.id} is not ready yet.`,
+      detail: `桌面本地后端 ${entry.id} 尚未就绪。`,
     });
   }
   const httpBaseUrl = entry.httpBaseUrl;

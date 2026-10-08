@@ -145,8 +145,8 @@ function ChatRouteGlobalShortcuts() {
           toastManager.add(
             stackedThreadToast({
               type: "info",
-              title: "Preview is desktop-only",
-              description: "Open FR Code in the desktop app to use the in-app preview.",
+              title: "预览仅桌面端可用",
+              description: "在桌面应用中打开 FR Code 以使用应用内预览。",
             }),
           );
           return;

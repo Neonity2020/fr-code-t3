@@ -286,8 +286,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "initial",
       type: "warning",
-      title: "Update Available: Codex v1.1.0",
-      description: "Install the update now or review provider settings.",
+      title: "有可用更新：Codex v1.1.0",
+      description: "立即安装更新或检查提供方设置。",
     });
   });
 
@@ -300,7 +300,7 @@ describe("provider update launch notification logic", () => {
       oneClickProviders: [],
     });
 
-    expect(view.description).toBe("Codex and Cursor can be updated from provider settings.");
+    expect(view.description).toBe("可在提供方设置中更新 Codex and Cursor。");
   });
 
   it("uses server update state for running progress", () => {
@@ -323,7 +323,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "running",
       type: "loading",
-      title: "Updating provider",
+      title: "正在更新提供方",
     });
     expect(shouldShowPrimaryProviderUpdateToast(view)).toBe(false);
   });
@@ -362,7 +362,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "failed",
       type: "error",
-      title: "Provider update failed",
+      title: "提供方更新失败",
       description: "command failed",
     });
   });
@@ -387,8 +387,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "unchanged",
       type: "warning",
-      title: "Provider still needs an update",
-      description: "Cursor still appears outdated. Check provider settings for details.",
+      title: "提供方仍需更新",
+      description: "Cursor 仍显示为 已过期，请查看提供方设置了解详情。",
     });
   });
 
@@ -415,8 +415,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "succeeded",
       type: "success",
-      title: "Provider updated",
-      description: "New sessions will use the updated provider.",
+      title: "提供方已更新",
+      description: "新会话将使用更新后的提供方。",
       dismissAfterVisibleMs: 3_000,
     });
   });
@@ -427,7 +427,7 @@ describe("provider update launch notification logic", () => {
     expect(firstFailedProviderUpdateMessage(results)).toBe("WebSocket closed");
     expect(getProviderUpdateRejectedToastView(2, "WebSocket closed")).toMatchObject({
       phase: "failed",
-      title: "Provider updates failed",
+      title: "提供方更新失败",
       description: "WebSocket closed",
     });
   });
@@ -471,8 +471,8 @@ describe("provider update launch notification logic", () => {
 
     expect(view).toMatchObject({
       tone: "loading",
-      title: "Updating 2 providers",
-      description: "Codex and Cursor updates are in progress.",
+      title: "正在更新 2 个提供方",
+      description: "Codex and Cursor 正在更新。",
     });
   });
 
@@ -493,8 +493,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "loading:codex:running",
       tone: "loading",
-      title: "Updating Codex",
-      description: "Codex update in progress.",
+      title: "正在更新 Codex",
+      description: "Codex 正在更新。",
     });
   });
 
@@ -518,7 +518,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "failed:claudeAgent:2026-04-23T10:00:00.000Z:Update command exited with code 1.",
       tone: "error",
-      title: "Claude v1.1.0 update failed",
+      title: "Claude v1.1.0 更新失败",
       description: "Update command exited with code 1.",
       dismissible: true,
     });
@@ -547,8 +547,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "succeeded:codex:2026-04-23T10:00:00.000Z:Provider updated.",
       tone: "success",
-      title: "Codex updated: v1.1.0",
-      description: "New sessions will use the updated provider.",
+      title: "Codex 已更新：v1.1.0",
+      description: "新会话将使用更新后的提供方。",
       dismissAfterVisibleMs: 3_000,
     });
   });
@@ -573,7 +573,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "unchanged:cursor:2026-04-23T10:00:00.000Z:still old",
       tone: "warning",
-      title: "Cursor still needs an update",
+      title: "Cursor 仍需更新",
       dismissible: true,
     });
   });
@@ -631,7 +631,7 @@ describe("provider update launch notification logic", () => {
     expect(successView).toMatchObject({
       key: "succeeded:codex:2026-04-23T10:01:00.000Z:Provider updated.",
       tone: "success",
-      title: "Codex updated: v1.2.0",
+      title: "Codex 已更新：v1.2.0",
     });
 
     const failureView = getProviderUpdateSidebarPillView(providers, {
@@ -641,7 +641,7 @@ describe("provider update launch notification logic", () => {
     expect(failureView).toMatchObject({
       key: "failed:claudeAgent:2026-04-23T10:00:00.000Z:Update command exited with code 1.",
       tone: "error",
-      title: "Claude v1.1.0 update failed",
+      title: "Claude v1.1.0 更新失败",
     });
   });
 
@@ -947,13 +947,13 @@ describe("provider update launch notification logic", () => {
     const runningResult: ProviderUpdateToastView = {
       phase: "running",
       type: "loading",
-      title: "Updating providers",
+      title: "正在更新提供方",
       description: "Running provider update command.",
     };
     const succeededResult: ProviderUpdateToastView = {
       phase: "succeeded",
       type: "success",
-      title: "Provider updated",
+      title: "提供方已更新",
       description: "New sessions will use the updated provider.",
     };
     const successPill: ProviderUpdateSidebarPillView = {
@@ -1114,7 +1114,7 @@ describe("getProviderUpdateRunToastView", () => {
 
     expect(view).toEqual({
       type: "error",
-      title: "2 of 3 provider updates failed",
+      title: "3 个提供方中有 2 个更新失败",
       description: "Mac Studio · Claude: npm exited with code 1.\nLaptop · Codex: WebSocket closed",
     });
   });
@@ -1136,8 +1136,8 @@ describe("getProviderUpdateRunToastView", () => {
       ]),
     ).toEqual({
       type: "success",
-      title: "2 providers updated",
-      description: "New sessions will use the updated providers.",
+      title: "已更新 2 个提供方",
+      description: "新会话将使用更新后的提供方。",
     });
     expect(
       getProviderUpdateRunToastView([

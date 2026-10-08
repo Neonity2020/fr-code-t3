@@ -112,7 +112,7 @@ function handleToastDismissClick(
 
 function CopyErrorButton({ text }: { text: string }) {
   const { copyToClipboard, isCopied } = useCopyToClipboard({ target: "error-message" });
-  const label = isCopied ? "Copied error" : "Copy error";
+  const label = isCopied ? "已复制错误" : "复制错误";
 
   return (
     <Tooltip>
@@ -149,8 +149,8 @@ function ToastExpandableSection({
   labels: { expand?: string; collapse?: string };
 }) {
   const [open, setOpen] = useState(false);
-  const expandLabel = labels.expand ?? "Show details";
-  const collapseLabel = labels.collapse ?? "Hide details";
+  const expandLabel = labels.expand ?? "显示详情";
+  const collapseLabel = labels.collapse ?? "隐藏详情";
 
   return (
     <div className="min-w-0">
@@ -203,8 +203,8 @@ function ToastDescriptionAndExpandable({
     );
   }
 
-  const expandLabel = labels.expand ?? "Show details";
-  const collapseLabel = labels.collapse ?? "Hide details";
+  const expandLabel = labels.expand ?? "显示详情";
+  const collapseLabel = labels.collapse ?? "隐藏详情";
 
   const toggle = () => setOpen((v) => !v);
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -651,7 +651,7 @@ function Toasts({ position }: { position: ToastPosition }) {
               />
               <div className={toastCornerDismissClass}>
                 <button
-                  aria-label="Dismiss notification"
+                  aria-label="关闭通知"
                   className={toastCornerOrbClass}
                   data-slot="toast-close"
                   onClick={() =>
@@ -742,7 +742,7 @@ function AnchoredToasts() {
                     <>
                       <div className={toastCornerDismissClass}>
                         <button
-                          aria-label="Dismiss notification"
+                          aria-label="关闭通知"
                           className={toastCornerOrbClass}
                           data-slot="toast-close"
                           onClick={() =>

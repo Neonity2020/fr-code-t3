@@ -27,7 +27,7 @@ export function DiffFilePathCopyButton({ filePath }: { filePath: string }) {
             ref={ref}
             size="icon-micro"
             variant="ghost-muted"
-            aria-label="Copy file path"
+            aria-label="复制文件路径"
             onClick={() => copyToClipboard(filePath, undefined)}
           />
         }
@@ -38,7 +38,7 @@ export function DiffFilePathCopyButton({ filePath }: { filePath: string }) {
         />
       </TooltipTrigger>
       <TooltipPopup>
-        <p>{isCopied ? "Copied" : "Copy path"}</p>
+        <p>{isCopied ? "已复制" : "复制路径"}</p>
       </TooltipPopup>
     </Tooltip>
   );

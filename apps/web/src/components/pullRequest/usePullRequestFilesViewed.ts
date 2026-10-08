@@ -136,7 +136,7 @@ export function usePullRequestFilesViewed(options: {
         // back, and when the connection went away mid-flight, which the reader is already being
         // told about and which the host never refused.
         if (owned.size > 0 && !isAtomCommandInterrupted(result)) {
-          toastManager.add({ type: "error", title: "Could not update viewed files" });
+          toastManager.add({ type: "error", title: "无法更新文件查看状态" });
         }
         return;
       }

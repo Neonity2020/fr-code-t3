@@ -36,10 +36,10 @@ const DOWNLOAD_FORMAT = new Intl.NumberFormat(undefined, {
 });
 const SUGGESTED_SEARCHES = ["Dracula", "Catppuccin", "Nord", "Tokyo Night"];
 const SORT_OPTIONS: ReadonlyArray<{ value: OpenVsxThemeSort; label: string }> = [
-  { value: "downloadCount", label: "Most downloaded" },
-  { value: "rating", label: "Best rated" },
-  { value: "timestamp", label: "Newest" },
-  { value: "relevance", label: "Most relevant" },
+  { value: "downloadCount", label: "下载最多" },
+  { value: "rating", label: "评分最高" },
+  { value: "timestamp", label: "最新" },
+  { value: "relevance", label: "最相关" },
 ];
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -143,7 +143,7 @@ export function ThemeSearchSection({
         if (!controller.signal.aborted) {
           setResults(null);
           lastSearchKeyRef.current = null;
-          setError(cause instanceof Error ? cause.message : "Open VSX search failed.");
+          setError(cause instanceof Error ? cause.message : "Open VSX 搜索失败。");
         }
       }
       if (requestRef.current === controller) {
@@ -221,7 +221,7 @@ export function ThemeSearchSection({
       try {
         installedCollection = getStoredCustomThemeCollection(extension.collectionId);
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Installed themes could not be read.");
+        setError(cause instanceof Error ? cause.message : "无法读取已安装主题。");
         return;
       }
       const updated = installedCollection.length > 0;
@@ -245,7 +245,7 @@ export function ThemeSearchSection({
         }
       } catch (cause) {
         if (!controller.signal.aborted) {
-          setError(cause instanceof Error ? cause.message : "That theme could not be added.");
+          setError(cause instanceof Error ? cause.message : "无法添加此主题。");
         }
       }
       if (requestRef.current === controller) {
@@ -260,18 +260,16 @@ export function ThemeSearchSection({
     <section className="space-y-3" aria-labelledby="theme-search-heading">
       <div>
         <h3 className="text-sm font-medium" id="theme-search-heading">
-          Search community themes
+          搜索社区主题
         </h3>
-        <p className="mt-0.5 text-muted-foreground text-xs">
-          Find open-source themes from Open VSX.
-        </p>
+        <p className="mt-0.5 text-muted-foreground text-xs">从 Open VSX 查找开源主题。</p>
       </div>
       <InputGroup>
         <InputGroupAddon>
           {isSearching ? <Spinner aria-hidden /> : <SearchIcon aria-hidden />}
         </InputGroupAddon>
         <InputGroupInput
-          aria-label="Search Open VSX themes"
+          aria-label="搜索 Open VSX 主题"
           autoFocus
           onChange={(event) => setQuery(event.currentTarget.value)}
           onKeyDown={(event) => {
@@ -279,7 +277,7 @@ export function ThemeSearchSection({
             if (event.key === "Enter" && !isSearching && installingId === null)
               void runSearch(query.trim());
           }}
-          placeholder="Search themes..."
+          placeholder="搜索主题…"
           size="lg"
           type="search"
           value={query}
@@ -289,7 +287,7 @@ export function ThemeSearchSection({
       {!isSearching || results !== null ? (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-            <p className="text-muted-foreground text-xs">Popular</p>
+            <p className="text-muted-foreground text-xs">热门</p>
             {SUGGESTED_SEARCHES.map((suggestion) => (
               <Button
                 key={suggestion}
@@ -310,13 +308,13 @@ export function ThemeSearchSection({
           </div>
           {results && results.length > 0 ? (
             <div className="flex shrink-0 items-center justify-end gap-2">
-              <p className="text-muted-foreground text-xs">Sort</p>
+              <p className="text-muted-foreground text-xs">排序</p>
               <Select
                 disabled={installingId !== null}
                 value={sortBy}
                 onValueChange={handleSortChange}
               >
-                <SelectTrigger size="sm" className="w-40" aria-label="Sort themes">
+                <SelectTrigger size="sm" className="w-40" aria-label="主题排序">
                   <SelectValue>
                     {SORT_OPTIONS.find((option) => option.value === sortBy)?.label}
                   </SelectValue>
@@ -335,11 +333,7 @@ export function ThemeSearchSection({
       ) : null}
 
       <div className="sr-only" role="status">
-        {isSearching
-          ? "Searching themes..."
-          : results
-            ? `${results.length} supported ${results.length === 1 ? "theme" : "themes"} found.`
-            : ""}
+        {isSearching ? "正在搜索主题…" : results ? `找到 ${results.length} 个支持的主题。` : ""}
       </div>
 
       {error ? (
@@ -350,15 +344,15 @@ export function ThemeSearchSection({
 
       {isSearching && results === null ? (
         <div className="flex min-h-20 items-center justify-center gap-2 text-muted-foreground text-sm">
-          <Spinner /> Searching themes...
+          <Spinner /> 正在搜索主题…
         </div>
       ) : null}
 
       {results ? (
         results.length === 0 ? (
           <div className="flex min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed text-center">
-            <p className="text-sm font-medium">No supported open-source themes found</p>
-            <p className="mt-1 text-muted-foreground text-xs">Try a broader search.</p>
+            <p className="text-sm font-medium">未找到支持的开源主题</p>
+            <p className="mt-1 text-muted-foreground text-xs">请尝试扩大搜索范围。</p>
           </div>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
@@ -367,8 +361,8 @@ export function ThemeSearchSection({
               const isInstalled = getCustomThemes().some(
                 (theme) => theme.collection?.id === extension.collectionId,
               );
-              const action = isInstalled ? "Update" : "Install";
-              const progressAction = isInstalled ? "Updating" : "Installing";
+              const action = isInstalled ? "更新" : "安装";
+              const progressAction = isInstalled ? "正在更新" : "正在安装";
               return (
                 <article
                   className="group flex min-w-0 flex-col gap-3 rounded-xl border border-border/70 bg-card/60 p-3 transition-colors hover:bg-accent/20"
@@ -380,18 +374,18 @@ export function ThemeSearchSection({
                       <h4 className="truncate text-sm font-medium">{extension.name}</h4>
                       <p className="truncate text-muted-foreground text-xs">
                         {extension.publisher} · {DOWNLOAD_FORMAT.format(extension.downloadCount)}{" "}
-                        downloads
+                        次下载
                       </p>
                     </div>
                   </div>
                   <p className="line-clamp-2 min-h-8 text-muted-foreground text-xs leading-4">
-                    {extension.description || "A community color theme for your editor."}
+                    {extension.description || "适用于编辑器的社区配色主题。"}
                   </p>
                   <div className="mt-auto flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-2">
                       {extension.sourceUrl ? (
                         <Button
-                          aria-label={`View source for ${extension.name}`}
+                          aria-label={`查看 ${extension.name} 的源码`}
                           render={<a href={extension.sourceUrl} rel="noreferrer" target="_blank" />}
                           size="icon-micro"
                           variant="ghost-muted"
@@ -432,14 +426,13 @@ export function ThemeSearchSection({
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Update “{pendingUpdate?.name}”?</AlertDialogTitle>
+            <AlertDialogTitle>更新“{pendingUpdate?.name}”?</AlertDialogTitle>
             <AlertDialogDescription>
-              This replaces its installed variants, including any local edits. Variants no longer in
-              the extension will be removed.
+              这将替换已安装的主题变体，包括本地编辑。扩展中已移除的变体也会被删除。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
             <Button
               onClick={() => {
                 const extension = pendingUpdate;
@@ -447,7 +440,7 @@ export function ThemeSearchSection({
                 if (extension) void handleInstall(extension, true);
               }}
             >
-              Update theme
+              更新主题
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

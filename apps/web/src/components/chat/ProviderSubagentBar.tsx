@@ -79,13 +79,13 @@ export function ProviderSubagentBar(props: {
         className="min-w-0 truncate text-muted-foreground tabular-nums"
       />
       <span role="status" className="sr-only">
-        {`${modelDescription} subagent: ${announcement}`}
+        {`${modelDescription} 子智能体：${announcement}`}
       </span>
-      <span className="ms-auto shrink-0 text-muted-foreground max-sm:hidden">Runs on its own</span>
+      <span className="ms-auto shrink-0 text-muted-foreground max-sm:hidden">自动运行</span>
       {props.onOpenParent ? (
         <Button size="sm" variant="ghost" onClick={props.onOpenParent}>
           <ArrowUpLeftIcon />
-          Open parent
+          打开父会话
         </Button>
       ) : null}
     </div>

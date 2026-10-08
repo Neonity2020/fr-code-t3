@@ -33,18 +33,18 @@ export function usesChatGptSharing(provider: ServerProvider | null | undefined):
 export const CURSOR_USAGE_WINDOWS = [
   {
     id: "totalPercentUsed",
-    label: "Overall",
-    description: "Combined usage across both allowances, not a third quota.",
+    label: "总体",
+    description: "两项额度的合计用量，并非第三项配额。",
   },
   {
     id: "autoPercentUsed",
-    label: "Cursor Models",
-    description: "Grok and Composer use this first. Auto can use either pool.",
+    label: "Cursor 模型",
+    description: "Grok 和 Composer 优先使用此额度。Auto 可使用任一额度池。",
   },
   {
     id: "apiPercentUsed",
-    label: "Other Models",
-    description: "Claude, GPT, and Gemini use this pool. Grok and Composer fall back here.",
+    label: "其他模型",
+    description: "Claude、GPT 和 Gemini 使用此额度池。Grok 和 Composer 会在需要时使用此额度。",
   },
 ] as const;
 
@@ -539,13 +539,13 @@ export function formatDuration(ms: number): string {
 export function formatResetsIn(window: ServerProviderUsageWindow, now: number): string | null {
   const resetsAt = resetMillis(window);
   if (resetsAt === null) return null;
-  return resetsAt <= now ? "resets now" : `resets in ${formatDuration(resetsAt - now)}`;
+  return resetsAt <= now ? "现在重置" : `${formatDuration(resetsAt - now)} 后重置`;
 }
 
 /** Limit commands are served by T3 from the same snapshots as Usage → Limits. */
 export const USAGE_LIMITS_COMMAND = {
   name: "usage-limits",
-  description: "Show this provider's usage limits",
+  description: "显示此提供方的用量限额",
 } satisfies ServerProviderSlashCommand;
 
 /** Handled by the client without sending a turn; anything with arguments stays an ordinary prompt. */
@@ -704,7 +704,7 @@ export function collectProviderUsageLimits(
         id: `${source.id}:${account.id}`,
         driver: account.driver,
         label: `${source.label} · ${account.id}`,
-        sourceLabel: "CLI Proxy",
+        sourceLabel: "CLI 代理",
         ...(account.usageLimits.resetCredits?.nextCreditId
           ? {
               resetCreditInput: {

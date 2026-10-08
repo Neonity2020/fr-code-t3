@@ -24,7 +24,7 @@ export class ClipboardWriteError extends Schema.TaggedError<ClipboardWriteError>
   },
 ) {
   override get message(): string {
-    return `Failed to copy ${this.target} to the clipboard.`;
+    return `无法将 ${this.target} 复制到剪贴板。`;
   }
 }
 
@@ -47,7 +47,7 @@ export class ClipboardReadError extends Schema.TaggedError<ClipboardReadError>()
   },
 ) {
   override get message(): string {
-    return `Failed to read ${this.target} from the clipboard.`;
+    return `无法从剪贴板读取 ${this.target}。`;
   }
 }
 

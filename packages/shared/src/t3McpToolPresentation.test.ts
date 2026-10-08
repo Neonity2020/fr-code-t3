@@ -26,50 +26,50 @@ describe("resolveT3McpToolPresentation", () => {
   });
   it("pretty prints Claude and Cursor T3 MCP tool names", () => {
     expect(resolveT3McpToolPresentation("mcp__t3-code__t3_thread_read")).toEqual({
-      displayName: "Read a T3 thread",
+      displayName: "读取 T3 会话",
       logo: "t3-code",
     });
   });
 
   it("pretty prints Codex T3 MCP tool names", () => {
     expect(resolveT3McpToolPresentation("t3-code.create_threads")).toEqual({
-      displayName: "Create T3 threads",
+      displayName: "创建 T3 会话",
       logo: "t3-code",
     });
   });
 
   it("pretty prints thread metadata updates", () => {
     expect(resolveT3McpToolPresentation("mcp__t3-code__t3_thread_update")).toEqual({
-      displayName: "Update T3 thread metadata",
+      displayName: "更新 T3 会话元数据",
       logo: "t3-code",
     });
   });
 
   it("pretty prints bare T3 MCP toolkit names", () => {
     expect(resolveT3McpToolPresentation("list_scheduled_tasks")).toEqual({
-      displayName: "List scheduled tasks",
+      displayName: "列出 定时任务",
       logo: "t3-code",
     });
   });
 
   it("pretty prints worktree T3 MCP tool names", () => {
     expect(resolveT3McpToolPresentation("mcp__t3-code__t3_worktree_handoff")).toEqual({
-      displayName: "Hand off thread to a git worktree",
+      displayName: "移交 会话到 Git 工作树",
       logo: "t3-code",
     });
     expect(resolveT3McpToolPresentation("t3-code.t3_worktree_status")).toEqual({
-      displayName: "Get thread worktree status",
+      displayName: "获取 会话工作树状态",
       logo: "t3-code",
     });
   });
 
   it("pretty prints preview T3 MCP tool names", () => {
     expect(resolveT3McpToolPresentation("T3-code.preview_open")).toEqual({
-      displayName: "Open a page in the preview browser",
+      displayName: "打开 预览浏览器中的页面",
       logo: "t3-code",
     });
     expect(resolveT3McpToolPresentation("mcp__t3-code__preview_status")).toEqual({
-      displayName: "Get preview browser status",
+      displayName: "获取 预览浏览器状态",
       logo: "t3-code",
     });
   });
@@ -83,14 +83,14 @@ describe("resolveT3McpToolPresentation", () => {
       "FR Code delegate_task",
       "t3-code__delegate_task",
     ]) {
-      expect(resolveT3McpToolPresentation(name)?.displayName).toBe("Delegate a child task");
+      expect(resolveT3McpToolPresentation(name)?.displayName).toBe("委派 子任务");
     }
   });
 
   it("matches OpenCode 2's per-thread server names, whose thread ids hold underscores", () => {
     expect(
       resolveT3McpToolPresentation("t3-code-thread_opencode2-adapter_delegate_task")?.displayName,
-    ).toBe("Delegate a child task");
+    ).toBe("委派 子任务");
     expect(resolveT3McpToolPresentation("t3-code-thread_opencode2-adapter_not_a_tool")).toBeNull();
   });
 

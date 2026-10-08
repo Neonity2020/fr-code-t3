@@ -31,7 +31,7 @@ function AccountSummary({ account }: { readonly account: UsageLimitsReport["acco
         <RedactedSensitiveText
           key={label}
           value={label}
-          ariaLabel="Toggle account label visibility"
+          ariaLabel="切换账号名称可见性"
           revealTooltip="Click to reveal account"
           hideTooltip="Click to hide account"
           className="max-w-full truncate align-bottom font-sans text-xs leading-normal"
@@ -63,7 +63,7 @@ export function usageLimitsBannerItem(
     variant: "info",
     priority: "notice",
     icon: <GaugeIcon />,
-    title: "Usage limits",
+    title: "用量限制",
     description: summary,
     dismissLabel: "Dismiss usage limits",
     onDismiss,
@@ -112,7 +112,7 @@ function UsageLimitsBannerBody({
                   className="self-start"
                   onClick={() => void ensureLocalApi().shell.openExternal(externalUsage.url)}
                 >
-                  Manage usage
+                  管理用量
                 </Button>
               ) : null}
               {resetCreditInput && account.limits.resetCredits ? (

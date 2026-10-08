@@ -19,11 +19,11 @@ describe("editorLabelForPlatform", () => {
 
 describe("openInEditorMenuLabel", () => {
   it("names the preferred editor", () => {
-    expect(openInEditorMenuLabel("zed")).toBe("Open in Zed");
+    expect(openInEditorMenuLabel("zed")).toBe("在 Zed 中打开");
   });
 
   it("keeps the generic label for the default file handler and missing preferences", () => {
-    expect(openInEditorMenuLabel("file-manager")).toBe("Open in editor");
-    expect(openInEditorMenuLabel(null)).toBe("Open in editor");
+    expect(openInEditorMenuLabel("file-manager")).toBe("在编辑器打开");
+    expect(openInEditorMenuLabel(null)).toBe("在编辑器打开");
   });
 });

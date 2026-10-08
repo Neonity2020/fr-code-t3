@@ -70,9 +70,9 @@ export async function writeUsagePrices(input: {
           result =
             saved._tag === "Success"
               ? { status: "saved" }
-              : { status: "failed", error: "Could not save. Try again." };
+              : { status: "failed", error: "无法保存，请重试。" };
         } catch {
-          result = { status: "failed", error: "Could not save. Try again." };
+          result = { status: "failed", error: "无法保存，请重试。" };
         }
       }
       input.onResult(target.environmentId, result);

@@ -896,7 +896,7 @@ describe("theme files", () => {
           colors: { accent: "#5b6cff" },
         }),
       ),
-    ).toThrow(`Failed to read the theme library from ${CUSTOM_THEMES_STORAGE_KEY}.`);
+    ).toThrow(`无法读取主题库 ${CUSTOM_THEMES_STORAGE_KEY}。`);
     expect(setItem).not.toHaveBeenCalled();
 
     vi.unstubAllGlobals();
@@ -924,7 +924,7 @@ describe("theme files", () => {
           colors: { accent: "#5b6cff" },
         }),
       ),
-    ).toThrow('A theme named "Aurora" is already installed.');
+    ).toThrow("已安装名为“Aurora”的主题。");
     expect(setItem).not.toHaveBeenCalled();
 
     vi.unstubAllGlobals();

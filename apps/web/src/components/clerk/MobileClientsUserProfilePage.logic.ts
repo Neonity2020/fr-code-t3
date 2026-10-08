@@ -40,6 +40,6 @@ export function mobileClientNotificationDetail(device: RelayClientDeviceRecord):
 export function mobileClientUpdatedAtLabel(updatedAt: string): string {
   const date = new Date(updatedAt);
   return Number.isNaN(date.getTime())
-    ? "Update time unavailable"
-    : `Updated ${mobileClientUpdatedAtFormatter.format(date)}`;
+    ? "更新时间不可用"
+    : `更新于 ${mobileClientUpdatedAtFormatter.format(date)}`;
 }

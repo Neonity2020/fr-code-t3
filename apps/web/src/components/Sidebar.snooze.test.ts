@@ -37,12 +37,12 @@ describe("resolveSnoozePresets", () => {
     for (const preset of presets) {
       // Day words live in the label column; the time column is time-only
       // (plus a weekday for next week, which names a different day).
-      expect(preset.whenLabel.toLowerCase()).not.toContain("tomorrow");
+      expect(preset.whenLabel.toLowerCase()).not.toContain("明天");
     }
     const tomorrow = presets.find((preset) => preset.id === "tomorrow");
     expect(tomorrow!.whenLabel).toMatch(/9/);
     const nextWeek = presets.find((preset) => preset.id === "next-week");
-    expect(nextWeek!.whenLabel).toMatch(/Mon/);
+    expect(nextWeek!.whenLabel).toMatch(/周一/);
   });
 
   it("drops the evening preset once evening is near or past", () => {
@@ -65,7 +65,7 @@ describe("resolveSnoozePresets", () => {
     const twelveHour = resolveSnoozePresets(localDate(2026, 4, 8, 10), "12-hour");
     const twentyFourHour = resolveSnoozePresets(localDate(2026, 4, 8, 10), "24-hour");
 
-    expect(twelveHour.find((preset) => preset.id === "evening")!.whenLabel).toMatch(/PM/i);
+    expect(twelveHour.find((preset) => preset.id === "evening")!.whenLabel).toMatch(/下午/);
     expect(twentyFourHour.find((preset) => preset.id === "evening")!.whenLabel).toBe("18:00");
   });
 });
@@ -76,18 +76,18 @@ describe("snoozeWakeDescription", () => {
   it("uses bare time today, 'tomorrow' next day, weekday within the week", () => {
     expect(
       snoozeWakeDescription(localDate(2026, 4, 8, 18).toISOString(), now, "locale"),
-    ).not.toContain("tomorrow");
+    ).not.toContain("明天");
     expect(snoozeWakeDescription(localDate(2026, 4, 9, 9).toISOString(), now, "locale")).toContain(
-      "tomorrow",
+      "明天",
     );
     expect(snoozeWakeDescription(localDate(2026, 4, 13, 9).toISOString(), now, "locale")).toMatch(
-      /Mon/,
+      /周一/,
     );
   });
 
   it("formats wake descriptions with the selected clock preference", () => {
     expect(snoozeWakeDescription(localDate(2026, 4, 8, 18).toISOString(), now, "12-hour")).toMatch(
-      /PM/i,
+      /下午/,
     );
     expect(snoozeWakeDescription(localDate(2026, 4, 8, 18).toISOString(), now, "24-hour")).toBe(
       "18:00",

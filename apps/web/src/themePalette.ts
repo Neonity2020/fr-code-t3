@@ -1141,8 +1141,7 @@ export class ThemeLibraryStorageError extends Schema.TaggedError<ThemeLibrarySto
   },
 ) {
   override get message(): string {
-    const direction = this.operation === "read" ? "from" : "to";
-    return `Failed to ${this.operation} the theme library ${direction} ${this.storageKey}.`;
+    return `无法${this.operation === "read" ? "读取" : "写入"}主题库 ${this.storageKey}。`;
   }
 }
 
@@ -1204,14 +1203,14 @@ function storedThemeHasCollectionId(storedTheme: unknown, collectionId: string):
 
 export function installCustomTheme(theme: ThemeDefinition): ThemeDefinition {
   if (RESERVED_THEME_IDS.has(theme.id)) {
-    throw new Error(`The theme id "${theme.id}" is reserved.`);
+    throw new Error(`主题 ID“${theme.id}”为保留值。`);
   }
   const library = getWritableCustomThemeLibrary();
   if (
     BUILT_IN_THEME_DEFINITIONS.some((existing) => existing.id === theme.id) ||
     library.storedThemes.some((storedTheme) => storedThemeHasId(storedTheme, theme.id))
   ) {
-    throw new Error(`A theme named "${theme.label}" is already installed.`);
+    throw new Error(`已安装名为“${theme.label}”的主题。`);
   }
   const canonicalTheme = canonicalizeThemeDefinition(theme);
   const themes = [...library.themes, canonicalTheme];
@@ -1221,7 +1220,7 @@ export function installCustomTheme(theme: ThemeDefinition): ThemeDefinition {
 
 export function updateCustomTheme(theme: ThemeDefinition): ThemeDefinition {
   if (RESERVED_THEME_IDS.has(theme.id)) {
-    throw new Error(`The theme id "${theme.id}" is reserved.`);
+    throw new Error(`主题 ID“${theme.id}”为保留值。`);
   }
 
   const library = getWritableCustomThemeLibrary();
@@ -1287,7 +1286,7 @@ export function replaceCustomThemeCollection(
     (theme) => RESERVED_THEME_IDS.has(theme.id) || occupiedIds.has(theme.id),
   );
   if (conflictingTheme) {
-    throw new Error(`A theme named "${conflictingTheme.label}" is already installed.`);
+    throw new Error(`已安装名为“${conflictingTheme.label}”的主题。`);
   }
 
   const nextStoredThemes: unknown[] = [];

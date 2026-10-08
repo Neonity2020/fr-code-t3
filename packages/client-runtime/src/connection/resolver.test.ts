@@ -201,7 +201,7 @@ describe("ConnectionResolver", () => {
       const error = yield* Effect.flip(broker.prepare(catalogEntry(target)));
 
       expect(error).toMatchObject({ reason: "unsupported" });
-      expect(error.message).toContain("Update FR Code on Compatible environment");
+      expect(error.message).toContain("更新 Compatible environment 上的 FR Code");
     }),
   );
 
@@ -221,7 +221,7 @@ describe("ConnectionResolver", () => {
       const error = yield* Effect.flip(broker.prepare(catalogEntry(target)));
 
       expect(error).toMatchObject({ reason: "unsupported" });
-      expect(error.message).toContain("This client is not supported");
+      expect(error.message).toContain("此服务器不支持当前客户端");
     }),
   );
 

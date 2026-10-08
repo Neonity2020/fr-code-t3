@@ -114,7 +114,7 @@ function createWindow(
     resizable: false,
     show: false,
     skipTaskbar: true,
-    title: "FR Code Snapshot Animation",
+    title: "FR Code 截图动画",
     transparent: true,
     webPreferences: {
       backgroundThrottling: false,

@@ -18,10 +18,10 @@ describe("ChangedFilesCard", () => {
     );
 
     expect(markup).toContain('data-changed-files-state="tree"');
-    expect(markup).toContain('aria-label="Open diff"');
-    expect(markup).toContain('role="group" aria-label="2 additions, 1 deletions"');
-    expect(markup).toContain("1 changed file");
-    expect(markup).not.toContain("1 changed files");
+    expect(markup).toContain('aria-label="查看差异"');
+    expect(markup).toContain('role="group" aria-label="新增 2 行，删除 1 行"');
+    expect(markup).toContain("1 个更改文件");
+    expect(markup).not.toContain("1 个更改文件s");
   });
 
   it("shows collapsed folders and root files together", () => {
@@ -53,7 +53,7 @@ describe("ChangedFilesCard", () => {
     expect(markup).toContain("packages/shared/src");
     expect(markup).not.toContain("git.ts");
     expect(markup).toContain("README.md");
-    expect(markup).not.toContain("Show all");
+    expect(markup).not.toContain("显示全部");
     expect(markup).not.toContain("App.test.tsx");
   });
 
@@ -70,9 +70,9 @@ describe("ChangedFilesCard", () => {
     );
 
     expect(markup).toContain('data-changed-files-state="tree"');
-    expect(markup).toContain("1 changed file");
+    expect(markup).toContain("1 个更改文件");
     expect(markup).toContain("apps/web/src");
-    expect(markup).not.toContain("Show all");
+    expect(markup).not.toContain("显示全部");
     expect(markup).not.toContain("App.tsx");
   });
 });

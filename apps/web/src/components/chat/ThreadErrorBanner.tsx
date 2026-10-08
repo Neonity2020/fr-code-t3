@@ -60,8 +60,8 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
         <AlertDescription>
           {chatGptUsageLimit ? (
             <div className="space-y-1">
-              <p className="font-medium">ChatGPT usage limit reached</p>
-              <p>Review your usage settings in ChatGPT to continue.</p>
+              <p className="font-medium">已达到 ChatGPT 用量限制</p>
+              <p>请在 ChatGPT 中检查用量设置以继续。</p>
             </div>
           ) : (
             <Tooltip>
@@ -76,7 +76,7 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
           <AlertAction>
             {chatGptUsageLimit ? <ChatGptUsageButton variant="default" size="sm" /> : null}
             {onDismiss ? (
-              <Button variant="ghost" size="icon-xs" aria-label="Dismiss error" onClick={onDismiss}>
+              <Button variant="ghost" size="icon-xs" aria-label="关闭错误提示" onClick={onDismiss}>
                 <XIcon />
               </Button>
             ) : null}

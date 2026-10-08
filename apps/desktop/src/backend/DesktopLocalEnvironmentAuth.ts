@@ -104,7 +104,7 @@ export const make = Effect.gen(function* () {
           httpBaseUrl: config.httpBaseUrl.href,
           credential,
           clientMetadata: {
-            label: "FR Code Desktop",
+            label: "FR Code 桌面端",
             deviceType: "desktop",
           },
         }).pipe(

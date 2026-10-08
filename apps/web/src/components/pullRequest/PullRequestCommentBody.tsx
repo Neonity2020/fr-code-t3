@@ -53,7 +53,7 @@ export function PullRequestCommentBody({
             setExpanded(!expanded);
           }}
         >
-          {expanded ? "Show less" : "Show full comment"}
+          {expanded ? "收起" : "显示完整评论"}
         </Button>
       ) : null}
     </div>

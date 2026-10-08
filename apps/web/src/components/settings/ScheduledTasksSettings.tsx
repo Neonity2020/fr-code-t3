@@ -102,13 +102,13 @@ import {
 
 /** JS day-of-week (0 = Sunday) rendered Monday-first, matching how people read a week. */
 const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0] as const;
-const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const WEEKDAY_LABELS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"] as const;
 const WEEKDAY_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
 
 const WORKSPACE_MODE_LABELS: Record<WorkspaceMode, string> = {
-  worktree: "Create a new worktree",
-  root: "Use the project checkout",
-  existing_worktree: "Use a specific checkout",
+  worktree: "创建新工作树",
+  root: "使用项目工作目录",
+  existing_worktree: "使用指定工作目录",
 };
 
 const EMPTY_DRAFT: DraftState = {
@@ -171,21 +171,21 @@ function splitModelKey(value: string): ModelSelection | null {
 }
 
 export function scheduleLabel(schedule: ScheduledTaskSchedule): string {
-  if (schedule.type === "webhook") return "On webhook";
+  if (schedule.type === "webhook") return "Webhook 触发";
   if (schedule.type === "interval") {
     const minutes = schedule.everyMs / 60_000;
     return Number.isInteger(minutes)
-      ? `Every ${minutes} min`
-      : `Every ${Math.round(schedule.everyMs / 1000)} sec`;
+      ? `每 ${minutes} 分钟`
+      : `每 ${Math.round(schedule.everyMs / 1000)} 秒`;
   }
   const weekdays = schedule.weekdays ?? [];
   const days =
     weekdays.length === 0
-      ? "Daily"
+      ? "每天"
       : weekdays.length === 5 && weekdays.every((day) => day >= 1 && day <= 5)
-        ? "Weekdays"
+        ? "工作日"
         : weekdays.map((day) => WEEKDAY_LABELS[day]).join(", ");
-  return `${days} at ${schedule.timeOfDay}`;
+  return `${days} ${schedule.timeOfDay}`;
 }
 
 /**
@@ -194,28 +194,28 @@ export function scheduleLabel(schedule: ScheduledTaskSchedule): string {
  * for upcoming runs instead of a misleading "just now".
  */
 export function relativeLabel(value: string | null): string {
-  if (!value) return "Not scheduled";
+  if (!value) return "未安排";
   const diffMs = new Date(value).getTime() - Date.now();
   if (diffMs <= 0) {
     const relative = formatRelativeTime(value);
-    if (!relative) return "Not scheduled";
+    if (!relative) return "未安排";
     return relative.suffix ? `${relative.value} ${relative.suffix}` : relative.value;
   }
   const minutes = Math.ceil(diffMs / 60_000);
-  if (minutes < 2) return "in under a minute";
-  if (minutes < 60) return `in ${minutes}m`;
+  if (minutes < 2) return "不到一分钟后";
+  if (minutes < 60) return `${minutes} 分钟后`;
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `in ${hours}h`;
-  return `in ${Math.round(hours / 24)}d`;
+  if (hours < 24) return `${hours} 小时后`;
+  return `${Math.round(hours / 24)} 天后`;
 }
 
 const DELIVERY_OUTCOME_LABELS: Record<ScheduledTaskWebhookDeliveryOutcome, string> = {
-  accepted: "Ran",
-  dispatch_failed: "Run failed",
-  rejected_signature: "Bad signature",
-  disabled: "Task paused",
-  rate_limited: "Rate limited",
-  expired: "Too old",
+  accepted: "已运行",
+  dispatch_failed: "运行失败",
+  rejected_signature: "签名错误",
+  disabled: "任务已暂停",
+  rate_limited: "触发速率限制",
+  expired: "已过时",
 };
 
 function deliveryOutcomeVariant(outcome: ScheduledTaskWebhookDeliveryOutcome) {
@@ -249,7 +249,7 @@ export function ScheduledTasksSettings(target: {
   return (
     <SettingsPageContainer>
       <SettingsSection
-        title="Scheduled tasks"
+        title="定时任务"
         variant="plain"
         headerAction={
           <Button
@@ -262,12 +262,12 @@ export function ScheduledTasksSettings(target: {
             }
           >
             <PlusIcon className="size-3" />
-            New task
+            新建任务
           </Button>
         }
       >
         {scope.kind === "unavailable" ? (
-          <SettingsSection title="Unavailable selection">
+          <SettingsSection title="所选项不可用">
             <SettingsRow title={scope.message} />
           </SettingsSection>
         ) : environments.length === 0 ? (
@@ -276,8 +276,8 @@ export function ScheduledTasksSettings(target: {
               <EmptyMedia variant="icon">
                 <Clock3Icon />
               </EmptyMedia>
-              <EmptyTitle>No environments available</EmptyTitle>
-              <EmptyDescription>Connect an environment to manage scheduled tasks.</EmptyDescription>
+              <EmptyTitle>没有可用环境</EmptyTitle>
+              <EmptyDescription>连接环境以管理定时任务。</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
@@ -358,27 +358,24 @@ function ScheduledTaskEnvironmentSection({
     >
       {!connected ? (
         <SettingsRow
-          title="Environment disconnected"
-          description={`Reconnect ${environment.label} to view its scheduled tasks.`}
+          title="环境已断开"
+          description={`重新连接 ${environment.label} 以查看其定时任务。`}
         />
       ) : tasksQuery.error ? (
-        <SettingsRow title="Could not load scheduled tasks" description={tasksQuery.error} />
+        <SettingsRow title="无法加载定时任务" description={tasksQuery.error} />
       ) : !tasks ? (
-        <SettingsRow title="Loading scheduled tasks…" role="status" />
+        <SettingsRow title="正在加载定时任务…" role="status" />
       ) : (
         <>
           {taskId && !linkedTask ? (
             <SettingsRow
-              title="Task unavailable"
-              description="This task no longer exists or is outside the selected project scope."
+              title="任务不可用"
+              description="此任务已不存在，或不在所选项目范围内。"
               role="status"
             />
           ) : null}
           {tasks.length === 0 ? (
-            <SettingsRow
-              title="No scheduled tasks"
-              description="No tasks match this environment and project selection."
-            />
+            <SettingsRow title="没有定时任务" description="没有符合当前环境和项目选择的任务。" />
           ) : (
             tasks.map((task) => (
               <ScheduledTaskRow
@@ -430,7 +427,7 @@ function ScheduledTaskRow({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not update scheduled task",
+          title: "无法更新定时任务",
           description: String(squashAtomCommandFailure(result)),
         }),
       );
@@ -445,12 +442,12 @@ function ScheduledTaskRow({
           <span>
             {scheduleLabel(task.schedule)} ·{" "}
             {!task.enabled
-              ? "Paused"
+              ? "已暂停"
               : isWebhook
-                ? "Listening"
+                ? "正在监听"
                 : task.nextRunAt
-                  ? `Next run ${relativeLabel(task.nextRunAt)}`
-                  : "Not scheduled"}
+                  ? `下次运行：${relativeLabel(task.nextRunAt)}`
+                  : "未安排"}
           </span>
           {task.lastRunStatus !== "never" ? (
             <Badge variant={statusVariant(task.lastRunStatus)}>{task.lastRunStatus}</Badge>
@@ -463,7 +460,7 @@ function ScheduledTaskRow({
           <Switch
             checked={task.enabled}
             disabled={busy}
-            aria-label={`Enable ${task.title}`}
+            aria-label={`启用 ${task.title}`}
             onCheckedChange={() => void act("toggle")}
           />
           <Menu>
@@ -473,7 +470,7 @@ function ScheduledTaskRow({
                   size="icon-sm"
                   variant="ghost"
                   disabled={busy}
-                  aria-label={`Actions for ${task.title}`}
+                  aria-label={`${task.title} 的操作`}
                 />
               }
             >
@@ -482,23 +479,23 @@ function ScheduledTaskRow({
             <MenuPopup align="end">
               <MenuItem onClick={onEdit}>
                 <PencilIcon />
-                Edit
+                编辑
               </MenuItem>
               {isWebhook ? (
                 <MenuItem onClick={() => setDeliveriesOpen(true)}>
                   <InboxIcon />
-                  Deliveries
+                  请求记录
                 </MenuItem>
               ) : (
                 <MenuItem onClick={() => void act("run")}>
                   <PlayIcon />
-                  Run now
+                  立即运行
                 </MenuItem>
               )}
               <MenuSeparator />
               <MenuItem onClick={() => void act("delete")}>
                 <Trash2Icon />
-                Delete
+                删除
               </MenuItem>
             </MenuPopup>
           </Menu>
@@ -551,14 +548,14 @@ function WebhookDeliveriesDialog({
     >
       <DialogPopup className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Deliveries · {task.title}</DialogTitle>
-          <DialogDescription>Recent requests to this task's webhook URL.</DialogDescription>
+          <DialogTitle>请求记录 · {task.title}</DialogTitle>
+          <DialogDescription>最近发送到此任务 Webhook 网址的请求。</DialogDescription>
         </DialogHeader>
         <DialogPanel>
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           {selectedId !== null && selected === null && selectedQuery.error === null ? (
             <p className="text-sm text-muted-foreground" role="status">
-              Loading delivery…
+              正在加载请求…
             </p>
           ) : selected ? (
             <div className="space-y-4">
@@ -570,36 +567,36 @@ function WebhookDeliveriesDialog({
                   {selected.method} · {relativeLabel(selected.receivedAt)}
                 </span>
                 {selected.signatureVerified ? (
-                  <span className="text-muted-foreground">Signature verified</span>
+                  <span className="text-muted-foreground">签名已验证</span>
                 ) : null}
               </div>
               {selected.error ? <p className="text-sm text-destructive">{selected.error}</p> : null}
-              <DeliveryBlock title="Prompt sent to the agent">
-                {selected.renderedPrompt ?? "No run was started for this request."}
+              <DeliveryBlock title="发送给智能体的提示词">
+                {selected.renderedPrompt ?? "此次请求未启动运行。"}
               </DeliveryBlock>
               {selected.missingFields.length > 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Empty placeholders: {selected.missingFields.join(", ")}
+                  空占位符： {selected.missingFields.join(", ")}
                 </p>
               ) : null}
-              <DeliveryBlock title="Headers">
+              <DeliveryBlock title="请求头">
                 {Object.entries(selected.headers)
                   .map(([name, value]) => `${name}: ${value}`)
                   .join("\n")}
               </DeliveryBlock>
               {selected.query ? (
-                <DeliveryBlock title="Query">{selected.query}</DeliveryBlock>
+                <DeliveryBlock title="查询参数">{selected.query}</DeliveryBlock>
               ) : null}
-              <DeliveryBlock title={selected.bodyTruncated ? "Body (truncated)" : "Body"}>
-                {selected.body || "(empty)"}
+              <DeliveryBlock title={selected.bodyTruncated ? "请求体（已截断）" : "请求体"}>
+                {selected.body || "（空）"}
               </DeliveryBlock>
             </div>
           ) : selectedId !== null ? null : deliveries === null ? (
             <p className="text-sm text-muted-foreground" role="status">
-              Loading deliveries…
+              正在加载请求记录…
             </p>
           ) : deliveries.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No requests yet.</p>
+            <p className="text-sm text-muted-foreground">暂无请求。</p>
           ) : (
             <ul className="divide-y divide-border">
               {deliveries.map((delivery) => (
@@ -618,8 +615,8 @@ function WebhookDeliveriesDialog({
                     </span>
                     {delivery.missingFields.length > 0 ? (
                       <span className="text-muted-foreground">
-                        {delivery.missingFields.length} empty placeholder
-                        {delivery.missingFields.length === 1 ? "" : "s"}
+                        {delivery.missingFields.length} 空占位符
+                        {""}
                       </span>
                     ) : null}
                   </button>
@@ -631,7 +628,7 @@ function WebhookDeliveriesDialog({
         <DialogFooter>
           {selectedId !== null ? (
             <Button variant="outline" size="sm" onClick={() => setSelectedId(null)}>
-              Back
+              返回
             </Button>
           ) : (
             <Button
@@ -640,10 +637,10 @@ function WebhookDeliveriesDialog({
               disabled={deliveriesQuery.isPending}
               onClick={deliveriesQuery.refresh}
             >
-              Refresh
+              刷新
             </Button>
           )}
-          <DialogClose render={<Button size="sm" />}>Done</DialogClose>
+          <DialogClose render={<Button size="sm" />}>完成</DialogClose>
         </DialogFooter>
       </DialogPopup>
     </Dialog>
@@ -676,7 +673,7 @@ function WebhookEndpointField({
   const [rotating, setRotating] = useState(false);
   const endpoint = task?.webhook;
   if (!task || !endpoint) {
-    return <p className="text-sm text-muted-foreground">The URL appears after you save.</p>;
+    return <p className="text-sm text-muted-foreground">保存后显示网址。</p>;
   }
   const { address: url, copyable, note } = webhookAddress(endpoint, httpBaseUrl);
   const rotateUrl = async () => {
@@ -686,7 +683,7 @@ function WebhookEndpointField({
       })) ??
       // No themed dialog host is mounted; fall back to the native prompt
       // rather than rotating unasked.
-      window.confirm("Rotate this webhook URL? The current URL stops working.");
+      window.confirm("轮换此 Webhook 网址？当前网址将失效。");
     if (!confirmed) return;
     setRotating(true);
     const result = await rotate({ environmentId, input: { id: task.id } });
@@ -695,7 +692,7 @@ function WebhookEndpointField({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not rotate webhook URL",
+          title: "无法轮换 Webhook 网址",
           description: String(squashAtomCommandFailure(result)),
         }),
       );
@@ -706,7 +703,7 @@ function WebhookEndpointField({
       <div className="flex items-center gap-2">
         <Input
           readOnly
-          aria-label="Webhook URL"
+          aria-label="Webhook 网址"
           value={url}
           onFocus={(event) => event.currentTarget.select()}
         />
@@ -719,7 +716,7 @@ function WebhookEndpointField({
           onClick={() => copyToClipboard(url, undefined)}
         >
           <CopyIcon />
-          {isCopied ? "Copied" : "Copy"}
+          {isCopied ? "已复制" : "复制"}
         </Button>
         <Button
           size="sm"
@@ -728,7 +725,7 @@ function WebhookEndpointField({
           disabled={rotating}
           onClick={() => void rotateUrl()}
         >
-          Rotate
+          旋转
         </Button>
       </div>
       {note !== null ? <p className="text-xs text-muted-foreground">{note}</p> : null}
@@ -748,10 +745,10 @@ function WebhookDeliveryMode({ environmentId }: { readonly environmentId: Enviro
   return (
     <p className="text-xs text-muted-foreground">
       {cloudLink.data.holdWebhooksWhileOffline
-        ? "Held for up to 24 hours while this environment is offline. "
-        : "Forwarded live. Requests fail while this environment is offline. "}
+        ? "此环境离线时最多保留 24 小时。"
+        : "实时转发。此环境离线时请求会失败。"}
       <Link to="/settings/connections" className="underline underline-offset-2">
-        Change in Connections
+        在连接设置中更改
       </Link>
     </p>
   );
@@ -926,7 +923,7 @@ function ScheduledTaskEditorDialog({
     if (result._tag === "Failure") {
       submissionPending.current = false;
       if (!isAtomCommandInterrupted(result)) {
-        reportFailure("Could not save scheduled task", squashAtomCommandFailure(result));
+        reportFailure("无法保存定时任务", squashAtomCommandFailure(result));
       }
       return;
     }
@@ -942,19 +939,16 @@ function ScheduledTaskEditorDialog({
     >
       <DialogPopup className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>{draft.editingId ? "Edit task" : "New task"}</DialogTitle>
-          <DialogDescription>
-            Run a prompt automatically — on an interval, at a fixed time, or when a webhook is
-            called.
-          </DialogDescription>
+          <DialogTitle>{draft.editingId ? "编辑任务" : "新建任务"}</DialogTitle>
+          <DialogDescription>按时间间隔、指定时间或 Webhook 触发自动运行提示词。</DialogDescription>
         </DialogHeader>
 
         <DialogPanel>
           <fieldset disabled={saving} className="space-y-5">
             {!connected ? (
-              <p className="text-sm text-destructive">Reconnect this environment before saving.</p>
+              <p className="text-sm text-destructive">保存前请重新连接此环境。</p>
             ) : null}
-            <Field label="Runs on" htmlFor="scheduled-task-environment">
+            <Field label="运行位置" htmlFor="scheduled-task-environment">
               <Select
                 value={environmentId}
                 disabled={task !== null || saving}
@@ -980,7 +974,7 @@ function ScheduledTaskEditorDialog({
                         kind={resolveEnvironmentMachineKind(environment?.serverConfig ?? null)}
                         className="size-4"
                       />
-                      {environment?.label ?? "Unavailable environment"}
+                      {environment?.label ?? "环境不可用"}
                     </span>
                   </SelectValue>
                 </SelectTrigger>
@@ -1004,13 +998,13 @@ function ScheduledTaskEditorDialog({
             ) : null}
             {editingTaskMissing ? (
               <p className="text-xs text-destructive" role="status">
-                This scheduled task no longer exists.
+                此定时任务已不存在。
               </p>
             ) : null}
-            <Field label="Name" htmlFor="scheduled-task-title">
+            <Field label="名称" htmlFor="scheduled-task-title">
               <Input
                 id="scheduled-task-title"
-                placeholder="e.g. Check for Sentry issues"
+                placeholder="例如：检查 Sentry 问题"
                 value={draft.title}
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, title: event.target.value }))
@@ -1019,7 +1013,7 @@ function ScheduledTaskEditorDialog({
             </Field>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Project" htmlFor="scheduled-task-project">
+              <Field label="项目" htmlFor="scheduled-task-project">
                 <Select
                   value={selectedProjectId}
                   onValueChange={(projectId) =>
@@ -1027,9 +1021,7 @@ function ScheduledTaskEditorDialog({
                   }
                 >
                   <SelectTrigger size="sm" id="scheduled-task-project">
-                    <SelectValue placeholder="Select a project">
-                      {selectedProject?.title}
-                    </SelectValue>
+                    <SelectValue placeholder="选择项目">{selectedProject?.title}</SelectValue>
                   </SelectTrigger>
                   <SelectPopup>
                     {projects.map((project) => (
@@ -1041,7 +1033,7 @@ function ScheduledTaskEditorDialog({
                 </Select>
               </Field>
 
-              <Field label="Workspace" htmlFor="scheduled-task-workspace">
+              <Field label="工作区" htmlFor="scheduled-task-workspace">
                 <Select
                   value={draft.workspaceMode}
                   onValueChange={(value) =>
@@ -1052,16 +1044,16 @@ function ScheduledTaskEditorDialog({
                     <SelectValue>{WORKSPACE_MODE_LABELS[draft.workspaceMode]}</SelectValue>
                   </SelectTrigger>
                   <SelectPopup>
-                    <SelectItem value="worktree">Create a new worktree</SelectItem>
-                    <SelectItem value="root">Use the project checkout</SelectItem>
-                    <SelectItem value="existing_worktree">Use a specific checkout</SelectItem>
+                    <SelectItem value="worktree">创建新工作树</SelectItem>
+                    <SelectItem value="root">使用项目工作目录</SelectItem>
+                    <SelectItem value="existing_worktree">使用指定工作目录</SelectItem>
                   </SelectPopup>
                 </Select>
               </Field>
             </div>
 
             {draft.workspaceMode === "worktree" ? (
-              <Field label="Base branch" htmlFor="scheduled-task-base-ref">
+              <Field label="基准分支" htmlFor="scheduled-task-base-ref">
                 <WorktreeBaseBranchPicker
                   key={`${environmentId}:${selectedProjectId}`}
                   id="scheduled-task-base-ref"
@@ -1078,7 +1070,7 @@ function ScheduledTaskEditorDialog({
               </Field>
             ) : null}
             {draft.workspaceMode === "existing_worktree" ? (
-              <Field label="Checkout path" htmlFor="scheduled-task-checkout">
+              <Field label="工作目录路径" htmlFor="scheduled-task-checkout">
                 <Input
                   id="scheduled-task-checkout"
                   value={draft.existingWorktreePath}
@@ -1093,11 +1085,11 @@ function ScheduledTaskEditorDialog({
               </Field>
             ) : null}
 
-            <Field label="Prompt" htmlFor="scheduled-task-prompt">
+            <Field label="提示词" htmlFor="scheduled-task-prompt">
               <Textarea
                 id="scheduled-task-prompt"
                 className="max-h-64 overflow-y-auto"
-                placeholder="What should the agent do each time this runs?"
+                placeholder="每次运行时智能体应做什么？"
                 value={draft.prompt}
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, prompt: event.target.value }))
@@ -1105,7 +1097,7 @@ function ScheduledTaskEditorDialog({
               />
             </Field>
 
-            <Field label="Model">
+            <Field label="模型">
               <ProviderModelPicker
                 disabled={saving || !connected}
                 activeInstanceId={activeInstanceId}
@@ -1125,14 +1117,13 @@ function ScheduledTaskEditorDialog({
               {task?.schedule.type === "interval" &&
               task.schedule.everyMs < MIN_SCHEDULED_TASK_INTERVAL_MS ? (
                 <p className="text-sm text-muted-foreground" role="status">
-                  This task uses a legacy interval below one minute. Saving updates it to at least
-                  one minute.
+                  此任务使用小于一分钟的旧版间隔。保存时会调整为至少一分钟。
                 </p>
               ) : null}
               <div className="flex items-center justify-between gap-2">
-                <Label>Schedule</Label>
+                <Label>执行计划</Label>
                 <ToggleGroup
-                  aria-label="Schedule type"
+                  aria-label="计划类型"
                   value={[draft.scheduleMode]}
                   onValueChange={(values) => {
                     const mode = values[0] as ScheduleMode | undefined;
@@ -1147,9 +1138,9 @@ function ScheduledTaskEditorDialog({
                       }));
                   }}
                 >
-                  <Toggle value="fixed">At a time</Toggle>
-                  <Toggle value="interval">Every interval</Toggle>
-                  <Toggle value="webhook">On webhook</Toggle>
+                  <Toggle value="fixed">指定时间</Toggle>
+                  <Toggle value="interval">固定间隔</Toggle>
+                  <Toggle value="webhook">Webhook 触发</Toggle>
                 </ToggleGroup>
               </div>
 
@@ -1158,12 +1149,12 @@ function ScheduledTaskEditorDialog({
                   <WebhookEndpointField environmentId={environmentId} task={liveTask} />
                   <p className="text-xs text-muted-foreground">
                     {
-                      "Each request runs the prompt. Use {{body.path}}, {{headers.name}}, {{query.name}}, {{body}} or {{request}} in the prompt; only what it names reaches the agent."
+                      "每次请求都会运行提示词。可在提示词中使用 {{body.path}}、{{headers.name}}、{{query.name}}、{{body}} 或 {{request}}；仅其中引用的内容会传给智能体。"
                     }
                   </p>
                   <Field
-                    label="Skip requests older than"
-                    hint="minutes, optional"
+                    label="跳过超过以下时长的请求"
+                    hint="分钟，可选"
                     htmlFor="scheduled-task-max-age"
                   >
                     <Input
@@ -1172,7 +1163,7 @@ function ScheduledTaskEditorDialog({
                       nativeInput
                       min={1}
                       max={MAX_WEBHOOK_DELIVERY_AGE_MINUTES}
-                      placeholder="Run every request"
+                      placeholder="运行每个请求"
                       value={draft.maxDeliveryAgeMinutes}
                       onChange={(event) =>
                         setDraft((current) => ({
@@ -1184,9 +1175,9 @@ function ScheduledTaskEditorDialog({
                   </Field>
                   <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0 space-y-1">
-                      <Label htmlFor="scheduled-task-signature">Require signature</Label>
+                      <Label htmlFor="scheduled-task-signature">要求签名</Label>
                       <p className="text-sm text-muted-foreground">
-                        Reject requests without a valid HMAC-SHA256 signature of the body.
+                        拒绝请求正文未附有效 HMAC-SHA256 签名的请求。
                       </p>
                     </div>
                     <Switch
@@ -1199,7 +1190,7 @@ function ScheduledTaskEditorDialog({
                   </div>
                   {draft.signatureEnabled ? (
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <Field label="Header" htmlFor="scheduled-task-signature-header">
+                      <Field label="请求头" htmlFor="scheduled-task-signature-header">
                         <Input
                           id="scheduled-task-signature-header"
                           value={draft.signatureHeader}
@@ -1211,11 +1202,11 @@ function ScheduledTaskEditorDialog({
                           }
                         />
                       </Field>
-                      <Field label="Prefix" htmlFor="scheduled-task-signature-prefix">
+                      <Field label="前缀" htmlFor="scheduled-task-signature-prefix">
                         <Input
                           id="scheduled-task-signature-prefix"
                           value={draft.signaturePrefix}
-                          placeholder="None"
+                          placeholder="无"
                           onChange={(event) =>
                             setDraft((current) => ({
                               ...current,
@@ -1224,7 +1215,7 @@ function ScheduledTaskEditorDialog({
                           }
                         />
                       </Field>
-                      <Field label="Encoding" htmlFor="scheduled-task-signature-encoding">
+                      <Field label="编码" htmlFor="scheduled-task-signature-encoding">
                         <Select
                           value={draft.signatureEncoding}
                           onValueChange={(value) =>
@@ -1243,7 +1234,7 @@ function ScheduledTaskEditorDialog({
                           </SelectPopup>
                         </Select>
                       </Field>
-                      <Field label="Secret" htmlFor="scheduled-task-signature-secret">
+                      <Field label="密钥" htmlFor="scheduled-task-signature-secret">
                         <Input
                           id="scheduled-task-signature-secret"
                           type="password"
@@ -1251,8 +1242,8 @@ function ScheduledTaskEditorDialog({
                           value={draft.signatureSecret}
                           placeholder={
                             liveTask?.schedule.type === "webhook" && liveTask.webhook?.hasSecret
-                              ? "Unchanged"
-                              : "Shared secret"
+                              ? "未更改"
+                              : "共享密钥"
                           }
                           onChange={(event) =>
                             setDraft((current) => ({
@@ -1268,7 +1259,7 @@ function ScheduledTaskEditorDialog({
               ) : draft.scheduleMode === "fixed" ? (
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="scheduled-task-time">Run at</Label>
+                    <Label htmlFor="scheduled-task-time">运行时间</Label>
                     <Input
                       type="time"
                       id="scheduled-task-time"
@@ -1279,13 +1270,13 @@ function ScheduledTaskEditorDialog({
                         setDraft((current) => ({ ...current, timeOfDay: event.target.value }))
                       }
                     />
-                    <span className="text-xs text-muted-foreground">on</span>
+                    <span className="text-xs text-muted-foreground">在</span>
                   </div>
                   <ToggleGroup
                     multiple
                     variant="outline"
                     size="sm"
-                    aria-label="Days to run"
+                    aria-label="运行日期"
                     value={[...draft.weekdays].map(String)}
                     onValueChange={(values) => {
                       if (values.length === 0) return;
@@ -1304,7 +1295,7 @@ function ScheduledTaskEditorDialog({
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="scheduled-task-interval">Run every</Label>
+                  <Label htmlFor="scheduled-task-interval">运行间隔</Label>
                   <Input
                     type="number"
                     id="scheduled-task-interval"
@@ -1317,19 +1308,19 @@ function ScheduledTaskEditorDialog({
                       setDraft((current) => ({ ...current, intervalMinutes: event.target.value }))
                     }
                   />
-                  <span className="text-xs text-muted-foreground">minutes</span>
+                  <span className="text-xs text-muted-foreground">分钟</span>
                 </div>
               )}
             </div>
 
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0 space-y-1">
-                <Label htmlFor="scheduled-task-enabled">Enabled</Label>
+                <Label htmlFor="scheduled-task-enabled">已启用</Label>
                 <p
                   id="scheduled-task-enabled-description"
                   className="text-sm text-muted-foreground"
                 >
-                  Disabled tasks stay saved but do not run.
+                  禁用的任务会保留，但不会运行。
                 </p>
               </div>
               <Switch
@@ -1344,14 +1335,14 @@ function ScheduledTaskEditorDialog({
 
         <DialogFooter>
           <DialogClose render={<Button variant="outline" size="sm" disabled={saving} />}>
-            Cancel
+            取消
           </DialogClose>
           <Button
             size="sm"
             disabled={saving || editingTaskMissing || !connected || !tasksQuery.data}
             onClick={() => void submit()}
           >
-            {draft.editingId ? "Save task" : "Create task"}
+            {draft.editingId ? "保存任务" : "创建任务"}
           </Button>
         </DialogFooter>
       </DialogPopup>

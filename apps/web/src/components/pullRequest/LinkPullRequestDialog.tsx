@@ -180,7 +180,7 @@ function LinkPullRequestDialog({
     try {
       await linking.changeLink(threadRef, resolved.link.url, true);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Could not link the pull request.");
+      setSubmitError(error instanceof Error ? error.message : "无法关联拉取请求。");
       return;
     } finally {
       setPending(false);
@@ -202,16 +202,15 @@ function LinkPullRequestDialog({
     <Dialog open={open} onOpenChange={(next) => (pending ? undefined : onOpenChange(next))}>
       <DialogPopup className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Link pull request</DialogTitle>
+          <DialogTitle>关联拉取请求</DialogTitle>
           <DialogDescription>
-            Attach a pull request to this thread. A full URL can point at any repository on a host
-            this environment has a project for.
+            将拉取请求关联到此会话。完整网址可指向此环境中已有项目所在代码托管平台的任意仓库。
           </DialogDescription>
         </DialogHeader>
         <DialogPanel>
           <Input
             ref={inputRef}
-            placeholder="Pull request URL or #42"
+            placeholder="拉取请求网址或 #42"
             value={reference}
             onChange={(event) => {
               setDirty(true);
@@ -240,7 +239,7 @@ function LinkPullRequestDialog({
             onClick={() => onOpenChange(false)}
             disabled={pending}
           >
-            Cancel
+            取消
           </Button>
           <Button
             type="button"
@@ -248,7 +247,7 @@ function LinkPullRequestDialog({
             onClick={() => void submit()}
             disabled={pending || resolved === null || "error" in resolved}
           >
-            {pending ? "Linking..." : "Link"}
+            {pending ? "正在关联…" : "关联"}
           </Button>
         </DialogFooter>
       </DialogPopup>

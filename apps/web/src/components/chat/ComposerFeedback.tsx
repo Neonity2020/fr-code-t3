@@ -32,14 +32,14 @@ export function feedbackBannerItem(
               (error: unknown) => {
                 toastManager.add({
                   type: "error",
-                  title: "Could not copy thread ID",
-                  description: error instanceof Error ? error.message : "An error occurred.",
+                  title: "无法复制会话 ID",
+                  description: error instanceof Error ? error.message : "发生错误。",
                 });
               },
             );
           }}
         >
-          Copy ID
+          复制 ID
         </Button>
       ) : undefined,
     ...(submission.status !== "uploading"

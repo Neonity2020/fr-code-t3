@@ -66,7 +66,7 @@ describe("buildFileContextMenuItems", () => {
     });
 
     expect(items.map((item) => item.id)).toEqual(["open", "reveal-in-folder", "open-with"]);
-    expect(items[0]).toMatchObject({ label: "Open" });
+    expect(items[0]).toMatchObject({ label: "打开" });
     expect(items[1]).toMatchObject({ label: "Reveal in Finder" });
     const openWith = items[2];
     NodeAssert.ok(openWith);

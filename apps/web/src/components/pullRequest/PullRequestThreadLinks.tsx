@@ -81,7 +81,7 @@ function EnabledPullRequestThreadLinks({
     } catch (error) {
       toastManager.add({
         type: "error",
-        title: remove ? "Could not unlink the pull request" : "Could not link the pull request",
+        title: remove ? "无法取消关联拉取请求" : "无法关联拉取请求",
         description: error instanceof Error ? error.message : String(error),
       });
       return;
@@ -104,8 +104,8 @@ function EnabledPullRequestThreadLinks({
     linking.mode === "multiple" ? ((relations.data ?? lastRelations)?.threads ?? []) : [];
   const linkedThreadsLabel =
     linkedThreads.length > 0
-      ? `Linked from ${linkedThreads.length} ${linkedThreads.length === 1 ? "thread" : "threads"}`
-      : "Linked threads";
+      ? `由 ${linkedThreads.length} ${linkedThreads.length === 1 ? "会话" : "会话"}关联`
+      : "关联会话";
   return (
     <>
       {display === "count" && (linkedThreads.length > 0 || relations.error !== null) ? (
@@ -130,7 +130,7 @@ function EnabledPullRequestThreadLinks({
               </Button>
             }
           />
-          <TooltipPopup>{linkedThreadsLabel}. Search in the command palette.</TooltipPopup>
+          <TooltipPopup>{linkedThreadsLabel}。请在命令面板中搜索。</TooltipPopup>
         </Tooltip>
       ) : null}
       {display === "menu-item" ? (
@@ -149,17 +149,13 @@ function EnabledPullRequestThreadLinks({
           ) : (
             <PullRequestGlyph.link aria-hidden className="size-3.5" />
           )}
-          {linkedHere
-            ? "Unlink from this thread"
-            : currentThreadRef
-              ? "Link to this thread"
-              : "Link to thread"}
+          {linkedHere ? "取消与此会话的关联" : currentThreadRef ? "关联到此会话" : "关联到会话"}
         </MenuItem>
       ) : null}
       {display === "picker" ? (
         <Dialog open onOpenChange={onPickerOpenChange}>
           <DialogPopup className="max-w-md" showCloseButton={false}>
-            <DialogTitle className="sr-only">Link pull request to a thread</DialogTitle>
+            <DialogTitle className="sr-only">将拉取请求关联到会话</DialogTitle>
             <ThreadPicker
               environmentId={environmentId}
               url={url}
@@ -205,12 +201,12 @@ function ThreadPicker({
     )
     .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   return (
-    <Command mode="none" value={query} onValueChange={setQuery} aria-label="Choose a thread">
-      <CommandInput placeholder="Search threads or projects..." disabled={pending} />
+    <Command mode="none" value={query} onValueChange={setQuery} aria-label="选择会话">
+      <CommandInput placeholder="搜索会话或项目…" disabled={pending} />
       <CommandList className="max-h-80 overflow-y-auto">
         {candidates.length === 0 ? (
           <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-            No active threads found.
+            未找到活动会话。
           </div>
         ) : (
           candidates.map((thread) => {
@@ -224,7 +220,7 @@ function ThreadPicker({
               >
                 <MessageSquareIcon aria-hidden className="size-4 shrink-0" />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate">{thread.title || "Untitled thread"}</span>
+                  <span className="truncate">{thread.title || "未命名会话"}</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {projectNames.get(thread.projectId)}
                   </span>
@@ -232,7 +228,7 @@ function ThreadPicker({
                 {linked ? (
                   <>
                     <CheckIcon aria-hidden className="size-3.5" />
-                    <span className="text-xs text-muted-foreground">Linked</span>
+                    <span className="text-xs text-muted-foreground">已关联</span>
                   </>
                 ) : null}
               </CommandItem>

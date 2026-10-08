@@ -59,8 +59,8 @@ describe("PreviewEmptyState", () => {
       { url: "https://myapp.test/admin#users", lastVisitedAt: Date.now(), title: "Admin" },
       { url: "http://localhost:5173/", lastVisitedAt: Date.now(), title: "Recent Local" },
     ]);
-    expect(html).toContain("Recently used");
-    expect(html).toContain("Local servers");
+    expect(html).toContain("最近使用");
+    expect(html).toContain("本地服务器");
     expect(html).toContain("myapp.test/admin#users");
     expect(html).toContain("Admin");
     expect(html).toContain("Recent Local");
@@ -70,14 +70,14 @@ describe("PreviewEmptyState", () => {
   it("renders only the recents group when no servers are found", () => {
     mocks.servers = [];
     const html = render([{ url: "https://myapp.test/", lastVisitedAt: 0 }]);
-    expect(html).toContain("Recently used");
-    expect(html).not.toContain("Local servers");
+    expect(html).toContain("最近使用");
+    expect(html).not.toContain("本地服务器");
   });
 
   it("keeps the original empty state when both groups are empty", () => {
     mocks.servers = [];
     const html = render([]);
-    expect(html).toContain("No preview yet");
+    expect(html).toContain("暂无预览");
   });
 
   it("renders an out-of-range lastVisitedAt entry without throwing", () => {
@@ -87,6 +87,6 @@ describe("PreviewEmptyState", () => {
       html = render([{ url: "https://myapp.test/", lastVisitedAt: 1e20 }]);
     }).not.toThrow();
     expect(html).toContain("myapp.test");
-    expect(html).toContain("Remove");
+    expect(html).toContain("移除");
   });
 });

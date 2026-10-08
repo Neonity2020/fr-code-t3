@@ -38,8 +38,8 @@ function reportScriptFailure(result: AtomCommandResult<unknown, unknown>) {
     const error = squashAtomCommandFailure(result);
     toastManager.add({
       type: "error",
-      title: "Failed to save project actions",
-      description: error instanceof Error ? error.message : "An error occurred.",
+      title: "无法保存项目操作",
+      description: error instanceof Error ? error.message : "发生错误。",
     });
   }
   return mapAtomCommandResult(result, () => undefined);
@@ -76,8 +76,8 @@ export function useProjectScriptSettings(
     keybinding?: string | null,
   ): Promise<AtomCommandResult<void, unknown>> {
     if (savingRef.current || targets.length === 0) {
-      const message = "No available machine, or another action change is saving.";
-      toastManager.add({ type: "error", title: "Actions not saved", description: message });
+      const message = "没有可用的机器，或正在保存另一项操作更改。";
+      toastManager.add({ type: "error", title: "操作未保存", description: message });
       return AsyncResult.failure(Cause.fail(new Error(message)));
     }
     savingRef.current = true;

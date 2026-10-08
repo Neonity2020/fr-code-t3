@@ -35,7 +35,7 @@ export function dynamicToolTitle(
 ): string | undefined {
   if (toolName === "cua_repl.js") return asTrimmedString(asRecord(input)?.title);
   const skill = claudeSkillInvocation(toolName, input);
-  return skill === undefined ? undefined : `Skill: ${skill.name}`;
+  return skill === undefined ? undefined : `技能：${skill.name}`;
 }
 
 function recordHasKeys(
@@ -345,19 +345,19 @@ export function formatSearchToolLabel(
   const glob = firstInputString(input, SEARCH_GLOB_KEYS);
   const target = searchTargetName(firstInputString(input, SEARCH_TARGET_KEYS));
   if (query && target) {
-    return `Searched ${query} in ${target}`;
+    return `在 ${target} 中搜索了 ${query}`;
   }
   if (glob && target) {
-    return `Searched files ${glob} in ${target}`;
+    return `在 ${target} 中搜索了文件 ${glob}`;
   }
   if (glob) {
-    return `Searched files ${glob}`;
+    return `搜索了文件 ${glob}`;
   }
   if (query) {
-    return `Searched ${query}`;
+    return `搜索了 ${query}`;
   }
   if (target) {
-    return `Searched in ${target}`;
+    return `在 ${target} 中搜索`;
   }
   return undefined;
 }
@@ -365,11 +365,11 @@ export function formatSearchToolLabel(
 /** Work-log heading for a file read: verb plus the structured path, never the path alone. */
 export function formatReadToolLabel(path: string, extraCount = 0): string {
   const trimmed = path.trim();
-  const suffix = extraCount > 0 ? ` +${extraCount} more` : "";
+  const suffix = extraCount > 0 ? `，另有 ${extraCount} 项` : "";
   if (!trimmed) {
-    return `Read file${suffix}`;
+    return `读取文件${suffix}`;
   }
-  return `Read ${trimmed}${suffix}`;
+  return `读取了 ${trimmed}${suffix}`;
 }
 
 export interface ToolActivityPresentationInput {
@@ -390,7 +390,7 @@ export function deriveToolActivityPresentation(
 ): ToolActivityPresentation {
   const title = asTrimmedString(input.title);
   const detail = stripTrailingExitCode(asTrimmedString(input.detail));
-  const fallbackSummary = asTrimmedString(input.fallbackSummary) ?? "Tool";
+  const fallbackSummary = asTrimmedString(input.fallbackSummary) ?? "工具";
   const data = asRecord(input.data);
   const command = extractToolCommand(data, title);
   const primaryPath = extractPrimaryPath(data);
@@ -402,7 +402,7 @@ export function deriveToolActivityPresentation(
 
   if (action === "command") {
     return {
-      summary: "Ran command",
+      summary: "运行了命令",
       ...(command ? { detail: command } : {}),
     };
   }
@@ -414,13 +414,13 @@ export function deriveToolActivityPresentation(
       };
     }
     return {
-      summary: "Read file",
+      summary: "读取文件",
     };
   }
 
   if (action === "file_change") {
     return {
-      summary: "Changed files",
+      summary: "已修改文件",
       ...(primaryPath ? { detail: primaryPath } : {}),
     };
   }
@@ -431,7 +431,7 @@ export function deriveToolActivityPresentation(
       return { summary: searchLabel };
     }
     return {
-      summary: "Searched files",
+      summary: "搜索了文件",
     };
   }
 

@@ -155,7 +155,7 @@ describe("VoiceInputController", () => {
   it("checks support and permission before recording", async () => {
     const unsupported = createHarness({ getTranscriber: () => null });
     await unsupported.controller.start();
-    expect(unsupported.controller.currentState.error).toContain("not available");
+    expect(unsupported.controller.currentState.error).toContain("不可用");
     expect(unsupported.recorder.record).not.toHaveBeenCalled();
 
     const denied = createHarness({
@@ -426,7 +426,7 @@ describe("VoiceInputController", () => {
     await harness.controller.stop();
 
     expect(harness.controller.currentState.phase).toBe("error");
-    expect(harness.controller.currentState.error).toContain("finish voice recording");
+    expect(harness.controller.currentState.error).toContain("完成录音");
   });
 
   it("ignores a late transcript after the draft owner changes", async () => {
@@ -449,7 +449,7 @@ describe("VoiceInputController", () => {
     await stopping;
 
     expect(harness.commits).toEqual([]);
-    expect(harness.controller.currentState.error).toContain("draft changed");
+    expect(harness.controller.currentState.error).toContain("草稿发生变化");
   });
 
   it("queues the next recording until canceled preparation settles", async () => {
@@ -486,7 +486,7 @@ describe("VoiceInputController", () => {
     await first.controller.start();
     const next = createHarness();
     await next.controller.start();
-    expect(next.controller.currentState.error).toContain("already active");
+    expect(next.controller.currentState.error).toContain("另一段语音正在录制");
     expect(next.recorder.record).not.toHaveBeenCalled();
     await first.controller.interruptRecording();
   });
@@ -517,7 +517,7 @@ describe("VoiceInputController", () => {
     expect(next.deleted).toEqual([]);
     const blocked = createHarness();
     await blocked.controller.start();
-    expect(blocked.controller.currentState.error).toContain("already active");
+    expect(blocked.controller.currentState.error).toContain("另一段语音正在录制");
     await next.controller.interruptRecording();
   });
 
@@ -585,7 +585,7 @@ describe("VoiceInputController", () => {
     await starting;
 
     expect(harness.recorder.record).not.toHaveBeenCalled();
-    expect(harness.controller.currentState.error).toContain("no longer available");
+    expect(harness.controller.currentState.error).toContain("已不可用");
   });
 
   it("discards recorder errors and audio interruptions without transcribing", async () => {
@@ -635,6 +635,6 @@ describe("VoiceInputController", () => {
     await starting;
 
     expect(harness.recorder.record).not.toHaveBeenCalled();
-    expect(harness.controller.currentState.error).toContain("background");
+    expect(harness.controller.currentState.error).toContain("后台");
   });
 });

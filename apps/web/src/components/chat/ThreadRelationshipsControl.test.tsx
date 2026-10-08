@@ -25,14 +25,14 @@ describe("thread lineage row list", () => {
   });
 
   it("offers one page at a time", () => {
-    expect(renderRowList(6)).toContain("Show 12 more");
-    expect(renderRowList(6 + 12)).toContain("Show 2 more");
+    expect(renderRowList(6)).toContain("再显示 12 项");
+    expect(renderRowList(6 + 12)).toContain("再显示 2 项");
   });
 
   it("omits the expansion affordance when everything fits", () => {
     const markup = renderRowList(rows.length);
 
-    expect(markup).not.toContain("more");
+    expect(markup).not.toContain("更多");
     expect(resolveThreadLineageWindow(rows.slice(0, 6), 6).hiddenCount).toBe(0);
   });
 
@@ -40,7 +40,7 @@ describe("thread lineage row list", () => {
     const markup = renderRowList(6);
     const list = /<ul([^>]*)>/.exec(markup)?.[1] ?? "";
 
-    expect(list).toContain('aria-label="Related threads"');
+    expect(list).toContain('aria-label="相关会话"');
     expect(list).toContain("max-h-[13.5rem]");
     expect(list).toContain("overflow-y-auto");
     expect(list).toContain("overscroll-contain");

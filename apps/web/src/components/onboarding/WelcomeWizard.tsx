@@ -173,14 +173,14 @@ export function WelcomeWizard({
           if (importWarning) {
             toastManager.add({
               type: "warning",
-              title: "Some history was not imported",
+              title: "部分历史记录未导入",
               description: importWarning,
               timeout: 0,
             });
           } else if (importedThreadCount > 0) {
             toastManager.add({
               type: "success",
-              title: `Imported ${importedThreadCount} ${importedThreadCount === 1 ? "thread" : "threads"}`,
+              title: `已导入 ${importedThreadCount} ${"个会话"}`,
             });
           }
           return true;
@@ -188,8 +188,8 @@ export function WelcomeWizard({
         .catch(() => {
           const errorToast = {
             type: "error",
-            title: "Could not finish setup",
-            description: "Your settings could not be saved. Try again.",
+            title: "无法完成设置",
+            description: "无法保存设置。请重试。",
           } as const;
           if (completionErrorToastIdRef.current === null) {
             completionErrorToastIdRef.current = toastManager.add(errorToast);
@@ -218,12 +218,12 @@ export function WelcomeWizard({
         initialFocus={() => document.getElementById("onboarding-pairing-url") ?? true}
       >
         <WizardHeader
-          title="Set up FR Code"
+          title="设置 FR Code"
           identity={
             <div className="flex items-baseline gap-1.5" role="img" aria-label="FR Code">
               <FRWordmark className="h-4 w-auto shrink-0" aria-hidden />
               <span className="text-2xl font-medium tracking-tight text-muted-foreground">
-                Code
+                代码
               </span>
             </div>
           }
@@ -328,15 +328,13 @@ function ConnectionStep({
   }, [ready]);
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-        Connect your computers
-      </h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">连接您的计算机</h1>
       <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-        Choose one or more computers. We’ll set up agents and projects on each.
+        选择一台或多台计算机。我们将在各台机器上配置智能体和项目。
       </p>
       {directEnvironments.length > 0 ? (
         <fieldset className="mt-5 space-y-2">
-          <legend className="sr-only">Computers to set up</legend>
+          <legend className="sr-only">待配置的计算机</legend>
           {directEnvironments.map((environment) => (
             <label
               key={environment.environmentId}
@@ -358,7 +356,7 @@ function ConnectionStep({
                     {environment.label}
                   </span>
                   <span className="shrink-0 text-xs text-muted-foreground">
-                    {environment.connection.phase === "connected" ? "Connected" : "Connecting…"}
+                    {environment.connection.phase === "connected" ? "已连接" : "正在连接…"}
                   </span>
                 </span>
                 {environment.displayUrl ? (
@@ -393,7 +391,7 @@ function ConnectionStep({
               }
             >
               <LinkIcon className="size-4 text-muted-foreground" />
-              <span className="flex-1 text-left">Add a computer</span>
+              <span className="flex-1 text-left">添加计算机</span>
               <ChevronRightIcon
                 className={cn("size-4 text-muted-foreground", pairingOpen && "rotate-90")}
               />
@@ -416,15 +414,14 @@ function ConnectionStep({
       </div>
       <div className="mt-6 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <p className="min-w-0 text-xs leading-relaxed text-muted-foreground">
-          FR Code collects anonymous usage data to help us improve it. To read more about how your
-          data is used and how to opt out, see our{" "}
+          FR Code 会收集匿名使用数据以帮助改进产品。有关数据使用方式及退出方法，请参阅{" "}
           <a
             className="underline underline-offset-2 hover:text-foreground"
             href={PRIVACY_POLICY_URL}
             target="_blank"
             rel="noreferrer noopener"
           >
-            privacy policy
+            隐私政策
           </a>
           .
         </p>
@@ -435,7 +432,7 @@ function ConnectionStep({
           disabled={!ready || isPairing}
           onClick={onContinue}
         >
-          Continue
+          继续
           <ArrowRightIcon className="size-3.5" />
         </Button>
       </div>
@@ -481,11 +478,11 @@ function ConnectAccountOption({
           <span className="flex-1 text-left">T3 Connect</span>
           <span className="text-xs text-muted-foreground">
             {!isLoaded
-              ? "Loading sign-in…"
+              ? "正在加载登录…"
               : !isSignedIn
-                ? "Sign in"
+                ? "登录"
                 : !discoveryReady
-                  ? "Loading computers…"
+                  ? "正在加载计算机…"
                   : null}
           </span>
           <ChevronRightIcon
@@ -503,18 +500,14 @@ function ConnectAccountOption({
                   onDiscoveryReady={onDiscoveryReady}
                   selection={{ selectedIds, onChange: onToggleEnvironment, autoSelectedComputers }}
                   refreshWhileEmpty
-                  empty={
-                    <p className="py-3 text-sm text-muted-foreground">No computers linked yet.</p>
-                  }
+                  empty={<p className="py-3 text-sm text-muted-foreground">尚未关联计算机。</p>}
                 />
               ) : null}
             </div>
-            <p className="text-sm text-muted-foreground">
-              Run this on each computer you want to connect.
-            </p>
+            <p className="text-sm text-muted-foreground">在每台要连接的计算机上运行此命令。</p>
             <CommandBlock command="npx t3 connect" className="mt-3" />
             <p className="mt-3 text-xs text-muted-foreground">
-              Keep FR Code running. Select the computers you want to set up above.
+              请保持 FR Code 运行，并在上方选择要配置的计算机。
             </p>
           </div>
         </CollapsiblePanel>
@@ -562,7 +555,7 @@ function PairingForm({
     }
     if (isAtomCommandInterrupted(result)) return;
     const cause = squashAtomCommandFailure(result);
-    setErrorMessage(cause instanceof Error ? cause.message : "Pairing failed.");
+    setErrorMessage(cause instanceof Error ? cause.message : "配对失败。");
   };
 
   return (
@@ -576,7 +569,7 @@ function PairingForm({
       >
         <div>
           <label className="block text-sm text-muted-foreground" htmlFor="onboarding-pairing-url">
-            Pairing link
+            配对链接
           </label>
           <Input
             id="onboarding-pairing-url"
@@ -616,20 +609,18 @@ function PairingForm({
               className="group flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
               <ChevronRightIcon className="size-3.5 group-data-panel-open:rotate-90" />
-              Need a pairing link?
+              需要配对链接？
             </CollapsibleTrigger>
             <Button type="submit" disabled={isPairing || pairingUrl.trim().length === 0}>
-              {isPairing ? "Pairing..." : "Pair"}
+              {isPairing ? "正在配对…" : "配对"}
             </Button>
           </div>
           <CollapsiblePanel>
-            <p className="pt-3 text-sm text-muted-foreground">
-              Run this on the computer with your code.
-            </p>
+            <p className="pt-3 text-sm text-muted-foreground">在代码所在的计算机上运行此命令。</p>
             <CommandBlock command="npx t3 pair" className="mt-2" />
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              Start FR Code first, or run <code className="font-mono">npx t3 serve</code>. Add{" "}
-              <code className="font-mono">--tailscale</code> to use your tailnet.
+              请先启动 FR Code，或运行 <code className="font-mono">npx t3 serve</code>。添加{" "}
+              <code className="font-mono">--tailscale</code> 以使用您的 tailnet。
             </p>
           </CollapsiblePanel>
         </Collapsible>
@@ -663,10 +654,7 @@ function AgentsStep({
 }) {
   const { environments } = useEnvironments();
   return (
-    <StepShell
-      title="Connect your agents"
-      description="Choose an agent to start coding. You can add more later."
-    >
+    <StepShell title="连接你的智能体" description="选择一个智能体开始编程。稍后可添加更多。">
       <ScrollArea scrollFade className="mt-5 h-auto max-h-[min(32rem,55dvh)]">
         <div className="space-y-5 pr-3">
           {environmentIds.map((environmentId) => (
@@ -675,7 +663,7 @@ function AgentsStep({
               environmentId={environmentId}
               machineLabel={
                 environments.find((environment) => environment.environmentId === environmentId)
-                  ?.label ?? "Computer"
+                  ?.label ?? "计算机"
               }
             />
           ))}
@@ -683,7 +671,7 @@ function AgentsStep({
       </ScrollArea>
       <div className="mt-6 flex justify-end">
         <Button autoFocus onClick={onContinue}>
-          Continue
+          继续
           <ArrowRightIcon className="size-3.5" />
         </Button>
       </div>
@@ -814,7 +802,7 @@ function ConnectedAgentsStep({
       ) ? (
         <div className="mt-3">
           <Button size="xs" variant="ghost-muted" onClick={() => setAddingAccount(true)}>
-            Connect another ChatGPT account
+            连接另一个 ChatGPT 账号
           </Button>
         </div>
       ) : null}
@@ -957,7 +945,7 @@ function AgentCard({
       <div className="min-w-0 flex-1">
         <span className="block text-sm font-medium text-foreground">{displayName}</span>
         <p className="mt-0.5 text-xs leading-relaxed break-words whitespace-pre-wrap text-muted-foreground">
-          {providerState === "ready" ? "Ready to code." : summary.headline}
+          {providerState === "ready" ? "可以开始编程了。" : summary.headline}
           {providerState !== "ready" && summary.detail ? ` · ${summary.detail}` : ""}
         </p>
       </div>
@@ -965,12 +953,12 @@ function AgentCard({
         {providerState === "ready" ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success-foreground">
             <CheckIcon className="size-3.5" />
-            Ready
+            就绪
           </span>
         ) : providerState === "checking" ? (
-          <span className="text-xs text-muted-foreground">Checking...</span>
+          <span className="text-xs text-muted-foreground">正在检查…</span>
         ) : providerState === "disabled" ? (
-          <span className="text-xs text-muted-foreground">Disabled</span>
+          <span className="text-xs text-muted-foreground">已禁用</span>
         ) : providerState === "attention" ? (
           <span className="text-xs text-muted-foreground">{summary.headline}</span>
         ) : (
@@ -981,7 +969,7 @@ function AgentCard({
             disabled={terminalOpen || !terminalAvailable}
           >
             <TerminalIcon className="size-3.5" />
-            {providerState === "signIn" ? "Sign in" : "Install"}
+            {providerState === "signIn" ? "登录" : "安装"}
           </Button>
         )}
       </div>
@@ -1097,25 +1085,24 @@ function AgentInstallTerminal({
         <span className="text-2xs font-medium text-muted-foreground">
           {setupState === "writeFailed" ? (
             <>
-              Run <code className="rounded bg-muted px-1 font-mono">{command}</code> in this
-              terminal.
+              运行 <code className="rounded bg-muted px-1 font-mono">{command}</code> 在此终端中。
             </>
           ) : setupState === "ready" ? (
-            "Review the command, then press Enter to run it."
+            "检查命令后按 Enter 执行。"
           ) : setupState === "openFailed" ? (
-            "Could not open the setup terminal."
+            "无法打开设置终端。"
           ) : (
-            "Preparing command..."
+            "正在准备命令…"
           )}
         </span>
         <div className="flex items-center gap-1">
           {setupState === "openFailed" ? (
             <Button size="xs" variant="ghost" onClick={() => setSetupAttempt((value) => value + 1)}>
-              Retry
+              重试
             </Button>
           ) : null}
           <Button size="xs" variant="ghost-muted" onClick={onClose}>
-            Close
+            关闭
           </Button>
         </div>
       </div>
@@ -1125,7 +1112,7 @@ function AgentInstallTerminal({
             threadRef={threadRef}
             threadId={AGENT_ONBOARDING_THREAD_ID}
             terminalId={terminalId}
-            terminalLabel={`Install ${driver}`}
+            terminalLabel={`安装 ${driver}`}
             cwd={cwd}
             providerInstanceId={providerInstanceId}
             advancedTypography={advancedTypography}
@@ -1343,13 +1330,13 @@ function ImportStep({
     importedThreadCountRef.current = importedThreadCount;
     if (importedProjectsCount < selection.length) {
       if (importedThreadCount > 0 && skippedThreadCount > 0) {
-        importWarningRef.current = `Imported ${importedThreadCount} ${importedThreadCount === 1 ? "thread" : "threads"}. ${skippedThreadCount} ${skippedThreadCount === 1 ? "thread" : "threads"} could not be imported.`;
+        importWarningRef.current = `已导入 ${importedThreadCount} 个会话，${skippedThreadCount} 个会话无法导入。`;
       } else if (skippedThreadCount > 0) {
-        importWarningRef.current = `${skippedThreadCount} ${skippedThreadCount === 1 ? "thread could" : "threads could"} not be imported.`;
+        importWarningRef.current = `${skippedThreadCount} 个会话无法导入。`;
       } else if (importedThreadCount > 0) {
-        importWarningRef.current = `Imported ${importedThreadCount} ${importedThreadCount === 1 ? "thread" : "threads"}. Some thread history could not be imported.`;
+        importWarningRef.current = `已导入 ${importedThreadCount} 个会话。部分会话历史无法导入。`;
       } else {
-        importWarningRef.current = "Could not import thread history.";
+        importWarningRef.current = "无法导入会话历史。";
       }
     }
     finishAfterImport();
@@ -1358,16 +1345,16 @@ function ImportStep({
   if (scans.every((scan) => scan.data === null) && scans.some((scan) => scan.isPending)) {
     return (
       <div className="flex h-full min-h-40 flex-col">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Your projects</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">您的项目</h1>
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-6">
           <Spinner size="lg" tone="muted" />
           <p className="text-center text-sm text-muted-foreground">
-            Looking for projects from Claude Code and Codex…
+            正在查找 Claude Code 和 Codex 的项目…
           </p>
         </div>
         <div className="flex justify-end">
           <Button variant="ghost-muted" onClick={() => void onDone()}>
-            Do not import projects
+            不导入项目
           </Button>
         </div>
       </div>
@@ -1375,14 +1362,11 @@ function ImportStep({
   }
 
   return (
-    <StepShell
-      title="Choose your projects"
-      description="Import projects and conversations from your selected computers."
-    >
+    <StepShell title="选择项目" description="从所选计算机导入项目和会话。">
       {candidates.length > 0 ? (
         <div className="mt-5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
           <span role="status">
-            {selected.length} of {candidates.length} selected
+            {selected.length} / {candidates.length} 已选择
           </span>
           <div className="flex items-center gap-1">
             <Button
@@ -1391,7 +1375,7 @@ function ImportStep({
               disabled={isImporting || selected.length === candidates.length}
               onClick={() => setSelectedPaths(new Set(candidates.map((item) => item.key)))}
             >
-              Select all
+              全选
             </Button>
             <Button
               variant="ghost"
@@ -1399,7 +1383,7 @@ function ImportStep({
               disabled={isImporting || selected.length === 0}
               onClick={() => setSelectedPaths(new Set())}
             >
-              Select none
+              取消全选
             </Button>
           </div>
         </div>
@@ -1412,7 +1396,7 @@ function ImportStep({
             );
             const label =
               environments.find((environment) => environment.environmentId === scan.environmentId)
-                ?.label ?? "Computer";
+                ?.label ?? "计算机";
             return (
               <fieldset
                 key={scan.environmentId}
@@ -1425,21 +1409,21 @@ function ImportStep({
                 {scan.isPending && scan.data === null ? (
                   <div className="flex items-center gap-2 py-3 text-sm text-muted-foreground">
                     <Spinner size="md" />
-                    Looking for projects…
+                    正在查找项目…
                   </div>
                 ) : scan.error !== null ? (
                   <div
                     role="alert"
                     className="flex items-center justify-between gap-3 text-sm text-muted-foreground"
                   >
-                    <span>Could not check projects. {scan.error}</span>
+                    <span>无法检查项目。 {scan.error}</span>
                     <Button variant="ghost" size="sm" onClick={scan.refresh}>
-                      Retry
+                      重试
                     </Button>
                   </div>
                 ) : scanCandidates.length === 0 ? (
                   <p className="py-2 text-sm text-muted-foreground">
-                    No existing Claude Code or Codex projects found.
+                    未找到已有的 Claude Code 或 Codex 项目。
                   </p>
                 ) : null}
                 {scan.data?.truncated ? (
@@ -1459,16 +1443,14 @@ function ImportStep({
       </ScrollArea>
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
         <Button variant="ghost-muted" disabled={isImporting} onClick={finishAfterImport}>
-          Do not import projects
+          不导入项目
         </Button>
         <Button
           autoFocus
           disabled={isImporting || selected.length === 0}
           onClick={() => void runImport(selected)}
         >
-          {isImporting
-            ? "Importing…"
-            : `Import ${selected.length} ${selected.length === 1 ? "project" : "projects"}`}
+          {isImporting ? "正在导入…" : `导入 ${selected.length} ${"个项目"}`}
         </Button>
       </div>
     </StepShell>
@@ -1531,9 +1513,9 @@ function ImportCandidateList({
             />
             <CollapsibleTrigger className="group flex min-w-0 flex-1 items-center gap-1.5 text-left">
               <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-panel-open:rotate-90" />
-              <span className="truncate text-sm text-muted-foreground">Other folders</span>
+              <span className="truncate text-sm text-muted-foreground">其他文件夹</span>
               <span className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums">
-                {other.length} {other.length === 1 ? "folder" : "folders"}
+                {other.length} {"个文件夹"}
               </span>
             </CollapsibleTrigger>
           </div>

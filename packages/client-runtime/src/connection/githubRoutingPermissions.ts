@@ -103,7 +103,7 @@ export class GitHubRoutingPermissions extends Context.Reference<{
       Effect.fail(
         new ConnectionBlockedError({
           reason: "unsupported",
-          detail: "GitHub routing preferences are unavailable on this client.",
+          detail: "此客户端不支持 GitHub 路由偏好。",
         }),
       ),
     forget: () => Effect.void,
@@ -148,7 +148,7 @@ export const makeGitHubRoutingPermissions = Effect.fn("makeGitHubRoutingPermissi
           return Effect.fail(
             new ConnectionBlockedError({
               reason: "configuration",
-              detail: "This environment does not have a saved connection endpoint.",
+              detail: "此环境没有已保存的连接端点。",
             }),
           );
         return update((current) => [

@@ -6960,20 +6960,20 @@ export function makeClaudeAdapterV2(
                 {
                   questions: [
                     {
-                      header: "Resume session",
+                      header: "恢复会话",
                       question,
                       options: [
                         {
-                          label: "Compact and continue",
-                          description: "Resume with a summary and use fewer tokens.",
+                          label: "压缩并继续",
+                          description: "通过摘要恢复会话，减少 token 用量。",
                         },
                         {
-                          label: "Keep full history",
-                          description: "Resume without changing the conversation.",
+                          label: "保留完整历史",
+                          description: "保持对话内容不变并恢复会话。",
                         },
                         {
                           label: CLAUDE_RESUME_COMPACTION_NEVER_ANSWER,
-                          description: "Keep full history and skip future resume prompts.",
+                          description: "保留完整历史，以后不再显示恢复提示。",
                         },
                       ],
                       multiSelect: false,
@@ -6998,9 +6998,10 @@ export function makeClaudeAdapterV2(
               return {
                 behavior: "completed" as const,
                 result:
-                  selection === "Compact and continue"
+                  selection === "压缩并继续" || selection === "Compact and continue"
                     ? ("compact" as const)
-                    : selection === CLAUDE_RESUME_COMPACTION_NEVER_ANSWER
+                    : selection === CLAUDE_RESUME_COMPACTION_NEVER_ANSWER ||
+                        selection === "Don't ask again"
                       ? ("never" as const)
                       : ("continue" as const),
               };

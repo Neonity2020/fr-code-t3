@@ -79,7 +79,7 @@ function button(label: string) {
 }
 
 function openEditor() {
-  act(() => button("Write custom instructions for all").props.onClick());
+  act(() => button("为所有目标编写自定义说明：").props.onClick());
 }
 
 function editInstructions(value: string) {
@@ -87,7 +87,7 @@ function editInstructions(value: string) {
 }
 
 function applyInstructions() {
-  act(() => button("Apply instructions to all").props.onClick());
+  act(() => button("将说明应用到所有").props.onClick());
 }
 
 beforeEach(() => {
@@ -131,7 +131,7 @@ describe("mixed source control instructions", () => {
       customInstructions,
     }));
 
-    act(() => button("Reset change request templates").props.onClick());
+    act(() => button("Reset 变更请求模板").props.onClick());
 
     expect(state.updateSettings).toHaveBeenCalledTimes(1);
     expect(state.styles.map((style) => style.followChangeRequestTemplates)).toEqual([
@@ -153,7 +153,7 @@ describe("mixed source control instructions", () => {
       );
     });
 
-    act(() => button("Reset source control writing style").props.onClick());
+    act(() => button("Reset 版本控制写作风格").props.onClick());
 
     expect(state.updateSettings).toHaveBeenCalledTimes(1);
     expect(
@@ -171,7 +171,7 @@ describe("mixed source control instructions", () => {
     const initialStyles = state.styles;
     openEditor();
     expect(renderer!.root.findByType("textarea").props.value).toBe("");
-    expect(button("Apply instructions to all").props.disabled).toBe(true);
+    expect(button("将说明应用到所有").props.disabled).toBe(true);
 
     applyInstructions();
     expect(state.updateSettings).not.toHaveBeenCalled();
@@ -181,7 +181,7 @@ describe("mixed source control instructions", () => {
   it("applies edited instructions to every selected environment", () => {
     openEditor();
     editInstructions("  Keep titles concise.  ");
-    expect(button("Apply instructions to all").props.disabled).toBe(false);
+    expect(button("将说明应用到所有").props.disabled).toBe(false);
     applyInstructions();
 
     expect(state.updateSettings).toHaveBeenCalledTimes(1);
@@ -196,7 +196,7 @@ describe("mixed source control instructions", () => {
     openEditor();
     editInstructions("Temporary instructions");
     editInstructions("");
-    expect(button("Apply instructions to all").props.disabled).toBe(false);
+    expect(button("将说明应用到所有").props.disabled).toBe(false);
     applyInstructions();
 
     expect(state.updateSettings).toHaveBeenCalledTimes(1);

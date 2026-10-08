@@ -41,11 +41,11 @@ export function snapShotShortcutRegistrationFailureMessage(
   platform: NodeJS.Platform,
 ): string {
   return isModifierPairShortcut(shortcut)
-    ? `${snapShotModifierPairLabel(
+    ? `此系统不支持 ${snapShotModifierPairLabel(
         snapShotShortcutModifierPair(shortcut),
         platform === "darwin",
-      )} is not available on this system.`
-    : "This shortcut is already used by the system or another app.";
+      )}。`
+    : "此快捷键已被系统或其他应用占用。";
 }
 
 const COMMON_MOD_ACTIONS: Readonly<Record<string, string>> = {

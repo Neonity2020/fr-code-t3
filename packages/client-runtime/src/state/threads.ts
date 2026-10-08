@@ -60,14 +60,14 @@ function formatThreadError(cause: Cause.Cause<unknown>): string {
   const error = Cause.squash(cause);
   return error instanceof Error && error.message.trim().length > 0
     ? error.message
-    : "Could not synchronize the thread.";
+    : "无法同步会话。";
 }
 
 function formatHistoryError(error: unknown): string {
   if (error instanceof Error && error.message.trim().length > 0) {
     return error.message;
   }
-  return "Could not load earlier activity.";
+  return "无法加载更早的活动。";
 }
 
 function historyMetaFromCachedSnapshot(
@@ -659,7 +659,7 @@ export const makeEnvironmentThreadState = Effect.fn("EnvironmentThreadState.make
     const runLoad = Effect.gen(function* () {
       const preparedOption = yield* SubscriptionRef.get(supervisor.prepared);
       if (Option.isNone(preparedOption) || Option.isNone(httpClient)) {
-        const message = "Environment is not connected.";
+        const message = "环境未连接。";
         const stillCurrent = yield* SubscriptionRef.modify(
           state,
           (latest): readonly [boolean, EnvironmentThreadState] => {

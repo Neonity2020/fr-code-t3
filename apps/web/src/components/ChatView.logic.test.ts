@@ -103,7 +103,7 @@ function makeThread(overrides: Partial<Thread> = {}): Thread {
     id: threadId,
     environmentId,
     projectId,
-    title: "Thread",
+    title: "会话",
     modelSelection: {
       instanceId: ProviderInstanceId.make("codex"),
       model: "gpt-5.4",
@@ -342,12 +342,12 @@ describe("deriveComposerSendState", () => {
 describe("buildExpiredTerminalContextToastCopy", () => {
   it("formats empty and omission guidance", () => {
     expect(buildExpiredTerminalContextToastCopy(1, "empty")).toEqual({
-      title: "Expired terminal context won't be sent",
-      description: "Remove it or re-add it to include terminal output.",
+      title: "不会发送 Expired terminal context",
+      description: "请移除或重新添加，以包含终端输出。",
     });
     expect(buildExpiredTerminalContextToastCopy(2, "omitted")).toEqual({
-      title: "Expired terminal contexts omitted from message",
-      description: "Re-add it if you want that terminal output included.",
+      title: "消息中已省略 Expired terminal contexts",
+      description: "如需包含该终端输出，请重新添加。",
     });
   });
 });
@@ -412,9 +412,8 @@ describe("getStartedThreadModelChangeBlockReason", () => {
         },
       }),
     ).toEqual({
-      title: "Start a new chat to change models",
-      description:
-        "This provider does not allow switching models after a conversation has started.",
+      title: "新建对话以更改模型",
+      description: "此提供方不允许在对话开始后切换模型。",
     });
   });
 });

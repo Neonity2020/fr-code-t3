@@ -70,7 +70,7 @@ describe("tailscale endpoint provider", () => {
           },
           source: "desktop-addon",
           status: "available",
-          description: "Reachable from devices on the same Tailnet.",
+          description: "同一 Tailnet 上的设备可访问。",
         },
         {
           id: "tailscale-magicdns:https://desktop.tail.ts.net/",
@@ -90,7 +90,7 @@ describe("tailscale endpoint provider", () => {
           },
           source: "desktop-addon",
           status: "unavailable",
-          description: "MagicDNS hostname. Configure Tailscale Serve for HTTPS access.",
+          description: "MagicDNS 主机名。请配置 Tailscale Serve 以启用 HTTPS 访问。",
         },
       ]);
     }).pipe(Effect.provide(layerUnusedTailscaleExternalServices)),
@@ -145,7 +145,7 @@ describe("tailscale endpoint provider", () => {
             },
             source: "desktop-addon",
             status: "available",
-            description: "HTTPS endpoint served by Tailscale Serve.",
+            description: "由 Tailscale Serve 提供的 HTTPS 端点。",
           },
         ]);
       }).pipe(Effect.provide(layerUnusedTailscaleExternalServices)),

@@ -173,7 +173,7 @@ it("enables and disables only the capture UUID", async () => {
 
 it("never changes the global user-extensions preference", async () => {
   const { setup, call } = fixture({ state: 2, version: 2, enabled: false });
-  await expect(setup.perform("enable-extension")).rejects.toThrow("GNOME has disabled");
+  await expect(setup.perform("enable-extension")).rejects.toThrow("GNOME 已禁用");
   expect(call.mock.calls.every(([message]) => message.member.startsWith("Get"))).toBe(true);
   setup.close();
 });

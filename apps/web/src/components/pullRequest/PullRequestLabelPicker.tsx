@@ -66,12 +66,10 @@ export function PullRequestLabelPicker({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: candidate.isApplied
-          ? `Could not take ${candidate.name} off`
-          : `Could not put ${candidate.name} on`,
+        title: candidate.isApplied ? `无法移除 ${candidate.name}` : `无法添加 ${candidate.name}`,
         description: readableFailure(
           squashAtomCommandFailure(result),
-          "The host refused it. Check that you have triage access on this repository.",
+          "托管平台拒绝了操作。请确认你对此仓库拥有分类管理权限。",
         ),
       });
       return;
@@ -81,22 +79,22 @@ export function PullRequestLabelPicker({
   return (
     <PullRequestCandidatePicker
       icon={<TagIcon className="size-3.5" />}
-      label="Change labels"
+      label="更改标签"
       allowed={allowed}
       disabledReason="Changing labels needs triage access on this repository"
       open={open}
       onOpenChange={setOpen}
       query={query}
       onQueryChange={setQuery}
-      searchLabel="Search labels"
+      searchLabel="搜索标签"
       isPending={candidatesQuery.isPending && candidatesQuery.data === null}
       error={candidatesQuery.data === null ? candidatesQuery.error : null}
       candidates={candidates}
-      emptyLabel="This repository has no labels."
-      noMatchLabel="No label matches that."
-      errorLabel="The labels could not be read."
+      emptyLabel="此仓库没有标签。"
+      noMatchLabel="没有匹配的标签。"
+      errorLabel="无法读取标签。"
       truncated={candidatesQuery.data?.truncated === true}
-      truncatedLabel="This repository has more labels than are listed here. Apply the rest on the host."
+      truncatedLabel="此仓库还有未列出的标签。请在托管平台上添加其他标签。"
       candidateKey={(candidate) => candidate.name}
       disabled={pending !== null}
       onSelect={(candidate) => void toggle(candidate)}
@@ -117,7 +115,7 @@ export function PullRequestLabelPicker({
               ) : null}
             </span>
             {candidate.isApplied ? (
-              <CheckIcon aria-label="Applied" className="size-3.5 shrink-0" />
+              <CheckIcon aria-label="已应用" className="size-3.5 shrink-0" />
             ) : null}
           </>
         );

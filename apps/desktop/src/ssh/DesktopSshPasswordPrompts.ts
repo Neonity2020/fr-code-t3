@@ -77,7 +77,7 @@ export class DesktopSshPromptPresentationError extends Schema.TaggedError<Deskto
   },
 ) {
   override get message(): string {
-    return `Failed to present SSH password prompt for ${this.destination}.`;
+    return `无法显示 ${this.destination} 的 SSH 密码提示。`;
   }
 }
 

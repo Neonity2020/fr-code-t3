@@ -31,7 +31,7 @@ export function SettingsScopeNotice({
           .filter((group) => !search.project || group.projectKey === search.project)
           .flatMap((group) =>
             group.memberProjects.map((member) => ({
-              label: `${group.displayName} · ${member.environmentLabel ?? "Environment"} · ${member.workspaceRoot}`,
+              label: `${group.displayName} · ${member.environmentLabel ?? "环境"} · ${member.workspaceRoot}`,
               search: {
                 project: group.projectKey,
                 machine: member.environmentId,
@@ -60,7 +60,7 @@ export function SettingsScopeNotice({
                   : entry.label,
                 search: { machine: entry.environmentId },
               }))
-          : [{ label: "Open all environments", search: {} }];
+          : [{ label: "打开所有环境", search: {} }];
   return (
     <SettingsPageContainer>
       <Alert role="status">

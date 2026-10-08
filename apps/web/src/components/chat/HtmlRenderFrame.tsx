@@ -106,7 +106,7 @@ export function HtmlRenderFrame(props: {
               <TooltipTrigger
                 render={
                   <Button
-                    aria-label="Open in panel"
+                    aria-label="在面板中打开"
                     size="icon-xs"
                     variant="glass"
                     onClick={() =>
@@ -125,13 +125,13 @@ export function HtmlRenderFrame(props: {
               >
                 <Maximize2Icon className="size-3.5" />
               </TooltipTrigger>
-              <TooltipPopup side="left">Open in panel</TooltipPopup>
+              <TooltipPopup side="left">在面板中打开</TooltipPopup>
             </Tooltip>
           </div>
         </>
       ) : failed ? (
         <p className="flex size-full items-center justify-center text-muted-foreground text-xs">
-          Unable to load {title}
+          无法加载 {title}
         </p>
       ) : null}
     </div>

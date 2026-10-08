@@ -55,21 +55,21 @@ function ensureRelayClientAvailable(
     const registry = yield* EnvironmentRegistry.EnvironmentRegistry;
     const status = yield* registry
       .run(environmentId, request(WS_METHODS.cloudGetRelayClientStatus, {}))
-      .pipe(Effect.mapError(relayClientRpcError("Could not check relay client availability.")));
+      .pipe(Effect.mapError(relayClientRpcError("无法检查中继客户端是否可用。")));
     if (status.status === "available") return;
     if (status.status === "unsupported") {
       return yield* new CloudEnvironmentLinkError({
-        message: `FR Code cannot install the relay client automatically on ${status.platform}-${status.arch}.`,
+        message: `FR Code 无法在 ${status.platform}-${status.arch} 上自动安装中继客户端。`,
       });
     }
 
     const confirmed = yield* Effect.tryPromise({
       try: () => requestRelayClientInstallConfirmation(status.version),
-      catch: relayClientRpcError("Could not confirm relay client installation."),
+      catch: relayClientRpcError("无法确认中继客户端安装状态。"),
     });
     if (!confirmed) {
       return yield* new CloudEnvironmentLinkError({
-        message: "Relay client installation was cancelled.",
+        message: "中继客户端安装已取消。",
       });
     }
 
@@ -82,12 +82,12 @@ function ensureRelayClientAvailable(
       )
       .pipe(
         Stream.runLast,
-        Effect.mapError(relayClientRpcError("Could not install the relay client.")),
+        Effect.mapError(relayClientRpcError("无法安装中继客户端。")),
         Effect.ensuring(Effect.sync(finishRelayClientInstall)),
       );
     if (Option.isNone(installed) || installed.value.type !== "complete") {
       return yield* new CloudEnvironmentLinkError({
-        message: "The relay client install completed without a final status.",
+        message: "中继客户端安装结束，但未返回最终状态。",
       });
     }
     const installedStatus = installed.value.status;
@@ -95,8 +95,8 @@ function ensureRelayClientAvailable(
       return yield* new CloudEnvironmentLinkError({
         message:
           installedStatus.status === "unsupported"
-            ? `FR Code cannot install the relay client automatically on ${installedStatus.platform}-${installedStatus.arch}.`
-            : "The relay client is still unavailable after installation.",
+            ? `FR Code 无法在 ${installedStatus.platform}-${installedStatus.arch} 上自动安装中继客户端。`
+            : "安装后中继客户端仍不可用。",
       });
     }
   });
@@ -165,12 +165,12 @@ function ensureLinkedEnvironmentMatches(input: {
 }): Effect.Effect<void, CloudEnvironmentLinkError> {
   if (input.link.environmentId !== input.expectedEnvironmentId) {
     return new CloudEnvironmentLinkError({
-      message: "Relay returned credentials for a different environment.",
+      message: "中继返回了其他环境的凭据。",
     });
   }
   if (input.link.endpoint.providerKind !== input.expectedProviderKind) {
     return new CloudEnvironmentLinkError({
-      message: "Relay returned credentials for a different endpoint provider.",
+      message: "中继返回了其他端点提供方的凭据。",
     });
   }
   return Effect.void;
@@ -192,7 +192,7 @@ export function readPrimaryCloudLinkState(input: {
     const client = yield* makeEnvironmentHttpApiClient(input.target.httpBaseUrl);
     return yield* client.connect
       .linkState({ headers: {} })
-      .pipe(Effect.mapError(environmentApiError("Could not read environment cloud link state.")));
+      .pipe(Effect.mapError(environmentApiError("无法读取环境的云连接状态。")));
   }).pipe(Effect.provide(PrimaryEnvironmentHttpLayer.layer));
 }
 
@@ -209,9 +209,7 @@ export function updatePrimaryCloudPreferences(input: {
         headers: {},
         payload,
       })
-      .pipe(
-        Effect.mapError(environmentApiError("Could not update environment cloud preferences.")),
-      );
+      .pipe(Effect.mapError(environmentApiError("无法更新环境的云服务偏好。")));
   }).pipe(Effect.provide(PrimaryEnvironmentHttpLayer.layer));
 }
 
@@ -227,7 +225,7 @@ export function unlinkPrimaryEnvironmentFromCloud(input: {
     const client = yield* makeEnvironmentHttpApiClient(input.target.httpBaseUrl);
     yield* client.connect
       .unlink({ headers: {} })
-      .pipe(Effect.mapError(environmentApiError("Could not unlink the environment from cloud.")));
+      .pipe(Effect.mapError(environmentApiError("无法断开环境与云服务的连接。")));
 
     const configuredRelayUrl = relayUrl();
     if (configuredRelayUrl && input.clerkToken) {
@@ -268,7 +266,7 @@ export function linkPrimaryEnvironmentToCloud(input: {
     const configuredRelayUrl = relayUrl();
     if (!configuredRelayUrl) {
       return yield* new CloudEnvironmentLinkError({
-        message: "T3CODE_RELAY_URL is not configured.",
+        message: "尚未配置 T3CODE_RELAY_URL。",
       });
     }
     const managedTunnelsEnabled = (input.mode ?? "managed") === "managed";
@@ -311,7 +309,7 @@ export function linkPrimaryEnvironmentToCloud(input: {
           origin: endpointOrigin(input.target.httpBaseUrl),
         },
       })
-      .pipe(Effect.mapError(environmentApiError("Could not obtain environment link proof.")));
+      .pipe(Effect.mapError(environmentApiError("无法获取环境连接凭证。")));
     const link = yield* relayClient
       .linkEnvironment({
         clerkToken: input.clerkToken,
@@ -345,6 +343,6 @@ export function linkPrimaryEnvironmentToCloud(input: {
           endpointRuntime: link.endpointRuntime,
         },
       })
-      .pipe(Effect.mapError(environmentApiError("Could not configure environment relay access.")));
+      .pipe(Effect.mapError(environmentApiError("无法配置环境的中继访问。")));
   }).pipe(Effect.provide(PrimaryEnvironmentHttpLayer.layer));
 }

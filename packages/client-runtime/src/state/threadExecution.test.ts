@@ -68,7 +68,7 @@ describe("thread execution presentation", () => {
       ordinal: 1,
       type: "error" as const,
       status: "failed" as const,
-      title: "Usage limit reached",
+      title: "已达到用量限制",
       startedAt: now,
       completedAt: now,
       updatedAt: now,
@@ -133,7 +133,7 @@ describe("thread execution presentation", () => {
       ordinal: 1,
       type: "error" as const,
       status: "failed" as const,
-      title: "Usage limit reached",
+      title: "已达到用量限制",
       startedAt: now,
       completedAt: now,
       updatedAt: now,
@@ -385,20 +385,20 @@ describe("deriveProviderSubagentStatus", () => {
         { status: "running", startedAt, completedAt: null },
         at("2026-07-28T10:01:05.400Z"),
       ),
-    ).toBe("Working 1m 5s");
+    ).toBe("正在工作 1 分钟 5 秒");
     expect(
       formatProviderSubagentStatus(
         { status: "completed", startedAt, completedAt: "2026-07-28T10:00:34.000Z" },
         at("2026-07-28T11:00:00.000Z"),
       ),
-    ).toBe("Completed in 34s");
+    ).toBe("已完成，耗时 34 秒");
     expect(
       formatProviderSubagentStatus(
         { status: "cancelled", startedAt, completedAt: "2026-07-28T10:00:34.000Z" },
         0,
       ),
-    ).toBe("Cancelled");
-    expect(formatProviderSubagentStatus(null, 0)).toBe("Starting");
+    ).toBe("已取消");
+    expect(formatProviderSubagentStatus(null, 0)).toBe("正在启动");
   });
 
   it("leaves T3 delegated tasks and ordinary threads alone", () => {
@@ -503,8 +503,8 @@ describe("presentPendingBackgroundWork", () => {
         { taskId: "unnamed", kind: "subagent", description },
       ]);
 
-      expect(presentation?.title).toBe("Waiting on a subagent");
-      expect(presentation?.items[0]?.label).toBe("subagent");
+      expect(presentation?.title).toBe("正在等待子智能体");
+      expect(presentation?.items[0]?.label).toBe("子智能体");
     },
   );
 
@@ -519,7 +519,7 @@ describe("presentPendingBackgroundWork", () => {
     ]);
 
     expect(presentation).toEqual({
-      title: "Waiting on subagent Luna Window Properties",
+      title: "正在等待子智能体：Luna Window Properties",
       items: [{ taskId: "luna", kind: "subagent", label: "Luna Window Properties", childThreadId }],
       waiting: true,
     });
@@ -532,7 +532,7 @@ describe("presentPendingBackgroundWork", () => {
       { taskId: "review", kind: "subagent", description: "Review src/math.ts" },
     ]);
 
-    expect(presentation?.title).toBe("Waiting on 2 subagents and 1 command");
+    expect(presentation?.title).toBe("正在等待 2 个子智能体、1 个命令");
     expect(presentation?.items.map((item) => item.label)).toEqual([
       "Luna Window Properties",
       "Review src/math.ts",
@@ -545,9 +545,9 @@ describe("presentPendingBackgroundWork", () => {
       presentPendingBackgroundWork([
         { taskId: "a", kind: "subagent", description: "Review src/math.ts" },
       ])?.title,
-    ).toBe("Waiting on subagent Review src/math.ts");
+    ).toBe("正在等待子智能体：Review src/math.ts");
     expect(presentPendingBackgroundWork([{ taskId: "a", kind: "monitor" }])?.title).toBe(
-      "Waiting on a monitor",
+      "正在等待监控任务",
     );
     expect(presentPendingBackgroundWork([])).toBeNull();
   });
@@ -558,9 +558,9 @@ describe("presentPendingBackgroundWork", () => {
       presentPendingBackgroundWork([
         { taskId: "dev", kind: "command", description: "Start the shared dev server" },
       ]),
-    ).toMatchObject({ title: "Running: Start the shared dev server", waiting: false });
+    ).toMatchObject({ title: "正在运行：Start the shared dev server", waiting: false });
     expect(presentPendingBackgroundWork([{ taskId: "a", kind: "command" }])).toMatchObject({
-      title: "Running a command",
+      title: "正在运行命令",
       waiting: false,
     });
     expect(
@@ -568,13 +568,13 @@ describe("presentPendingBackgroundWork", () => {
         { taskId: "a", kind: "command", description: "vp run dev" },
         { taskId: "b", kind: "command", description: "tailscale serve" },
       ]),
-    ).toMatchObject({ title: "Running 2 commands", waiting: false });
+    ).toMatchObject({ title: "正在运行 2 个命令", waiting: false });
     expect(
       presentPendingBackgroundWork([
         { taskId: "a", kind: "command", description: "vp run dev" },
         { taskId: "b", kind: "monitor", description: "Watch PR checks" },
       ]),
-    ).toMatchObject({ title: "Waiting on 1 command and 1 monitor", waiting: true });
+    ).toMatchObject({ title: "正在等待 1 个命令、1 个监控任务", waiting: true });
   });
 
   it("groups work by kind, subagents first, and keeps each name", () => {
@@ -588,7 +588,7 @@ describe("presentPendingBackgroundWork", () => {
       },
       { taskId: "a", kind: "subagent", description: "Review src/math.ts" },
     ]);
-    expect(presentation?.title).toBe("Waiting on 2 subagents and 1 command");
+    expect(presentation?.title).toBe("正在等待 2 个子智能体、1 个命令");
     expect(presentation?.items.map((item) => [item.kind, item.label, item.childThreadId])).toEqual([
       ["subagent", "Write tests", "thread:b"],
       ["subagent", "Review src/math.ts", undefined],
@@ -603,9 +603,9 @@ describe("presentPendingBackgroundWork", () => {
         { taskId: "watch", kind: "monitor" },
         { taskId: "other", kind: "background_task" },
       ])?.title,
-    ).toBe("Waiting on 1 command, 1 monitor and 1 background task");
+    ).toBe("正在等待 1 个命令、1 个监控任务、1 个后台任务");
     expect(presentPendingBackgroundWork([{ taskId: "old", kind: "background_task" }])?.title).toBe(
-      "Waiting on a background task",
+      "正在等待后台任务",
     );
   });
 });
@@ -674,8 +674,8 @@ describe("provider-reported model selection", () => {
       },
     ];
     const variantReport = { ...selected, options: [{ id: "variant", value: "default" }] };
-    expect(formatModelSelectionEffort(selected, models, variantReport)).toBe("Default");
-    expect(formatModelSelectionEffort(selected, models)).toBe("Unknown");
+    expect(formatModelSelectionEffort(selected, models, variantReport)).toBe("默认");
+    expect(formatModelSelectionEffort(selected, models)).toBe("未知");
   });
 });
 
@@ -693,9 +693,9 @@ describe("presentProviderGoal", () => {
         false,
       ),
     ).toEqual({
-      title: "Goal paused",
+      title: "目标已暂停",
       objective: "Ship the feature",
-      usage: "12k / 50k tokens · 4m 5s",
+      usage: "12k / 50k tokens · 4 分钟 5 秒",
       canResume: true,
     });
   });
@@ -704,7 +704,7 @@ describe("presentProviderGoal", () => {
     expect(
       presentProviderGoal({ objective: "All tests pass", status: "active", checks: 1 }, true),
     ).toEqual({
-      title: "Pursuing goal",
+      title: "正在追求目标",
       objective: "All tests pass",
       usage: "1 check",
       canResume: false,
@@ -715,6 +715,6 @@ describe("presentProviderGoal", () => {
     ).toBeNull();
     expect(
       presentProviderGoal({ objective: "All tests pass", status: "active" }, false).title,
-    ).toBe("Goal set");
+    ).toBe("目标已设置");
   });
 });

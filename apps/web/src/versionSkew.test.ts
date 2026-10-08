@@ -23,8 +23,7 @@ import {
   supportsDesktopAppUpdate,
 } from "./versionSkew";
 
-const MISMATCH_HINT =
-  "Version mismatch. Try syncing the client and server to the same FR Code version.";
+const MISMATCH_HINT = "版本不匹配。请将客户端与服务器同步到同一 FR Code 版本。";
 
 describe("versionSkew", () => {
   it("updates only the proven npm prefix and safely quotes its path", () => {
@@ -196,7 +195,7 @@ describe("versionSkew", () => {
     const mismatch = resolveVersionMismatch("0.0.33");
 
     expect(appendVersionMismatchHint("Socket closed.", mismatch)).toBe(
-      `Socket closed. Hint: ${MISMATCH_HINT}`,
+      `Socket closed. 提示：${MISMATCH_HINT}`,
     );
   });
 

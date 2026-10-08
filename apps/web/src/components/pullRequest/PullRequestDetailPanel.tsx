@@ -179,33 +179,32 @@ import { PullRequestGlyph } from "./pullRequestIcons";
 type DetailTab = "summary" | "timeline" | "code";
 
 const ACTION_SUCCESS_LABELS: Record<PullRequestAction, string> = {
-  merge: "Pull request merged",
-  ready: "Marked ready for review",
-  draft: "Converted to draft",
-  close: "Pull request closed",
-  reopen: "Pull request reopened",
-  "update-branch": "Branch updated with the base branch",
+  merge: "拉取请求已合并",
+  ready: "已标记为可审查",
+  draft: "已转为草稿",
+  close: "拉取请求已关闭",
+  reopen: "拉取请求已重新打开",
+  "update-branch": "分支已根据基准分支更新",
   // True whichever it did: a pull request that was already mergeable merges the moment this is
   // armed, and the client has no way to tell that apart from one still waiting on something.
-  "enable-auto-merge":
-    "Auto-merge turned on — merges as soon as this is ready, sooner if it already is",
-  "disable-auto-merge": "Auto-merge turned off",
-  revert: "Revert pull request opened",
-  "approve-workflows": "Workflows approved",
+  "enable-auto-merge": "自动合并已开启 — 就绪后立即合并，已就绪时可能马上执行",
+  "disable-auto-merge": "自动合并已关闭",
+  revert: "撤销拉取请求已打开",
+  "approve-workflows": "工作流已批准",
 };
 
 /** Said as the thing that did not happen, rather than as the operation that returned an error. */
 const ACTION_FAILURE_LABELS: Record<PullRequestAction, string> = {
-  merge: "Could not merge this pull request",
-  ready: "Could not mark this ready for review",
-  draft: "Could not convert this to a draft",
-  close: "Could not close this pull request",
-  reopen: "Could not reopen this pull request",
-  "update-branch": "Could not update this branch",
-  "enable-auto-merge": "Could not turn on auto-merge",
-  "disable-auto-merge": "Could not turn off auto-merge",
-  revert: "Could not open a revert pull request",
-  "approve-workflows": "Could not approve workflows",
+  merge: "无法合并此拉取请求",
+  ready: "无法标记为可审查",
+  draft: "无法转为草稿",
+  close: "无法关闭此拉取请求",
+  reopen: "无法重新打开此拉取请求",
+  "update-branch": "无法更新此分支",
+  "enable-auto-merge": "无法开启自动合并",
+  "disable-auto-merge": "无法关闭自动合并",
+  revert: "无法打开撤销拉取请求",
+  "approve-workflows": "无法批准工作流",
 };
 
 /** What to try, for the times the host says only that it refused. */
@@ -242,9 +241,9 @@ const UPDATE_BRANCH_REBASE_FAILURE_HINT =
   "The host refused it. A rebase stops at the first commit that does not apply cleanly; updating with a merge commit may still work.";
 
 const TABS: ReadonlyArray<{ value: DetailTab; label: string }> = [
-  { value: "summary", label: "Summary" },
-  { value: "timeline", label: "Timeline" },
-  { value: "code", label: "Code" },
+  { value: "summary", label: "摘要" },
+  { value: "timeline", label: "时间线" },
+  { value: "code", label: "代码" },
 ];
 
 // The diff viewer pulls in its worker pool, so load it only when the reader approaches Code.
@@ -383,7 +382,7 @@ function PullRequestBaseFreshnessWarning({
       </PopoverTrigger>
       <PopoverPopup align="start" side="bottom" className="max-w-80" padding="compact">
         <p className="text-xs text-foreground">{summary}</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">Changes can be cleanly merged.</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">可以无冲突地合并更改。</p>
         {/* Each way the host offers and this reader may take, as its own button: a split button
             would need a menu inside a popover, and two buttons say the same thing in one layer. */}
         {freshness.methods.length > 0 ? (
@@ -397,7 +396,7 @@ function PullRequestBaseFreshnessWarning({
                 onClick={() => onUpdate(method)}
               >
                 <PullRequestGlyph.merged aria-hidden className="size-3" />
-                {method === "rebase" ? "Update with rebase" : "Update branch"}
+                {method === "rebase" ? "通过变基更新" : "更新分支"}
               </Button>
             ))}
           </span>
@@ -705,11 +704,11 @@ export function PullRequestDetailPanel({
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
   const { copyToClipboard: copyReference } = useCopyToClipboard<string>({
     target: "pull request reference",
-    onCopy: (label) => toastManager.add({ type: "success", title: `${label} copied` }),
+    onCopy: (label) => toastManager.add({ type: "success", title: `${label} 已复制` }),
     onError: (error, label) =>
       toastManager.add({
         type: "error",
-        title: `Failed to copy ${label}`,
+        title: `复制 ${label} 失败`,
         description: error.message,
       }),
   });
@@ -755,7 +754,7 @@ export function PullRequestDetailPanel({
   const onCheckoutCommandError = useCallback((error: Error) => {
     toastManager.add({
       type: "error",
-      title: "Could not copy checkout command",
+      title: "无法复制检出命令",
       description: error.message,
     });
   }, []);
@@ -987,7 +986,7 @@ export function PullRequestDetailPanel({
     });
     if (commentResult._tag === "Failure") {
       setPendingAction(null);
-      toastManager.add({ type: "error", title: "Could not post the comment" });
+      toastManager.add({ type: "error", title: "无法发布评论" });
       return { commentPosted: false };
     }
     const actionSucceeded = await finishAction(action);
@@ -1012,11 +1011,8 @@ export function PullRequestDetailPanel({
       // rewritten is the one thing a failed save must not cost them.
       toastManager.add({
         type: "error",
-        title: "The title could not be saved",
-        description: readableFailure(
-          squashAtomCommandFailure(result),
-          "The host refused the new title.",
-        ),
+        title: "无法保存标题",
+        description: readableFailure(squashAtomCommandFailure(result), "主机拒绝了新标题。"),
       });
       return;
     }
@@ -1104,11 +1100,11 @@ export function PullRequestDetailPanel({
       writeTaskToComposer(attachTarget, task);
       toastManager.add({
         type: "success",
-        title: "Added to the composer",
+        title: "已添加到输入框",
         description:
           task.prompt.length > 0
-            ? "The question is in the composer — read it over, then send."
-            : "The pull request is in the composer — type your question, then send.",
+            ? "问题已放入输入框，请检查后发送。"
+            : "拉取请求已放入输入框，请输入问题后发送。",
       });
       return;
     }
@@ -1119,20 +1115,20 @@ export function PullRequestDetailPanel({
     if (opened === null) {
       toastManager.add({
         type: "error",
-        title: "Could not open a thread",
-        description: "Try again from the project, or open a thread first.",
+        title: "无法打开会话",
+        description: "请从项目重试，或先打开一个会话。",
       });
       return;
     }
     toastManager.add({
       type: "success",
-      title: "Asked in a thread",
+      title: "已在会话中提问",
       // "Ask" leaves the composer empty on purpose, so saying the question is in it would send
       // the reader looking for something that is not there. The chips are what landed.
       description:
         task.prompt.length > 0
-          ? "The question is in the composer — read it over, then send."
-          : "The pull request is in the composer — type your question, then send.",
+          ? "问题已放入输入框，请检查后发送。"
+          : "拉取请求已放入输入框，请输入问题后发送。",
     });
   };
 
@@ -1152,8 +1148,8 @@ export function PullRequestDetailPanel({
       writeTaskToComposer(attachTarget, task);
       toastManager.add({
         type: "success",
-        title: "Added to the composer",
-        description: "The task is in the composer — read it over, then send.",
+        title: "已添加到输入框",
+        description: "任务已放入输入框，请检查后发送。",
       });
       return;
     }
@@ -1164,7 +1160,7 @@ export function PullRequestDetailPanel({
     // never expires, and an explicit one would survive the update and pin the result on screen.
     const toastId = toastManager.add({
       type: "loading",
-      title: "Preparing the pull request checkout...",
+      title: "正在准备拉取请求工作目录…",
     });
     // Wherever the reader chose to act: the thread, the checkout it is pointed at and the composer
     // the task lands in are all one server's, and picking another one moves all three.
@@ -1186,8 +1182,8 @@ export function PullRequestDetailPanel({
       // working tree than to prepare a worktree nobody asked for.
       toastManager.update(toastId, {
         type: "error",
-        title: "Could not open a thread for the checkout",
-        description: "Try again from the project, or open a thread first.",
+        title: "无法为工作目录打开会话",
+        description: "请从项目重试，或先打开一个会话。",
       });
       return;
     }
@@ -1204,7 +1200,7 @@ export function PullRequestDetailPanel({
         prepareThread.error instanceof Error ? prepareThread.error.message : null;
       toastManager.update(toastId, {
         type: "error",
-        title: "Could not prepare the pull request checkout",
+        title: "无法准备拉取请求工作目录",
         ...(detailMessage ? { description: detailMessage } : {}),
       });
       return;
@@ -1226,8 +1222,8 @@ export function PullRequestDetailPanel({
       // outcome worth stopping for, since it reads as success and is not.
       toastManager.update(toastId, {
         type: "error",
-        title: "Checked out, but the thread stayed where it was",
-        description: `The checkout is ready on \`${prepared.value.branch}\`. Point a thread at it from the branch picker, then ask again.`,
+        title: "已检出，但会话仍在原位置",
+        description: `工作目录已在 \`${prepared.value.branch}\` 准备就绪。请从分支选择器将会话指向该目录，然后重试。`,
       });
       return;
     }
@@ -1239,9 +1235,9 @@ export function PullRequestDetailPanel({
     // success, because everything else about the handoff did happen.
     const staleCheckoutToast = {
       type: "warning",
-      title: "Checked out, but not on the latest commits",
+      title: "已检出，但未更新到最新提交",
       description:
-        "The checkout could not be moved onto the pull request's latest commits, so the code there is older than the pull request. Uncommitted work or local commits keep it where it is.",
+        "工作目录无法移至拉取请求的最新提交，因此其中的代码较旧。未提交的改动或本地提交阻止了更新。",
     } as const;
     if (task === null) {
       toastManager.update(
@@ -1249,11 +1245,11 @@ export function PullRequestDetailPanel({
         prepared.value.isOnPullRequestHead
           ? {
               type: "success",
-              title: mode === "local" ? "Checked out here" : "Checked out",
+              title: mode === "local" ? "已在此检出" : "已检出",
               description:
                 mode === "local"
-                  ? "This repository is on the pull request's branch, with a thread open on it."
-                  : "The pull request is in its own worktree, with a thread open on it.",
+                  ? "此仓库已切换到拉取请求分支，并打开了会话。"
+                  : "拉取请求已放入独立工作树，并打开了会话。",
             }
           : staleCheckoutToast,
       );
@@ -1265,8 +1261,8 @@ export function PullRequestDetailPanel({
       prepared.value.isOnPullRequestHead
         ? {
             type: "success",
-            title: "Checkout ready",
-            description: "The task is in the composer — read it over, then send.",
+            title: "工作目录已就绪",
+            description: "任务已放入输入框，请检查后发送。",
           }
         : staleCheckoutToast,
     );
@@ -1385,15 +1381,15 @@ export function PullRequestDetailPanel({
     lastSelectedMergeMethod,
   );
   const selectedMergeMethodLabel = PULL_REQUEST_MERGE_METHOD_LABELS[selectedMergeMethod];
-  const pendingAutoMergeLabel = `Auto-merge (${selectedMergeMethodLabel.toLowerCase()})`;
+  const pendingAutoMergeLabel = `自动合并（${selectedMergeMethodLabel.toLowerCase()}）`;
   const conflicting = detail?.state === "open" && detail.mergeability === "conflicting";
   // Only an outright yes arms it. A host that reports nothing has not said the merge is already
   // spoken for, and an off switch for something that may not be on says the wrong thing twice.
   const autoMergeArmed = detail?.state === "open" && detail.autoMergeEnabled === true;
   const armedMergeMethod = detail?.autoMergeMethod;
   const armedAutoMergeLabel = armedMergeMethod
-    ? `Auto-merge (${PULL_REQUEST_MERGE_METHOD_LABELS[armedMergeMethod].toLowerCase()})`
-    : "Auto-merge";
+    ? `自动合并（${PULL_REQUEST_MERGE_METHOD_LABELS[armedMergeMethod].toLowerCase()}）`
+    : "自动合并";
   const workflowApprovalsRequired =
     detail?.state === "open" ? (detail.workflowApprovalsRequired ?? 0) : 0;
   // Out of date with the base, and still cleanly mergeable — the one pairing an update button
@@ -1482,7 +1478,7 @@ export function PullRequestDetailPanel({
     workflowApprovalsRequired > 0 && !checksStale && can("approve-workflows");
   const checksSummary = checksStale
     ? checksState === null
-      ? "No checks reported"
+      ? "没有检查结果"
       : pullRequestChecksStatePresentation(checksState).label
     : detail
       ? summarizePullRequestChecks(detail.checks)
@@ -1513,11 +1509,11 @@ export function PullRequestDetailPanel({
                   <Button
                     size="xs"
                     variant="outline"
-                    aria-label={handoff?.startsWith("checkout") ? "Checking out..." : "Check out"}
+                    aria-label={handoff?.startsWith("checkout") ? "正在检出…" : "检出"}
                   >
                     <GitBranchIcon aria-hidden className="size-3.5" />
                     <span className="@max-[35rem]/pr-header:hidden">
-                      {handoff?.startsWith("checkout") ? "Checking out..." : "Check out"}
+                      {handoff?.startsWith("checkout") ? "正在检出…" : "检出"}
                     </span>
                     <ChevronDownIcon aria-hidden className="size-3.5 text-muted-foreground" />
                   </Button>
@@ -1525,24 +1521,24 @@ export function PullRequestDetailPanel({
               />
             }
           />
-          <TooltipPopup>Check out this pull request</TooltipPopup>
+          <TooltipPopup>检出此拉取请求</TooltipPopup>
         </Tooltip>
         <MenuPopup align="end" side="bottom">
           <MenuItem onClick={() => startCheckout("worktree")}>
             <GitBranchIcon className="mt-1 size-3.5 shrink-0 self-start" />
             <span className="flex min-w-0 flex-col">
-              <span>In a separate worktree</span>
+              <span>在独立工作树中</span>
               <span className="text-xs text-muted-foreground">
-                Its own folder and thread. Nothing you have open moves.
+                使用独立文件夹和会话，不影响已打开的内容。
               </span>
             </span>
           </MenuItem>
           <MenuItem onClick={() => startCheckout("local")}>
             <FolderGit2Icon className="mt-1 size-3.5 shrink-0 self-start" />
             <span className="flex min-w-0 flex-col">
-              <span>In this repository</span>
+              <span>在此仓库中</span>
               <span className="text-xs text-muted-foreground">
-                Switches the branch you are working in, like `gh pr checkout`.
+                切换当前工作分支，效果类似于 `gh pr checkout`。
               </span>
             </span>
           </MenuItem>
@@ -1568,19 +1564,17 @@ export function PullRequestDetailPanel({
               variant="destructive-outline"
               disabled={handoff !== null || (attachTarget === null && checkoutRoot === null)}
               onClick={startResolveConflicts}
-              aria-label={handoff === "conflicts" ? "Preparing..." : "Resolve conflicts"}
+              aria-label={handoff === "conflicts" ? "正在准备…" : "解决冲突"}
             >
               <PullRequestGlyph.conflicting aria-hidden className="size-3.5" />
               <span className="@max-[30rem]/pr-header:hidden">
-                {handoff === "conflicts" ? "Preparing..." : "Resolve conflicts"}
+                {handoff === "conflicts" ? "正在准备…" : "解决冲突"}
               </span>
             </Button>
           </span>
         }
       />
-      <TooltipPopup side="top">
-        {handoff === "conflicts" ? "Preparing..." : "Resolve conflicts"}
-      </TooltipPopup>
+      <TooltipPopup side="top">{handoff === "conflicts" ? "正在准备…" : "解决冲突"}</TooltipPopup>
     </Tooltip>
   );
 
@@ -1654,13 +1648,13 @@ export function PullRequestDetailPanel({
                           variant="ghost-muted"
                           onClick={onBack}
                           className="-ml-1.5"
-                          aria-label="Back to this thread's pull requests"
+                          aria-label="返回此会话的拉取请求"
                         >
                           <ArrowLeftIcon aria-hidden className="size-3.5" />
                         </Button>
                       }
                     />
-                    <TooltipPopup side="top">Back to pull requests</TooltipPopup>
+                    <TooltipPopup side="top">返回拉取请求列表</TooltipPopup>
                   </Tooltip>
                 ) : null}
                 <Tooltip>
@@ -1682,7 +1676,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {repositoryUrl ? `Open ${detail.repository} repository` : detail.repository}
+                    {repositoryUrl ? `打开 ${detail.repository} 仓库` : detail.repository}
                   </TooltipPopup>
                 </Tooltip>
                 <Tooltip>
@@ -1696,7 +1690,7 @@ export function PullRequestDetailPanel({
                           "inline-flex shrink-0 cursor-pointer items-center gap-0.5 font-medium underline-offset-2 hover:underline",
                           statePresentation.toneClassName,
                         )}
-                        aria-label={`Open pull request #${detail.number} on host`}
+                        aria-label={`在托管平台打开拉取请求 #${detail.number}`}
                       >
                         #{detail.number}
                         <ExternalLinkIcon aria-hidden className="size-2.5" />
@@ -1730,13 +1724,13 @@ export function PullRequestDetailPanel({
                           tabIndex={condensed ? 0 : -1}
                           onClick={onBack}
                           className="-ml-1.5"
-                          aria-label="Back to this thread's pull requests"
+                          aria-label="返回此会话的拉取请求"
                         >
                           <ArrowLeftIcon aria-hidden className="size-3.5" />
                         </Button>
                       }
                     />
-                    <TooltipPopup side="top">Back to pull requests</TooltipPopup>
+                    <TooltipPopup side="top">返回拉取请求列表</TooltipPopup>
                   </Tooltip>
                 ) : null}
                 <Tooltip>
@@ -1751,7 +1745,7 @@ export function PullRequestDetailPanel({
                           "inline-flex shrink-0 cursor-pointer items-center gap-0.5 font-medium underline-offset-2 hover:underline",
                           statePresentation.toneClassName,
                         )}
-                        aria-label={`Open pull request #${detail.number} on host`}
+                        aria-label={`在托管平台打开拉取请求 #${detail.number}`}
                       >
                         #{detail.number}
                         <ExternalLinkIcon aria-hidden className="size-2.5" />
@@ -1779,7 +1773,7 @@ export function PullRequestDetailPanel({
             <TooltipProvider delay={150} closeDelay={150} timeout={400}>
               {!nativeStack && supportsStackActions && nativeStackQuery.error ? (
                 <Button variant="ghost" size="xs" onClick={nativeStackQuery.refresh}>
-                  Retry stack lookup
+                  重试查询堆栈
                 </Button>
               ) : null}
               {nativeStack ? (
@@ -1836,8 +1830,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {armedAutoMergeLabel}: the host will merge this on its own once its requirements
-                    are met
+                    {armedAutoMergeLabel}：满足要求后，平台会自动合并
                   </TooltipPopup>
                 </Tooltip>
               ) : null}
@@ -1853,15 +1846,15 @@ export function PullRequestDetailPanel({
                           variant="default"
                           disabled={actionPending}
                           onClick={() => void perform("ready")}
-                          aria-label="Ready for review"
+                          aria-label="可以开始评审"
                         >
                           <PullRequestGlyph.pullRequest aria-hidden className="size-3.5" />
-                          <span className="@max-[30rem]/pr-header:hidden">Ready for review</span>
+                          <span className="@max-[30rem]/pr-header:hidden">可以开始评审</span>
                         </Button>
                       </span>
                     }
                   />
-                  <TooltipPopup side="top">Ready for review</TooltipPopup>
+                  <TooltipPopup side="top">可以开始评审</TooltipPopup>
                 </Tooltip>
               ) : primaryAction === "enable-auto-merge" ? (
                 <Tooltip>
@@ -1877,14 +1870,14 @@ export function PullRequestDetailPanel({
                           }
                           aria-label={
                             pendingAction === "enable-auto-merge"
-                              ? "Enabling..."
+                              ? "正在启用…"
                               : pendingAutoMergeLabel
                           }
                         >
                           <PullRequestGlyph.merged aria-hidden className="size-3.5" />
                           <span className="@max-[30rem]/pr-header:hidden">
                             {pendingAction === "enable-auto-merge"
-                              ? "Enabling..."
+                              ? "正在启用…"
                               : pendingAutoMergeLabel}
                           </span>
                         </Button>
@@ -1892,7 +1885,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {pendingAction === "enable-auto-merge" ? "Enabling..." : pendingAutoMergeLabel}
+                    {pendingAction === "enable-auto-merge" ? "正在启用…" : pendingAutoMergeLabel}
                   </TooltipPopup>
                 </Tooltip>
               ) : primaryAction === "auto-merge-armed" ? (
@@ -1911,8 +1904,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {armedAutoMergeLabel}: the host will merge this on its own once its requirements
-                    are met
+                    {armedAutoMergeLabel}：满足要求后，平台会自动合并
                   </TooltipPopup>
                 </Tooltip>
               ) : primaryAction === "merge" ? (
@@ -1926,19 +1918,19 @@ export function PullRequestDetailPanel({
                           disabled={actionPending}
                           onClick={() => setConfirmation({ open: true, action: "merge" })}
                           aria-label={
-                            pendingAction === "merge" ? "Merging..." : selectedMergeMethodLabel
+                            pendingAction === "merge" ? "正在合并…" : selectedMergeMethodLabel
                           }
                         >
                           <PullRequestGlyph.merged aria-hidden className="size-3.5" />
                           <span className="@max-[30rem]/pr-header:hidden">
-                            {pendingAction === "merge" ? "Merging..." : selectedMergeMethodLabel}
+                            {pendingAction === "merge" ? "正在合并…" : selectedMergeMethodLabel}
                           </span>
                         </Button>
                       </span>
                     }
                   />
                   <TooltipPopup side="top">
-                    {pendingAction === "merge" ? "Merging..." : selectedMergeMethodLabel}
+                    {pendingAction === "merge" ? "正在合并…" : selectedMergeMethodLabel}
                   </TooltipPopup>
                 </Tooltip>
               ) : (primaryAction === "merged" || primaryAction === "closed") &&
@@ -1957,9 +1949,7 @@ export function PullRequestDetailPanel({
                       <MenuTrigger
                         render={
                           <Button
-                            aria-label={
-                              refreshing ? "Refreshing pull request" : "More pull request actions"
-                            }
+                            aria-label={refreshing ? "正在刷新拉取请求" : "更多拉取请求操作"}
                             size="icon-xs"
                             variant="ghost-muted"
                           />
@@ -1977,7 +1967,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup>
-                    {refreshing ? "Refreshing pull request" : "More pull request actions"}
+                    {refreshing ? "正在刷新拉取请求" : "更多拉取请求操作"}
                   </TooltipPopup>
                 </Tooltip>
                 <MenuPopup align="end" side="bottom">
@@ -1994,31 +1984,31 @@ export function PullRequestDetailPanel({
                   />
                   <MenuItem disabled={refreshing} onClick={() => void refreshFromHost()}>
                     <RefreshIcon size="sm" refreshing={refreshing} />
-                    Refresh
+                    刷新
                   </MenuItem>
                   <MenuItem disabled={handoff !== null} onClick={askAboutPullRequest}>
                     <MessageCircleQuestionIcon className="mt-1 size-3.5 shrink-0 self-start" />
                     <span className="flex min-w-0 flex-col">
-                      <span>{handoff === "ask" ? "Opening..." : "Ask a question"}</span>
+                      <span>{handoff === "ask" ? "正在打开…" : "提问"}</span>
                       <span className="text-xs text-muted-foreground">
                         {attachTarget !== null
-                          ? "Adds the pull request to this thread's composer."
-                          : "Opens a thread that knows which pull request you mean."}
+                          ? "将拉取请求添加到此会话的输入框。"
+                          : "打开一个了解此拉取请求的会话。"}
                       </span>
                     </span>
                   </MenuItem>
                   <MenuItem disabled={handoff !== null} onClick={explainPullRequest}>
                     <BookOpenIcon className="mt-1 size-3.5 shrink-0 self-start" />
                     <span className="flex min-w-0 flex-col">
-                      <span>{handoff === "explain" ? "Opening..." : "Explain this PR"}</span>
+                      <span>{handoff === "explain" ? "正在打开…" : "解释此拉取请求"}</span>
                       <span className="text-xs text-muted-foreground">
-                        A walk through the diff and what to read closely.
+                        查看差异并了解需要重点阅读的内容。
                       </span>
                     </span>
                   </MenuItem>
                   <MenuItem disabled={handoff !== null} onClick={startFixFindings}>
                     <HammerIcon className="size-3.5" />
-                    {handoff === "findings" ? "Preparing..." : handoffLabels.fixFindings}
+                    {handoff === "findings" ? "正在准备…" : handoffLabels.fixFindings}
                   </MenuItem>
                   {pickableEnvironments.length > 0 ? (
                     <ActOnEnvironmentPicker
@@ -2044,7 +2034,7 @@ export function PullRequestDetailPanel({
                           ) : (
                             <PullRequestGlyph.draft className="size-3.5" />
                           )}
-                          {detail.isDraft ? "Ready for review" : "Convert to draft"}
+                          {detail.isDraft ? "可以开始评审" : "转为草稿"}
                         </MenuItem>
                       ) : null}
                       {showsMergeNow ? (
@@ -2053,7 +2043,7 @@ export function PullRequestDetailPanel({
                           onClick={() => setConfirmation({ open: true, action: "merge" })}
                         >
                           <PullRequestGlyph.merged className="size-3.5" />
-                          Merge now
+                          立即合并
                         </MenuItem>
                       ) : null}
                       {/* The same merge, left with the host to carry out once its requirements
@@ -2065,7 +2055,7 @@ export function PullRequestDetailPanel({
                           onClick={() => void perform("disable-auto-merge")}
                         >
                           <PullRequestGlyph.merged className="size-3.5" />
-                          Disable auto-merge
+                          关闭自动合并
                         </MenuItem>
                       ) : showsAutoMerge ? (
                         <MenuItem
@@ -2075,7 +2065,7 @@ export function PullRequestDetailPanel({
                           }
                         >
                           <PullRequestGlyph.merged className="size-3.5" />
-                          Enable auto-merge
+                          启用自动合并
                         </MenuItem>
                       ) : null}
                       {/* A preference for the merge action rather than a second action, so it
@@ -2132,14 +2122,14 @@ export function PullRequestDetailPanel({
                   </MenuItem>
                   <MenuItem onClick={() => copyReference(detail.url, "PR link")}>
                     <LinkIcon className="size-3.5" />
-                    Copy link
+                    复制链接
                     <MenuShortcut>
                       {shortcutLabelForCommand(keybindings, "thread.copyReference")}
                     </MenuShortcut>
                   </MenuItem>
                   <MenuItem onClick={() => copyReference(`#${reference.number}`, "PR number")}>
                     <CopyIcon className="size-3.5" />
-                    Copy PR number
+                    复制 PR 编号
                     <MenuShortcut>
                       {shortcutLabelForCommand(keybindings, "pullRequest.copyNumber")}
                     </MenuShortcut>
@@ -2153,7 +2143,7 @@ export function PullRequestDetailPanel({
                         onClick={() => setConfirmation({ open: true, action: "close" })}
                       >
                         <PullRequestGlyph.closed className="size-3.5" />
-                        Close pull request
+                        关闭拉取请求
                       </MenuItem>
                     </>
                   ) : detail.state === "closed" && can("reopen") ? (
@@ -2161,7 +2151,7 @@ export function PullRequestDetailPanel({
                       <MenuSeparator />
                       <MenuItem disabled={actionPending} onClick={() => void perform("reopen")}>
                         <PullRequestGlyph.reopen className="size-3.5" />
-                        Reopen pull request
+                        重新打开拉取请求
                       </MenuItem>
                     </>
                   ) : detail.state === "merged" && can("revert") ? (
@@ -2172,7 +2162,7 @@ export function PullRequestDetailPanel({
                         onClick={() => setConfirmation({ open: true, action: "revert" })}
                       >
                         <RotateCcwIcon className="size-3.5" />
-                        Revert changes
+                        撤销更改
                       </MenuItem>
                     </>
                   ) : null}
@@ -2181,12 +2171,7 @@ export function PullRequestDetailPanel({
             </TooltipProvider>
           ) : null}
           {onClose ? (
-            <Button
-              size="icon-xs"
-              variant="ghost"
-              aria-label="Collapse pull request panel"
-              onClick={onClose}
-            >
+            <Button size="icon-xs" variant="ghost" aria-label="收起拉取请求面板" onClick={onClose}>
               <PanelRightIcon className="size-3.5" />
             </Button>
           ) : null}
@@ -2238,7 +2223,7 @@ export function PullRequestDetailPanel({
                       >
                         {isStackedPullRequest ? (
                           <PullRequestGlyph.stack
-                            aria-label="Stacked pull request"
+                            aria-label="堆叠拉取请求"
                             className="size-3 shrink-0"
                           />
                         ) : null}
@@ -2253,7 +2238,7 @@ export function PullRequestDetailPanel({
                             <span className="inline-flex min-w-0 max-w-[40%] shrink-0 items-center gap-1">
                               {isStackedPullRequest ? (
                                 <PullRequestGlyph.stack
-                                  aria-label="Stacked pull request"
+                                  aria-label="堆叠拉取请求"
                                   className="size-3 shrink-0"
                                 />
                               ) : null}
@@ -2264,16 +2249,11 @@ export function PullRequestDetailPanel({
                           }
                         />
                         <TooltipPopup side="top">
-                          {isStackedPullRequest
-                            ? `Stacked on ${detail.baseBranch}`
-                            : detail.baseBranch}
+                          {isStackedPullRequest ? `堆叠于 ${detail.baseBranch}` : detail.baseBranch}
                         </TooltipPopup>
                       </Tooltip>
                     )}
-                    <ArrowLeftIcon
-                      aria-label="receives changes from"
-                      className="size-3 shrink-0 opacity-60"
-                    />
+                    <ArrowLeftIcon aria-label="接收改动自" className="size-3 shrink-0 opacity-60" />
                     <Tooltip>
                       <TooltipTrigger
                         render={
@@ -2288,9 +2268,7 @@ export function PullRequestDetailPanel({
                   <span className="ml-auto inline-flex shrink-0 items-center justify-end gap-2 text-2xs">
                     <span
                       className="inline-flex items-center gap-1 tabular-nums"
-                      aria-label={`${detail.changedFiles.toLocaleString()} changed ${
-                        detail.changedFiles === 1 ? "file" : "files"
-                      }`}
+                      aria-label={`${detail.changedFiles.toLocaleString()} 更改了 ${"个文件"}`}
                     >
                       <FileDiffIcon aria-hidden className="size-3" />
                       {detail.changedFiles.toLocaleString()}
@@ -2343,7 +2321,7 @@ export function PullRequestDetailPanel({
                     </Tooltip>
                     {canEditPullRequestChangeRequest(detail) ? (
                       <PullRequestEditButton
-                        aria-label="Edit title"
+                        aria-label="编辑标题"
                         onClick={() => setTitleScope({ pullRequestKey, text: detail.title })}
                       />
                     ) : null}
@@ -2357,7 +2335,7 @@ export function PullRequestDetailPanel({
                       size="sm"
                       disabled={titleSaving}
                       value={titleDraft}
-                      aria-label="Pull request title"
+                      aria-label="拉取请求标题"
                       onChange={(event) =>
                         setTitleScope({ pullRequestKey, text: event.target.value })
                       }
@@ -2378,7 +2356,7 @@ export function PullRequestDetailPanel({
                         disabled={titleSaving}
                         onClick={() => setTitleScope(null)}
                       >
-                        Cancel
+                        取消
                       </Button>
                       <Button
                         size="xs"
@@ -2386,7 +2364,7 @@ export function PullRequestDetailPanel({
                         disabled={titleSaving || titleDraft.trim().length === 0}
                         onClick={() => void saveTitle(titleDraft)}
                       >
-                        {titleSaving ? "Saving..." : "Save"}
+                        {titleSaving ? "正在保存…" : "保存"}
                       </Button>
                     </div>
                   </div>
@@ -2394,15 +2372,15 @@ export function PullRequestDetailPanel({
                 <div className="mt-2 flex min-h-5 min-w-0 items-center gap-2 text-xs text-muted-foreground">
                   <PullRequestMetaLine className="min-w-0 whitespace-nowrap">
                     <PullRequestActorLabel actor={detail.author} profileUrl={authorProfileUrl} />
-                    <span>updated {formatRelativeTimeLabel(detail.updatedAt)}</span>
+                    <span>已更新 {formatRelativeTimeLabel(detail.updatedAt)}</span>
                   </PullRequestMetaLine>
                   {checkoutCommand ? (
                     <PullRequestCopyableCode
                       key={checkoutCommand}
                       value={checkoutCommand}
                       target="pull request checkout command"
-                      copyLabel="Copy checkout command"
-                      copiedLabel="Checkout command copied"
+                      copyLabel="复制检出命令"
+                      copiedLabel="已复制检出命令"
                       className="ml-auto font-mono"
                       tooltipSide="bottom"
                       onError={onCheckoutCommandError}
@@ -2425,7 +2403,7 @@ export function PullRequestDetailPanel({
                       >
                         {isStackedPullRequest ? (
                           <PullRequestGlyph.stack
-                            aria-label="Stacked pull request"
+                            aria-label="堆叠拉取请求"
                             className="size-3 shrink-0"
                           />
                         ) : null}
@@ -2440,7 +2418,7 @@ export function PullRequestDetailPanel({
                             <span className="inline-flex min-w-0 max-w-[40%] shrink-0 items-center gap-1">
                               {isStackedPullRequest ? (
                                 <PullRequestGlyph.stack
-                                  aria-label="Stacked pull request"
+                                  aria-label="堆叠拉取请求"
                                   className="size-3 shrink-0"
                                 />
                               ) : null}
@@ -2451,29 +2429,26 @@ export function PullRequestDetailPanel({
                           }
                         />
                         <TooltipPopup side="top">
-                          {isStackedPullRequest
-                            ? `Stacked on ${detail.baseBranch}`
-                            : detail.baseBranch}
+                          {isStackedPullRequest ? `堆叠于 ${detail.baseBranch}` : detail.baseBranch}
                         </TooltipPopup>
                       </Tooltip>
                     )}
                     <ArrowLeftIcon
-                      aria-label="receives changes from"
+                      aria-label="接收改动自"
                       className="size-3.5 shrink-0 opacity-60"
                     />
                     <PullRequestCopyableCode
                       key={detail.headBranch}
                       value={detail.headBranch}
                       target="branch name"
-                      copyLabel="Copy pull request branch"
-                      copiedLabel="Branch name copied"
+                      copyLabel="复制拉取请求分支"
+                      copiedLabel={"分支名称已复制"}
                     />
                   </span>
                   <span className="ml-auto inline-flex shrink-0 items-center justify-end gap-2">
                     <span className="inline-flex min-w-16 items-center justify-end gap-1.5 tabular-nums">
                       <FileDiffIcon className="size-3.5" />
-                      {detail.changedFiles.toLocaleString()}{" "}
-                      {detail.changedFiles === 1 ? "file" : "files"}
+                      {detail.changedFiles.toLocaleString()} {"个文件"}
                     </span>
                     <PullRequestDiffStat
                       additions={detail.additions}
@@ -2490,7 +2465,7 @@ export function PullRequestDetailPanel({
         {detail ? (
           <nav
             className="col-span-2 flex min-w-0 flex-wrap items-center gap-2 border-t border-border/60 px-4 py-2"
-            aria-label="Pull request tabs"
+            aria-label="拉取请求标签页"
           >
             <ToggleGroup
               className="shrink-0"
@@ -2533,31 +2508,27 @@ export function PullRequestDetailPanel({
                               setConfirmation({ open: true, action: "approve-workflows" })
                             }
                             aria-label={
-                              pendingAction === "approve-workflows"
-                                ? "Approving..."
-                                : "Approve workflows to run"
+                              pendingAction === "approve-workflows" ? "正在批准…" : "批准运行工作流"
                             }
                           >
                             <PlayIcon aria-hidden className="size-3.5" />
                             <span>
                               {pendingAction === "approve-workflows"
-                                ? "Approving..."
-                                : "Approve workflows to run"}
+                                ? "正在批准…"
+                                : "批准运行工作流"}
                             </span>
                           </Button>
                         </span>
                       }
                     />
                     <TooltipPopup side="top">
-                      {pendingAction === "approve-workflows"
-                        ? "Approving..."
-                        : "Approve workflows to run"}
+                      {pendingAction === "approve-workflows" ? "正在批准…" : "批准运行工作流"}
                     </TooltipPopup>
                   </Tooltip>
                 ) : (
                   <span
                     className="flex h-4 min-w-0 flex-wrap content-start items-center justify-end gap-x-1.5 overflow-hidden text-xs text-muted-foreground"
-                    aria-label={checksSummary ? `Checks: ${checksSummary}` : "Checks"}
+                    aria-label={checksSummary ? `检查：${checksSummary}` : "检查"}
                   >
                     {checksState !== null ? (
                       <PullRequestChecksPopover
@@ -2585,10 +2556,8 @@ export function PullRequestDetailPanel({
                     className="inline-flex items-center gap-1"
                     aria-label={
                       activityError
-                        ? "Comments unavailable"
-                        : `${detail.commentCount.toLocaleString()} ${
-                            detail.commentCount === 1 ? "comment" : "comments"
-                          }`
+                        ? "评论不可用"
+                        : `${detail.commentCount.toLocaleString()} ${"条评论"}`
                     }
                   >
                     <MessageSquareIcon aria-hidden className="size-3" />
@@ -2602,7 +2571,7 @@ export function PullRequestDetailPanel({
                     className="inline-flex items-center gap-1"
                     aria-label={
                       activityError
-                        ? "Commits unavailable"
+                        ? "提交不可用"
                         : `${detail.commits.length.toLocaleString()} ${
                             detail.commits.length === 1 ? "commit" : "commits"
                           }`
@@ -2633,17 +2602,13 @@ export function PullRequestDetailPanel({
                 <Button
                   size="xs"
                   variant="ghost-muted"
-                  aria-label={
-                    timelineOrder === "newest"
-                      ? "Show oldest activity first"
-                      : "Show newest activity first"
-                  }
+                  aria-label={timelineOrder === "newest" ? "先显示最早的动态" : "先显示最新的动态"}
                   onClick={() =>
                     setTimelineOrder((value) => (value === "newest" ? "oldest" : "newest"))
                   }
                 >
                   <ArrowDownUpIcon aria-hidden className="size-3" />
-                  {timelineOrder === "newest" ? "Newest first" : "Oldest first"}
+                  {timelineOrder === "newest" ? "最新在前" : "最早在前"}
                 </Button>
               </div>
             ) : null}
@@ -2682,9 +2647,8 @@ export function PullRequestDetailPanel({
           <PullRequestsUnavailableState
             {...(isPullRequestNotFound(detailQuery.failure)
               ? {
-                  title: `Pull request #${reference.number} not found`,
-                  error:
-                    "It may be an issue rather than a pull request, or this account can't see it.",
+                  title: `未找到拉取请求 #${reference.number}`,
+                  error: "这可能是议题而非拉取请求，或此账户无权查看。",
                 }
               : { error: detailQuery.error })}
             refreshing={detailQuery.isPending}
@@ -2736,7 +2700,7 @@ export function PullRequestDetailPanel({
             ) : null}
             {mountedTabs.has("code") ? (
               <div className={cn("absolute inset-0", tab !== "code" && "invisible")}>
-                <Suspense fallback={<DiffPanelLoadingState label="Loading pull request diff..." />}>
+                <Suspense fallback={<DiffPanelLoadingState label="正在加载拉取请求差异…" />}>
                   <PullRequestCodeTab
                     onAddToAgentSelection={addSelectionToAgent}
                     environmentId={environmentId}
@@ -2790,33 +2754,33 @@ export function PullRequestDetailPanel({
           <AlertDialogHeader>
             <AlertDialogTitle>
               {confirmAction === "merge"
-                ? "Merge pull request?"
+                ? "合并拉取请求？"
                 : confirmAction === "enable-auto-merge"
-                  ? "Enable auto-merge?"
+                  ? "启用自动合并？"
                   : confirmAction === "revert"
-                    ? "Revert these changes?"
+                    ? "撤销这些改动？"
                     : confirmAction === "approve-workflows"
-                      ? "Approve workflows to run?"
-                      : "Close pull request?"}
+                      ? "批准运行工作流？"
+                      : "关闭拉取请求？"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmAction === "merge"
-                ? `This merges #${reference.number} using ${selectedMergeMethod}.`
+                ? `这将使用 ${selectedMergeMethod} 合并 #${reference.number}。`
                 : confirmAction === "enable-auto-merge"
                   ? // The host merges this as soon as it considers the pull request ready, which
                     // may be immediately — there is no telling from here whether anything is
                     // still outstanding.
-                    `This merges #${reference.number} using ${selectedMergeMethod} as soon as the host considers it ready, which may be immediately.`
+                    `当托管平台认为 #${reference.number} 已就绪时，使用 ${selectedMergeMethod} 合并，可能立即执行。`
                   : confirmAction === "revert"
-                    ? `This opens a new pull request that reverses the changes merged by #${reference.number}.`
+                    ? `这将创建一个新拉取请求，撤销 #${reference.number} 已合并的改动。`
                     : confirmAction === "approve-workflows"
-                      ? `This allows ${workflowApprovalsRequired} ${workflowApprovalsRequired === 1 ? "workflow" : "workflows"} from #${reference.number} to run. Review the code and workflow changes first.`
-                      : `This closes #${reference.number} without merging it.`}
+                      ? `这将允许 #${reference.number} 中的 ${workflowApprovalsRequired} ${workflowApprovalsRequired === 1 ? "workflow" : "workflows"}运行。请先审查代码和工作流改动。`
+                      : `这将关闭 #${reference.number}，不会合并。`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogClose render={<Button variant="outline" size="sm" />}>
-              Cancel
+              取消
             </AlertDialogClose>
             <Button
               size="sm"
@@ -2836,12 +2800,12 @@ export function PullRequestDetailPanel({
               {confirmAction === "merge"
                 ? selectedMergeMethodLabel
                 : confirmAction === "enable-auto-merge"
-                  ? "Enable auto-merge"
+                  ? "启用自动合并"
                   : confirmAction === "revert"
-                    ? "Create revert PR"
+                    ? "创建撤销拉取请求"
                     : confirmAction === "approve-workflows"
-                      ? "Approve and run"
-                      : "Close"}
+                      ? "批准并运行"
+                      : "关闭"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

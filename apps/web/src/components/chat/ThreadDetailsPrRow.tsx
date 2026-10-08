@@ -236,7 +236,7 @@ export function ThreadDetailsPrRow({
   // detail rows, so the two read as one family.
   const rowTooltip =
     detail === null || statePresentation === null ? (
-      <TooltipPopup side="top">{status?.tooltip ?? `Pull request #${number}`}</TooltipPopup>
+      <TooltipPopup side="top">{status?.tooltip ?? `拉取请求 #${number}`}</TooltipPopup>
     ) : (
       <TooltipPopup
         side="top"
@@ -284,15 +284,14 @@ export function ThreadDetailsPrRow({
               <div className="flex min-w-0 items-start gap-2 text-destructive">
                 <TriangleAlertIcon aria-hidden className="mt-0.5 size-3 shrink-0 stroke-current" />
                 <div className="min-w-0 flex-1 wrap-break-word leading-5">
-                  Merge conflicts with {detail.baseBranch}
+                  合并冲突，涉及 {detail.baseBranch}
                 </div>
               </div>
             ) : null}
             <div className="flex min-w-0 items-center gap-2">
               <FileDiffIcon className="size-3 shrink-0 stroke-muted-foreground" />
               <div className="min-w-0 flex items-baseline gap-1 truncate text-foreground/75">
-                {detail.changedFiles.toLocaleString()}{" "}
-                {detail.changedFiles === 1 ? "file" : "files"}
+                {detail.changedFiles.toLocaleString()} {"个文件"}
                 <PullRequestDiffStat additions={detail.additions} deletions={detail.deletions} />
               </div>
             </div>
@@ -304,42 +303,42 @@ export function ThreadDetailsPrRow({
   const trailingAction =
     rowAction === "resolve"
       ? {
-          label: "Resolve",
+          label: "解决",
           pendingLabel: "Preparing...",
           pending: handoff === "conflicts",
           destructive: true,
           suffix: <ArrowUpRightIcon aria-hidden className="size-3 shrink-0" />,
-          tooltip: "Check the branch out and resolve the conflicts in a new thread",
+          tooltip: "检出分支并在新会话中解决冲突",
           onClick: startResolveConflicts,
         }
       : rowAction === "ready"
         ? {
-            label: "Ready",
+            label: "就绪",
             pendingLabel: "Marking...",
             pending: actionPending,
             destructive: false,
             suffix: null,
-            tooltip: "Mark this pull request as ready for review",
+            tooltip: "将此拉取请求标记为可评审",
             onClick: () => void perform("ready"),
           }
         : rowAction === "fix"
           ? {
-              label: "Fix",
+              label: "修复",
               pendingLabel: "Preparing...",
               pending: handoff === "findings",
               destructive: true,
               suffix: <ArrowUpRightIcon aria-hidden className="size-3 shrink-0" />,
-              tooltip: "Fix the failing checks in a new thread",
+              tooltip: "在新会话中修复失败的检查",
               onClick: startFixChecks,
             }
           : rowAction === "merge"
             ? {
-                label: "Merge",
+                label: "合并",
                 pendingLabel: "Merging...",
                 pending: actionPending,
                 destructive: false,
                 suffix: null,
-                tooltip: `Merge this pull request (${selectedMergeMethod})`,
+                tooltip: `合并此拉取请求（${selectedMergeMethod}）`,
                 onClick: () => setConfirmingMerge(true),
               }
             : null;
@@ -369,7 +368,7 @@ export function ThreadDetailsPrRow({
                 size="sm"
                 part={watchIsLast ? "secondary" : "checks"}
                 className="group/watch"
-                aria-label={`Stop watching #${number}`}
+                aria-label={`停止关注 #${number}`}
                 onClick={onStopWatching}
               />
             }
@@ -378,8 +377,7 @@ export function ThreadDetailsPrRow({
             <EyeOffIcon aria-hidden className="hidden size-4 group-hover/watch:block" />
           </TooltipTrigger>
           <TooltipPopup side="top">
-            Watching: the agent wakes when checks finish, someone comments, or the branch conflicts.
-            Click to stop.
+            正在关注：检查完成、收到评论或分支出现冲突时会唤醒智能体。点击停止关注。
           </TooltipPopup>
         </Tooltip>
       </>
@@ -487,14 +485,14 @@ export function ThreadDetailsPrRow({
         <AlertDialog open={confirmingMerge} onOpenChange={(open) => setConfirmingMerge(open)}>
           <AlertDialogPopup>
             <AlertDialogHeader>
-              <AlertDialogTitle>Merge pull request?</AlertDialogTitle>
+              <AlertDialogTitle>合并拉取请求？</AlertDialogTitle>
               <AlertDialogDescription>
-                This merges #{number} using {selectedMergeMethod}.
+                这将合并 #{number} 使用 {selectedMergeMethod}.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogClose render={<Button variant="outline" size="sm" />}>
-                Cancel
+                取消
               </AlertDialogClose>
               <Button
                 size="sm"
@@ -504,7 +502,7 @@ export function ThreadDetailsPrRow({
                   void perform("merge", selectedMergeMethod);
                 }}
               >
-                Merge
+                合并
               </Button>
             </AlertDialogFooter>
           </AlertDialogPopup>

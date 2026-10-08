@@ -58,7 +58,7 @@ export class ThreadArchiveBlockedError extends Schema.TaggedError<ThreadArchiveB
   },
 ) {
   override get message(): string {
-    return "Cannot archive while the provider is active.";
+    return "提供商正在运行，无法归档。";
   }
 }
 
@@ -169,12 +169,7 @@ export async function requestThreadUnpinConfirmation(input: {
   }
 
   return settlePromise(() =>
-    confirm(
-      [
-        `Unpin thread "${input.title}"?`,
-        "This will move the thread out of your pinned section.",
-      ].join("\n"),
-    ),
+    confirm([`取消会话“${input.title}”的置顶？`, "会话将从置顶分区移出。"].join("\n")),
   );
 }
 
@@ -186,8 +181,8 @@ export async function navigateAfterThreadDeletion(navigate: () => Promise<void>)
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Thread deleted, but navigation failed",
-        description: error instanceof Error ? error.message : "An error occurred.",
+        title: "会话已删除，但导航失败",
+        description: error instanceof Error ? error.message : "发生错误。",
       }),
     );
   }
@@ -386,7 +381,7 @@ export function useThreadActions() {
         claim: action,
         // Undo also brings the reader back when archiving moved them to a draft.
         undo: () => unarchiveThread(threadRef, { navigate: shouldNavigateToDraft }),
-        failureTitle: "Failed to undo archive",
+        failureTitle: "撤销归档失败",
       });
 
       if (shouldNavigateToDraft) {
@@ -472,10 +467,10 @@ export function useThreadActions() {
         const confirmationResult = await settlePromise(() =>
           localApi.dialogs.confirm(
             [
-              "This thread is the only one linked to this worktree:",
+              "仅此会话关联到此工作树：",
               displayWorktreePath ?? orphanedWorktreePath,
               "",
-              "Delete the worktree too?",
+              "同时删除工作树？",
             ].join("\n"),
             { variant: "destructive" },
           ),
@@ -570,7 +565,7 @@ export function useThreadActions() {
       if (cleanupFailure) {
         const removalFailed = removeResult._tag === "Failure";
         const error = squashAtomCommandFailure(cleanupFailure);
-        const message = error instanceof Error ? error.message : "An error occurred.";
+        const message = error instanceof Error ? error.message : "发生错误。";
         console.error("Worktree cleanup failed after thread deletion", {
           threadId: threadRef.threadId,
           projectCwd: threadProject.workspaceRoot,
@@ -580,11 +575,9 @@ export function useThreadActions() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: removalFailed
-              ? "Failed to delete worktree"
-              : "Worktree deleted, but Git status refresh failed",
+            title: removalFailed ? "无法删除工作树" : "工作树已删除，但 Git 状态刷新失败",
             description: removalFailed
-              ? `Could not remove ${displayWorktreePath ?? orphanedWorktreePath}. ${message}`
+              ? `无法移除 ${displayWorktreePath ?? orphanedWorktreePath}。${message}`
               : message,
           }),
         );
@@ -711,7 +704,7 @@ export function useThreadActions() {
           action: "Unpinned",
           claim: action,
           undo: () => pinThread(target, orderKey === undefined ? {} : { orderKey }),
-          failureTitle: "Failed to undo unpin",
+          failureTitle: "撤销取消置顶失败",
         });
       } else {
         action.finish();
@@ -781,7 +774,7 @@ export function useThreadActions() {
           }
           return unsettled;
         },
-        failureTitle: "Failed to undo settle",
+        failureTitle: "撤销归档状态失败",
       });
       return result;
     },
@@ -801,7 +794,7 @@ export function useThreadActions() {
       const resolved = resolveThreadTarget(target);
       const confirmationResult = await requestThreadUnpinConfirmation({
         enabled: confirmThreadUnpin,
-        title: resolved?.thread.title ?? "this thread",
+        title: resolved?.thread.title ?? "此会话",
         confirm: localApi ? (message) => localApi.dialogs.confirm(message) : null,
       });
       if (confirmationResult._tag === "Failure") {
@@ -921,7 +914,7 @@ export function useThreadActions() {
         action: "Snoozed",
         claim: action,
         undo: () => unsnoozeThread(target),
-        failureTitle: "Failed to wake thread",
+        failureTitle: "唤醒会话失败",
       });
       return result;
     },
@@ -934,13 +927,10 @@ export function useThreadActions() {
       const resolved = resolveThreadTarget(target);
 
       if (confirmThreadDelete && localApi) {
-        const title = resolved?.thread.title ?? "this thread";
+        const title = resolved?.thread.title ?? "此会话";
         const confirmationResult = await settlePromise(() =>
           localApi.dialogs.confirm(
-            [
-              `Delete thread "${title}"?`,
-              "This permanently clears conversation history for this thread.",
-            ].join("\n"),
+            [`删除会话“${title}”？`, "这会永久清除此会话的对话历史。"].join("\n"),
             { variant: "destructive" },
           ),
         );

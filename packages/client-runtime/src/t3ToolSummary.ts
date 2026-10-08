@@ -76,8 +76,8 @@ function countEntities(ids: ReadonlyArray<string | undefined>): number {
   );
 }
 
-function quantity(count: number, noun: string, plural = `${noun}s`): string {
-  return `${count} ${count === 1 ? noun : plural}`;
+function quantity(count: number, noun: string): string {
+  return `${count} ${noun}`;
 }
 
 /** Counts successful effects separately from failed or unfinished tool calls. */
@@ -96,9 +96,9 @@ export function summarizeT3ToolCalls(
   const completed = results.filter((call) => call.outcome === "completed");
   const failedCount = results.filter((call) => call.outcome === "failed").length;
   const selected = completed.length > 0 ? completed : results;
-  const times = quantity(selected.length, "time");
+  const times = quantity(selected.length, "次");
   const phrase = (past: string, infinitive: string, object: string) =>
-    `${completed.length > 0 ? past : `Tried to ${infinitive}`} ${object}`;
+    `${completed.length > 0 ? past : `尝试${infinitive}`} ${object}`;
   const entityIds = (key: string) =>
     selected.map((call) => id(call.output?.[key]) ?? id(call.input?.[key]));
   const projectIds = selected.map(
@@ -118,10 +118,10 @@ export function summarizeT3ToolCalls(
       const threads = new Set(threadIds).size;
       const object = targetsKnown
         ? messages === threads && messages > 1
-          ? `messages to ${quantity(threads, "thread")}`
-          : `${quantity(messages, "message")} to ${quantity(threads, "thread")}`
-        : quantity(messages, "message");
-      label = phrase("Sent", "send", object);
+          ? `消息到 ${quantity(threads, "个会话")}`
+          : `${quantity(messages, "条消息")} 到 ${quantity(threads, "个会话")}`
+        : quantity(messages, "条消息");
+      label = phrase("已发送", "发送", object);
       break;
     }
     case "thread-create": {
@@ -140,207 +140,195 @@ export function summarizeT3ToolCalls(
           });
         });
       label = resultsKnown
-        ? `Created ${quantity(new Set(createdIds).size, "thread")}`
-        : `Requested thread creation ${times}`;
+        ? `已创建 ${quantity(new Set(createdIds).size, "个会话")}`
+        : `已请求创建会话 ${times}`;
       break;
     }
     case "delegate":
-      label = phrase("Delegated", "delegate", quantity(countEntities(entityIds("taskId")), "task"));
+      label = phrase("已委派", "委派", quantity(countEntities(entityIds("taskId")), "个任务"));
       break;
     case "thread-read":
     case "thread-wait": {
       const targets = threadIds.every((value) => value !== undefined)
-        ? quantity(new Set(threadIds).size, "thread")
-        : `threads ${times}`;
+        ? quantity(new Set(threadIds).size, "个会话")
+        : `会话 ${times}`;
       label =
         action === "thread-read"
-          ? phrase("Read", "read", targets)
-          : phrase("Waited on", "wait on", targets);
+          ? phrase("已读取", "读取", targets)
+          : phrase("已等待", "等待", targets);
       break;
     }
     case "thread-list":
-      label = phrase("Listed", "list", `threads ${times}`);
+      label = phrase("已列出", "列出", `会话 ${times}`);
       break;
     case "thread-interrupt":
-      label = phrase(
-        "Requested interrupts for",
-        "interrupt",
-        quantity(countEntities(threadIds), "thread"),
-      );
+      label = phrase("已请求中断", "中断", quantity(countEntities(threadIds), "个会话"));
       break;
     case "task-status":
-      label = phrase("Checked", "check", `task status ${times}`);
+      label = phrase("已检查", "检查", `任务状态 ${times}`);
       break;
     case "task-cancel":
-      label = phrase(
-        "Requested cancellation of",
-        "cancel",
-        quantity(countEntities(entityIds("taskId")), "task"),
-      );
+      label = phrase("已请求取消", "取消", quantity(countEntities(entityIds("taskId")), "个任务"));
       break;
     case "schedule-create":
       label = phrase(
-        "Scheduled",
-        "schedule",
-        quantity(countEntities(entityIds("scheduledTaskId")), "task"),
+        "已安排",
+        "安排",
+        quantity(countEntities(entityIds("scheduledTaskId")), "个任务"),
       );
       break;
     case "schedule-list":
-      label = phrase("Listed", "list", `scheduled tasks ${times}`);
+      label = phrase("已列出", "列出", `定时任务 ${times}`);
       break;
     case "schedule-update":
       label = phrase(
-        "Updated",
-        "update",
-        quantity(countEntities(entityIds("scheduledTaskId")), "scheduled task"),
+        "已更新",
+        "更新",
+        quantity(countEntities(entityIds("scheduledTaskId")), "个定时任务"),
       );
       break;
     case "schedule-delete":
       // A successful delete can report deleted:false; it still represents a deletion request.
       label = phrase(
-        "Requested deletion of",
-        "delete",
-        quantity(countEntities(entityIds("scheduledTaskId")), "scheduled task"),
+        "已请求删除",
+        "删除",
+        quantity(countEntities(entityIds("scheduledTaskId")), "个定时任务"),
       );
       break;
     case "schedule-run":
-      label = phrase("Requested", "request", quantity(selected.length, "scheduled task run"));
+      label = phrase("已请求", "请求", quantity(selected.length, "次定时任务运行"));
       break;
     case "thread-configuration":
-      label = phrase("Checked", "check", `thread configuration ${times}`);
+      label = phrase("已检查", "检查", `会话配置 ${times}`);
       break;
     case "thread-configure":
-      label = phrase("Set", "set", `thread model ${times}`);
+      label = phrase("已设置", "设置", `会话模型 ${times}`);
       break;
     case "thread-fork":
-      label = phrase("Requested", "request", quantity(selected.length, "thread fork"));
+      label = phrase("已请求", "请求", quantity(selected.length, "次会话分叉"));
       break;
     case "thread-merge":
-      label = phrase("Requested", "request", quantity(selected.length, "context merge"));
+      label = phrase("已请求", "请求", quantity(selected.length, "次上下文合并"));
       break;
     case "thread-search":
-      label = phrase("Searched", "search", `threads ${times}`);
+      label = phrase("已搜索", "搜索", `会话 ${times}`);
       break;
     case "thread-transfers":
-      label = phrase("Checked", "check", `thread transfers ${times}`);
+      label = phrase("已检查", "检查", `会话移交记录 ${times}`);
       break;
     case "thread-organize":
-      label = phrase("Organized", "organize", `threads ${times}`);
+      label = phrase("已整理", "整理", `会话 ${times}`);
       break;
     case "thread-update":
-      label = phrase("Updated", "update", quantity(countEntities(threadIds), "thread"));
+      label = phrase("已更新", "更新", quantity(countEntities(threadIds), "个会话"));
       break;
     case "queue-list":
-      label = phrase("Listed", "list", `queued messages ${times}`);
+      label = phrase("已列出", "列出", `排队消息 ${times}`);
       break;
     case "queue-read":
       label = phrase(
-        "Read",
-        "read",
-        quantity(countEntities(entityIds("queuedRunId")), "queued message"),
+        "已读取",
+        "读取",
+        quantity(countEntities(entityIds("queuedRunId")), "条排队消息"),
       );
       break;
     case "queue-edit":
       label = phrase(
-        "Edited",
-        "edit",
-        quantity(countEntities(entityIds("queuedRunId")), "queued message"),
+        "已编辑",
+        "编辑",
+        quantity(countEntities(entityIds("queuedRunId")), "条排队消息"),
       );
       break;
     case "queue-cancel":
       label = phrase(
-        "Requested cancellation of",
-        "cancel",
-        quantity(countEntities(entityIds("queuedRunId")), "queued run"),
+        "已请求取消",
+        "取消",
+        quantity(countEntities(entityIds("queuedRunId")), "次排队运行"),
       );
       break;
     case "queue-reorder":
       label = phrase(
-        "Reordered",
-        "reorder",
-        quantity(countEntities(entityIds("queuedRunId")), "queued run"),
+        "已重新排序",
+        "重新排序",
+        quantity(countEntities(entityIds("queuedRunId")), "次排队运行"),
       );
       break;
     case "queue-steer":
       label = phrase(
-        "Requested steering with",
-        "steer with",
-        quantity(countEntities(entityIds("queuedRunId")), "queued message"),
+        "已请求使用消息引导",
+        "使用消息引导",
+        quantity(countEntities(entityIds("queuedRunId")), "条排队消息"),
       );
       break;
     case "question-list":
-      label = phrase("Listed", "list", `pending questions ${times}`);
+      label = phrase("已列出", "列出", `待回答问题 ${times}`);
       break;
     case "question-read":
       label = phrase(
-        "Read",
-        "read",
-        quantity(countEntities(entityIds("requestId")), "pending question request"),
+        "已读取",
+        "读取",
+        quantity(countEntities(entityIds("requestId")), "个待回答问题请求"),
       );
       break;
     case "question-respond":
       label = phrase(
-        "Answered",
-        "answer",
-        quantity(countEntities(entityIds("requestId")), "pending question request"),
+        "已回答",
+        "回答",
+        quantity(countEntities(entityIds("requestId")), "个待回答问题请求"),
       );
       break;
     case "secret-request":
-      label = phrase("Asked for", "ask for", quantity(selected.length, "secret"));
+      label = phrase("已请求", "请求", quantity(selected.length, "个密钥"));
       break;
     case "worktree-handoff":
       label = phrase(
-        "Handed off to",
-        "hand off to",
-        quantity(countEntities(entityIds("worktreePath")), "worktree"),
+        "已移交到",
+        "移交到",
+        quantity(countEntities(entityIds("worktreePath")), "个工作树"),
       );
       break;
     case "worktree-list":
-      label = phrase("Listed", "list", `workspace branches ${times}`);
+      label = phrase("已列出", "列出", `工作区分支 ${times}`);
       break;
     case "worktree-status":
-      label = phrase("Checked", "check", `worktree status ${times}`);
+      label = phrase("已检查", "检查", `工作树状态 ${times}`);
       break;
     case "project-list":
-      label = phrase("Listed", "list", `projects ${times}`);
+      label = phrase("已列出", "列出", `项目 ${times}`);
       break;
     case "project-read":
-      label = phrase("Read", "read", quantity(countEntities(projectIds), "project"));
+      label = phrase("已读取", "读取", quantity(countEntities(projectIds), "个项目"));
       break;
     case "project-create":
-      label = phrase("Registered", "register", quantity(countEntities(projectIds), "project"));
+      label = phrase("已注册", "注册", quantity(countEntities(projectIds), "个项目"));
       break;
     case "project-update":
-      label = phrase("Updated", "update", quantity(countEntities(projectIds), "project"));
+      label = phrase("已更新", "更新", quantity(countEntities(projectIds), "个项目"));
       break;
     case "project-delete":
-      label = phrase("Deleted", "delete", quantity(countEntities(projectIds), "project"));
+      label = phrase("已删除", "删除", quantity(countEntities(projectIds), "个项目"));
       break;
     case "project-clone":
-      label = phrase(
-        "Cloned",
-        "clone",
-        quantity(countEntities(entityIds("cwd")), "repository", "repositories"),
-      );
+      label = phrase("已克隆", "克隆", quantity(countEntities(entityIds("cwd")), "个仓库"));
       break;
     case "environment-read":
-      label = phrase("Checked", "check", `environment preferences ${times}`);
+      label = phrase("已检查", "检查", `环境偏好 ${times}`);
       break;
     case "environment-update":
-      label = phrase("Updated", "update", `environment preferences ${times}`);
+      label = phrase("已更新", "更新", `环境偏好 ${times}`);
       break;
     case "attachment-prepare":
       label = phrase(
-        "Prepared",
-        "prepare",
-        quantity(countEntities(entityIds("attachmentId")), "attachment upload"),
+        "已准备",
+        "准备",
+        quantity(countEntities(entityIds("attachmentId")), "个附件上传"),
       );
       break;
     case "attachment-discard":
       label = phrase(
-        "Discarded",
-        "discard",
-        quantity(countEntities(entityIds("attachmentId")), "pending attachment"),
+        "已丢弃",
+        "丢弃",
+        quantity(countEntities(entityIds("attachmentId")), "个待发送附件"),
       );
       break;
     case "attachment-send": {
@@ -358,54 +346,46 @@ export function summarizeT3ToolCalls(
         (call) => Array.isArray(call.input?.attachments) && call.input.attachments.length > 0,
       );
       const targets = threadIds.every((value) => value !== undefined)
-        ? ` to ${quantity(new Set(threadIds).size, "thread")}`
+        ? ` 到 ${quantity(new Set(threadIds).size, "个会话")}`
         : "";
       label = phrase(
-        "Sent",
-        "send",
+        "已发送",
+        "发送",
         countsKnown
-          ? `${quantity(attachmentCount, "attachment")}${targets}`
-          : `attachments${targets} ${times}`,
+          ? `${quantity(attachmentCount, "个附件")}${targets}`
+          : `附件${targets} ${times}`,
       );
       break;
     }
     case "link-pr":
-      label = phrase("Linked", "link", quantity(selected.length, "pull request"));
+      label = phrase("已关联", "关联", quantity(selected.length, "个拉取请求"));
       break;
     case "unlink-pr":
-      label = phrase("Unlinked", "unlink", quantity(selected.length, "pull request"));
+      label = phrase("已取消关联", "取消关联", quantity(selected.length, "个拉取请求"));
       break;
     case "watch-pr":
-      label = phrase("Watching", "watch", quantity(selected.length, "pull request"));
+      label = phrase("正在关注", "关注", quantity(selected.length, "个拉取请求"));
       break;
     case "unwatch-pr":
-      label = phrase(
-        "Stopped watching",
-        "stop watching",
-        quantity(selected.length, "pull request"),
-      );
+      label = phrase("已停止关注", "停止关注", quantity(selected.length, "个拉取请求"));
       break;
     case "list-prs":
-      label = phrase(
-        "Checked",
-        "check",
-        `linked pull requests${selected.length === 1 ? "" : ` ${times}`}`,
-      );
+      label = phrase("已检查", "检查", `关联拉取请求${selected.length === 1 ? "" : ` ${times}`}`);
       break;
     case "browser":
-      label = phrase("Used", "use", `browser ${times}`);
+      label = phrase("已使用", "使用", `浏览器 ${times}`);
       break;
     case "device":
-      label = phrase("Used", "use", `device controls ${times}`);
+      label = phrase("已使用", "使用", `设备控件 ${times}`);
       break;
     case "html-preview":
-      label = phrase("Previewed", "preview", quantity(selected.length, "HTML page"));
+      label = phrase("已预览", "预览", quantity(selected.length, "个 HTML 页面"));
       break;
     case "html-render":
-      label = phrase("Rendered", "render", quantity(selected.length, "HTML page"));
+      label = phrase("已渲染", "渲染", quantity(selected.length, "个 HTML 页面"));
       break;
     case "capabilities":
-      label = phrase("Checked", "check", `orchestration capabilities ${times}`);
+      label = phrase("已检查", "检查", `编排能力 ${times}`);
       break;
   }
   return { label, failedCount };

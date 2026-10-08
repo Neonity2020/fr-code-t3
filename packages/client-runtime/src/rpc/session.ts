@@ -184,10 +184,10 @@ export const make = Effect.fn("RpcSessionFactory.make")(function* (
               reason: "transport",
               detail: `${
                 !wasConnected
-                  ? `${connection.label} could not establish a WebSocket connection.`
+                  ? `${connection.label} 无法建立 WebSocket 连接。`
                   : timedOut
-                    ? `${connection.label} stopped responding.`
-                    : `${connection.label} disconnected.`
+                    ? `${connection.label} 已停止响应。`
+                    : `${connection.label} 已断开连接。`
               }${networkHint}`,
             }),
           ),
@@ -224,7 +224,7 @@ export const make = Effect.fn("RpcSessionFactory.make")(function* (
     const serverConfigUpdates = yield* PubSub.sliding<BufferedServerConfigEvent>(64);
     const configSubscriptionEndedError = new ConnectionTransientErrorClass({
       reason: "remote-unavailable",
-      detail: `${connection.label} config subscription ended.`,
+      detail: `${connection.label} 配置订阅已结束。`,
     });
     const serverConfigSource = protocolClient[WS_METHODS.subscribeServerConfig](
       serverConfigInput,
@@ -342,7 +342,7 @@ export const make = Effect.fn("RpcSessionFactory.make")(function* (
         return Stream.fail(
           new RpcClientError.RpcClientError({
             reason: new RpcClientError.RpcClientDefect({
-              message: `${connection.label} config subscription failed.`,
+              message: `${connection.label} 配置订阅失败。`,
               cause,
             }),
           }),
@@ -354,7 +354,7 @@ export const make = Effect.fn("RpcSessionFactory.make")(function* (
         (cause) =>
           new RpcClientError.RpcClientError({
             reason: new RpcClientError.RpcClientDefect({
-              message: `${connection.label} config subscription failed.`,
+              message: `${connection.label} 配置订阅失败。`,
               cause,
             }),
           }),

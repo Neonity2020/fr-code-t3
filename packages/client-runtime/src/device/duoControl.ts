@@ -1,10 +1,10 @@
 // @effect-diagnostics globalTimers:off - The stream owns this browser control queue and its timeout.
 export const DUO_POSES = [
-  { id: "closed", label: "Closed", angle: 0 },
-  { id: "book", label: "Book", angle: 90 },
-  { id: "open", label: "Open", angle: 180 },
-  { id: "laptop", label: "Laptop", angle: 90 },
-  { id: "tent", label: "Tent", angle: 80 },
+  { id: "closed", label: "已关闭", angle: 0 },
+  { id: "book", label: "书", angle: 90 },
+  { id: "open", label: "打开", angle: 180 },
+  { id: "laptop", label: "笔记本电脑", angle: 90 },
+  { id: "tent", label: "帐篷", angle: 80 },
 ] as const;
 export type DuoPose = (typeof DUO_POSES)[number]["id"];
 export type DuoOrientation =

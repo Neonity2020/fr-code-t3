@@ -77,7 +77,7 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
     ) {
       return yield* new OutdatedHostUpdateError({
         environmentId,
-        message: `Update FR Code on ${descriptor.label} manually; it cannot update itself.`,
+        message: `请手动更新 ${descriptor.label} 上的 FR Code；该环境无法自行更新。`,
       });
     }
 
@@ -188,7 +188,7 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
     if (Option.isNone(resumed)) {
       return yield* new OutdatedHostUpdateError({
         environmentId,
-        message: `${descriptor.label} did not come back on a compatible FR Code version.`,
+        message: `${descriptor.label} 未以兼容的 FR Code 版本恢复。`,
       });
     }
 

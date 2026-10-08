@@ -667,7 +667,7 @@ export const formatMissingToolsReason = (
     );
   }
 
-  return `WSL distro is missing required tools: ${issues.join(", ")}. Install ${remediations.join(" and ")}, then retry.`;
+  return `WSL 发行版缺少所需工具：${issues.join(", ")}。请安装 ${remediations.join(" and ")} 后重试。`;
 };
 
 const probeWslRuntimeImpl = (
@@ -954,7 +954,7 @@ const pruneWslRuntimesImpl = Effect.fn("desktop.wsl.pruneRuntimesImpl")(function
   yield* Effect.logWarning("Could not prune old WSL runtime caches.", {
     distro,
     runtimeId,
-    detail: detail || `exit ${result.exitCode}`,
+    detail: detail || `退出码 ${result.exitCode}`,
   });
 });
 
@@ -976,7 +976,7 @@ const invalidateWslRuntimeImpl = Effect.fn("desktop.wsl.invalidateRuntimeImpl")(
   yield* Effect.logWarning("Could not invalidate the staged WSL runtime cache.", {
     distro,
     runtimeId,
-    detail: detail || `exit ${result.exitCode}`,
+    detail: detail || `退出码 ${result.exitCode}`,
   });
 });
 
@@ -1009,7 +1009,7 @@ export const probeWslDistros: Effect.Effect<
     isDesktopWslDistroListError(error)
       ? error
       : new DesktopWslDistroListError({
-          reason: `Failed to run wsl.exe --list --verbose: ${error.message}`,
+          reason: `无法运行 wsl.exe --list --verbose：${error.message}`,
         }),
   ),
   Effect.timeoutOption(LIST_TIMEOUT),

@@ -9,7 +9,7 @@ export function ChatGptSharingControl({ provider }: { provider: ServerProvider |
     <div className="flex items-center justify-between gap-4 border-t px-3 py-2">
       <span className="flex items-center gap-2 text-xs text-muted-foreground">
         <OpenAI className="size-3.5" aria-hidden="true" />
-        Using ChatGPT plan
+        使用 ChatGPT 订阅
       </span>
       <ChatGptUsageButton size="xs" />
     </div>

@@ -109,15 +109,15 @@ function toggle() {
 it("shows only the current pull request until the rest are asked for", () => {
   render([other, bottom, top], top);
   expect(rows()).toEqual(["2"]);
-  expect(toggleLabel()).toBe("Show 2 more");
+  expect(toggleLabel()).toBe("显示另外 2 项");
 
   toggle();
   expect(rows()).toEqual(["2", "1", "3"]);
-  expect(toggleLabel()).toBe("Show less");
+  expect(toggleLabel()).toBe("收起");
 
   toggle();
   expect(rows()).toEqual(["2"]);
-  expect(toggleLabel()).toBe("Show 2 more");
+  expect(toggleLabel()).toBe("显示另外 2 项");
 });
 
 it("keeps the single row untouched when the thread links one pull request", () => {

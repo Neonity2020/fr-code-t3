@@ -19,7 +19,7 @@ export function DelimitedTablePreview(props: {
     <div className="flex min-h-0 flex-1 flex-col">
       {table.truncated ? (
         <FileSurfaceNotice>
-          Table limited to the first 100 rows and 30 columns. Switch to source for the rest.
+          表格仅显示前 100 行和 30 列。请切换到源代码查看其余内容。
         </FileSurfaceNotice>
       ) : null}
       <div className="min-h-0 flex-1 overflow-auto">

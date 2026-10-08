@@ -68,7 +68,7 @@ export function useDirectoryEntries(environmentId: EnvironmentId, cwd: string) {
             setErrors((previous) =>
               new Map(previous).set(
                 directoryPath,
-                cause instanceof Error ? cause.message : "Unable to load folder.",
+                cause instanceof Error ? cause.message : "无法加载文件夹。",
               ),
             );
           }

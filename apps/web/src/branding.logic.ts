@@ -8,7 +8,15 @@ export function formatAppDisplayName(input: {
     return input.baseName;
   }
 
-  return `${input.baseName} (${input.stageLabel})`;
+  const stageLabel =
+    input.stageLabel === "Dev"
+      ? "开发版"
+      : input.stageLabel === "Nightly"
+        ? "每日构建版"
+        : input.stageLabel === "Alpha"
+          ? "测试版"
+          : input.stageLabel;
+  return `${input.baseName} (${stageLabel})`;
 }
 
 export function resolveServerBackedAppStageLabel(input: {

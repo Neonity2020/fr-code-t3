@@ -80,21 +80,11 @@ describe("ServerUpdateAction", () => {
     [
       { kind: "npm-global", prefix: "/opt/node" },
       "npm install --global --prefix '/opt/node' t3@0.0.45",
-      "Update command copied",
-      "then restart t3",
+      "更新命令已复制",
+      "重新启动 t3",
     ],
-    [
-      { kind: "npx" },
-      "npx t3@0.0.45",
-      "Relaunch command copied",
-      "This does not update an installed t3 command.",
-    ],
-    [
-      undefined,
-      "npx t3@0.0.45",
-      "Relaunch command copied",
-      "This does not update an installed t3 command.",
-    ],
+    [{ kind: "npx" }, "npx t3@0.0.45", "重新启动命令已复制", "这不会更新已安装的 t3 命令。"],
+    [undefined, "npx t3@0.0.45", "重新启动命令已复制", "这不会更新已安装的 t3 命令。"],
   ] satisfies ReadonlyArray<readonly [ServerInstallation | undefined, string, string, string]>)(
     "copies an honest manual command for %j without invoking remote update",
     (installation, command, title, guidance) => {
@@ -131,8 +121,8 @@ describe("ServerUpdateAction", () => {
     });
     expect(testState.toast).toHaveBeenCalledWith({
       type: "success",
-      title: "Test server updated",
-      description: "Reconnected on t3@0.0.31.",
+      title: "Test server 已更新",
+      description: "已重新连接 t3@0.0.31。",
     });
   });
 
@@ -177,7 +167,7 @@ describe("ServerUpdateAction", () => {
       />,
     );
 
-    expect(markup).toContain("Update the desktop app on that machine to update this server.");
+    expect(markup).toContain("请更新该机器上的桌面应用，以更新此服务器。");
     expect(markup).not.toContain("<button");
   });
 
@@ -205,8 +195,8 @@ describe("ServerUpdateAction", () => {
     });
     expect(testState.toast).toHaveBeenCalledWith({
       type: "success",
-      title: "Test server updated",
-      description: "Desktop app relaunched on 0.0.34.",
+      title: "Test server 已更新",
+      description: "桌面应用已在 0.0.34 重新启动。",
     });
   });
 
@@ -319,8 +309,8 @@ describe("ServerUpdatesAction", () => {
       { environmentId: "batch-b", input: { targetVersion: "0.0.31" } },
     ]);
     expect(testState.toast.mock.calls.map(([toast]) => toast.title)).toEqual([
-      "Laptop updated",
-      "Office updated",
+      "Laptop 已更新",
+      "Office 已更新",
     ]);
   });
 
@@ -336,11 +326,11 @@ describe("ServerUpdatesAction", () => {
     expect(testState.updateServer).toHaveBeenCalledTimes(2);
     expect(testState.toast).toHaveBeenCalledWith({
       type: "error",
-      title: "Laptop update failed",
+      title: "Laptop 更新失败",
       description: "Download failed",
     });
     expect(testState.toast).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "success", title: "Office updated" }),
+      expect.objectContaining({ type: "success", title: "Office 已更新" }),
     );
     expect(button.props.disabled).toBe(false);
   });
@@ -410,7 +400,7 @@ describe("ServerUpdateProgress", () => {
       />,
     );
 
-    expect(markup).toContain("Restarting…");
+    expect(markup).toContain("正在重启…");
     // The wait state is monochrome and calm: no versions, no step rail, no
     // success/warning colors, one duty-cycled pulse on the dot.
     expect(markup).not.toContain("0.0.30");
@@ -433,8 +423,8 @@ describe("ServerUpdateProgress", () => {
       />,
     );
 
-    expect(markup).toContain("Downloading…");
-    expect(markup).not.toContain("Install");
+    expect(markup).toContain("正在下载…");
+    expect(markup).not.toContain("安装");
   });
 
   it("keeps the failure visible with its retryable error", () => {

@@ -11,7 +11,11 @@ function getTimestampFormatOptions(
   };
 
   if (timestampFormat === "locale") {
-    return baseOptions;
+    return {
+      ...baseOptions,
+      hour12: new Intl.DateTimeFormat(timestampLocale, { hour: "numeric" }).resolvedOptions()
+        .hour12,
+    };
   }
 
   return {
@@ -95,7 +99,7 @@ function getTimestampFormatter(
   }
 
   const formatter = new Intl.DateTimeFormat(
-    timestampLocale,
+    "zh-CN",
     getTimestampFormatOptions(timestampFormat, includeSeconds),
   );
   timestampFormatterCache.set(cacheKey, formatter);
@@ -113,30 +117,7 @@ export function formatTimestamp(isoDate: string, timestampFormat: TimestampForma
   return getTimestampFormatter(timestampFormat, true).format(date);
 }
 
-// Deliberately not the host locale: the tooltip's ordinal suffix and
-// day-before-month order below are English, so a localized month alone would
-// read "4th Juni 2026". Localizing the whole label is a separate change.
-const monthNameFormatter = new Intl.DateTimeFormat("en-US", { month: "long" });
-
-function ordinalSuffix(day: number): string {
-  const lastTwo = day % 100;
-  if (lastTwo >= 11 && lastTwo <= 13) return "th";
-  switch (day % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-}
-
-/**
- * Long-form tooltip label, e.g. `12:04, 4th June`.
- * Renders the wall-clock time without seconds followed by the ordinal day and month name.
- */
+/** Chinese calendar date followed by wall-clock time without seconds. */
 export function formatChatTimestampTooltip(
   isoDate: string,
   timestampFormat: TimestampFormat,
@@ -145,9 +126,9 @@ export function formatChatTimestampTooltip(
   if (!date) return "";
   const time = formatShortTimestamp(isoDate, timestampFormat);
   const day = date.getDate();
-  const month = monthNameFormatter.format(date);
+  const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  return `${time}, ${day}${ordinalSuffix(day)} ${month} ${year}`;
+  return `${year}年${month}月${day}日 ${time}`;
 }
 
 export function formatShortTimestamp(isoDate: string, timestampFormat: TimestampFormat): string {
@@ -156,11 +137,11 @@ export function formatShortTimestamp(isoDate: string, timestampFormat: Timestamp
   return getTimestampFormatter(timestampFormat, false).format(date);
 }
 
-const numericDateFormatter = new Intl.DateTimeFormat(timestampLocale, {
+const numericDateFormatter = new Intl.DateTimeFormat("zh-CN", {
   month: "numeric",
   day: "numeric",
 });
-const numericDateWithYearFormatter = new Intl.DateTimeFormat(timestampLocale, {
+const numericDateWithYearFormatter = new Intl.DateTimeFormat("zh-CN", {
   month: "numeric",
   day: "numeric",
   year: "numeric",
@@ -188,7 +169,7 @@ export function formatDayAwareTimestamp(
   const dayDiff = Math.round((startOfToday - startOfMessageDay) / 86_400_000);
 
   if (dayDiff <= 0) return time;
-  if (dayDiff === 1) return `yesterday at ${time}`;
+  if (dayDiff === 1) return `昨天 ${time}`;
   const dateFormatter =
     date.getFullYear() === now.getFullYear() ? numericDateFormatter : numericDateWithYearFormatter;
   return `${dateFormatter.format(date)} ${time}`;
@@ -215,7 +196,7 @@ export function formatUpcomingTimestamp(
 
   if (dayDiff < 0) return formatDayAwareTimestamp(isoDate, timestampFormat, nowMs);
   if (dayDiff === 0) return time;
-  if (dayDiff === 1) return `tomorrow at ${time}`;
+  if (dayDiff === 1) return `明天 ${time}`;
   const dateFormatter =
     date.getFullYear() === now.getFullYear() ? numericDateFormatter : numericDateWithYearFormatter;
   return `${dateFormatter.format(date)} ${time}`;
@@ -236,15 +217,15 @@ export function formatRelativeTime(isoDate: string): RelativeTimeParts | null {
   const date = parseTimestampDate(isoDate);
   if (!date) return null;
   const diffMs = Date.now() - date.getTime();
-  if (diffMs < 0) return { value: "just now", suffix: null };
+  if (diffMs < 0) return { value: "刚刚", suffix: null };
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return { value: "just now", suffix: null };
+  if (seconds < 60) return { value: "刚刚", suffix: null };
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return { value: `${minutes}m`, suffix: "ago" };
+  if (minutes < 60) return { value: `${minutes} 分钟`, suffix: "前" };
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return { value: `${hours}h`, suffix: "ago" };
+  if (hours < 24) return { value: `${hours} 小时`, suffix: "前" };
   const days = Math.floor(hours / 24);
-  return { value: `${days}d`, suffix: "ago" };
+  return { value: `${days} 天`, suffix: "前" };
 }
 
 export function formatRelativeTimeLabel(isoDate: string) {
@@ -268,20 +249,20 @@ export function formatElapsedDurationLabel(isoDate: string, nowMs: number = Date
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = nowMs - date.getTime();
-  if (diffMs <= 0) return "just now";
+  if (diffMs <= 0) return "刚刚";
 
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 5) return "just now";
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 5) return "刚刚";
+  if (seconds < 60) return `${seconds} 秒`;
 
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return `${minutes} 分钟`;
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
+  if (hours < 24) return `${hours} 小时`;
 
   const days = Math.floor(hours / 24);
-  return `${days}d`;
+  return `${days} 天`;
 }
 
 /**
@@ -291,16 +272,16 @@ export function formatRelativeTimeUntil(isoDate: string): RelativeTimeParts | nu
   const date = parseTimestampDate(isoDate);
   if (!date) return null;
   const diffMs = date.getTime() - Date.now();
-  if (diffMs <= 0) return { value: "Expired", suffix: null };
+  if (diffMs <= 0) return { value: "已过期", suffix: null };
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 5) return { value: "Soon", suffix: null };
-  if (seconds < 60) return { value: `${seconds}s`, suffix: "left" };
+  if (seconds < 5) return { value: "即将到期", suffix: null };
+  if (seconds < 60) return { value: `${seconds} 秒`, suffix: "后到期" };
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return { value: `${minutes}m`, suffix: "left" };
+  if (minutes < 60) return { value: `${minutes} 分钟`, suffix: "后到期" };
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return { value: `${hours}h`, suffix: "left" };
+  if (hours < 24) return { value: `${hours} 小时`, suffix: "后到期" };
   const days = Math.floor(hours / 24);
-  return { value: `${days}d`, suffix: "left" };
+  return { value: `${days} 天`, suffix: "后到期" };
 }
 
 export function formatRelativeTimeUntilLabel(isoDate: string): string {
@@ -317,16 +298,16 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = date.getTime() - nowMs;
-  if (diffMs <= 0) return "Expired";
+  if (diffMs <= 0) return "已过期";
 
   const totalSeconds = Math.floor(diffMs / 1000);
-  if (totalSeconds < 5) return "Expires in a moment";
-  if (totalSeconds < 60) return `Expires in ${totalSeconds}s`;
+  if (totalSeconds < 5) return "即将到期";
+  if (totalSeconds < 60) return `${totalSeconds} 秒后到期`;
 
   if (totalSeconds < 3600) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return seconds === 0 ? `Expires in ${minutes}m` : `Expires in ${minutes}m ${seconds}s`;
+    return seconds === 0 ? `${minutes} 分钟后到期` : `${minutes} 分 ${seconds} 秒后到期`;
   }
 
   if (totalSeconds < 86_400) {
@@ -334,22 +315,22 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
     const rem = totalSeconds % 3600;
     const minutes = Math.floor(rem / 60);
     const seconds = rem % 60;
-    const parts = [`${hours}h`];
-    if (minutes > 0) parts.push(`${minutes}m`);
-    if (seconds > 0) parts.push(`${seconds}s`);
-    return `Expires in ${parts.join(" ")}`;
+    const parts = [`${hours} 小时`];
+    if (minutes > 0) parts.push(`${minutes} 分钟`);
+    if (seconds > 0) parts.push(`${seconds} 秒`);
+    return `${parts.join(" ")} 后到期`;
   }
 
   const days = Math.floor(totalSeconds / 86_400);
   const remAfterDays = totalSeconds % 86_400;
-  if (remAfterDays === 0) return `Expires in ${days}d`;
+  if (remAfterDays === 0) return `${days} 天后到期`;
   const hours = Math.floor(remAfterDays / 3600);
   const rem = remAfterDays % 3600;
   const minutes = Math.floor(rem / 60);
   const seconds = rem % 60;
   const tail: string[] = [];
-  if (hours > 0) tail.push(`${hours}h`);
-  if (minutes > 0) tail.push(`${minutes}m`);
-  if (seconds > 0) tail.push(`${seconds}s`);
-  return tail.length > 0 ? `Expires in ${days}d ${tail.join(" ")}` : `Expires in ${days}d`;
+  if (hours > 0) tail.push(`${hours} 小时`);
+  if (minutes > 0) tail.push(`${minutes} 分钟`);
+  if (seconds > 0) tail.push(`${seconds} 秒`);
+  return tail.length > 0 ? `${days} 天 ${tail.join(" ")} 后到期` : `${days} 天后到期`;
 }

@@ -94,14 +94,12 @@ function DraftStartError({ onRetry }: { readonly onRetry: () => void }) {
       {isElectron ? <WorkspacePageHeader electron /> : null}
       <Empty className="flex-1">
         <EmptyHeader className="max-w-md">
-          <EmptyTitle>Couldn’t start a new thread</EmptyTitle>
-          <EmptyDescription>
-            The project is still available. Try opening the draft again.
-          </EmptyDescription>
+          <EmptyTitle>无法新建会话</EmptyTitle>
+          <EmptyDescription>项目仍可用，请尝试重新打开草稿。</EmptyDescription>
           <div className="mt-5 flex justify-center">
             <Button size="sm" onClick={onRetry}>
               <RefreshIcon size="md" />
-              Try again
+              重试
             </Button>
           </div>
         </EmptyHeader>
@@ -118,10 +116,10 @@ function HostedStaticOnboardingState() {
   const cloudEnabled = hasCloudPublicConfig();
   const localEnvironmentOff = isLocalEnvironmentDisabled();
   const description = localEnvironmentOff
-    ? "The local environment is turned off. Connect a remote environment, or turn the local environment back on in Connections."
+    ? "本地环境已关闭。请连接远程环境，或在“连接”中重新开启本地环境。"
     : cloudEnabled
-      ? "Enable T3 Connect on that machine, then open Connections here to sign in with the same account. You can also add the machine using a pairing link."
-      : "Open Connections and add that machine using its pairing link. This app must be able to reach it.";
+      ? "在该机器上启用 T3 Connect，然后在此处打开“连接”并登录同一账号。你也可以通过配对链接添加机器。"
+      : "打开“连接”，通过配对链接添加该机器。此应用必须能访问它。";
 
   return (
     <SidebarInset className="h-dvh min-h-0 overflow-hidden overscroll-y-none">
@@ -140,16 +138,16 @@ function HostedStaticOnboardingState() {
               <div className="mx-auto mb-5 flex size-11 items-center justify-center rounded-xl border border-border/70 bg-background/70 text-muted-foreground">
                 <LinkIcon className="size-5" />
               </div>
-              <EmptyTitle>Connect to a computer running FR Code</EmptyTitle>
+              <EmptyTitle>连接运行 FR Code 的计算机</EmptyTitle>
               <EmptyDescription>
-                This app connects to FR Code running on your computer or a server. Start the FR Code
-                desktop app or command-line server on that machine and keep it running.
+                此应用连接到计算机或服务器上的 FR Code。请在目标机器上启动 FR Code
+                桌面应用或命令行服务器，并保持运行。
               </EmptyDescription>
               <EmptyDescription>{description}</EmptyDescription>
               <div className="mt-6 flex justify-center">
                 <Button render={<Link to="/settings/connections" />} size="sm">
                   <PlusIcon className="size-4" />
-                  Open Connections
+                  打开连接设置
                 </Button>
               </div>
             </EmptyHeader>

@@ -31,7 +31,7 @@ export function usePrimarySessionState() {
   let error: string | null = null;
   if (result._tag === "Failure") {
     const cause = Cause.squash(result.cause);
-    error = cause instanceof Error ? cause.message : "Could not read environment session.";
+    error = cause instanceof Error ? cause.message : "无法读取环境会话。";
   }
   return {
     data: Option.getOrNull(AsyncResult.value(result)),

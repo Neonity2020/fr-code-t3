@@ -117,7 +117,7 @@ describe("LocalApi", () => {
     const { createLocalApi } = await import("./localApi");
 
     await expect(createLocalApi().shell.openSystemSettings("full-disk-access")).rejects.toThrow(
-      "Unable to open System Settings.",
+      "无法打开系统设置。",
     );
   });
 

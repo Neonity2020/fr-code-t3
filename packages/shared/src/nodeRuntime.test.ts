@@ -81,8 +81,8 @@ describe("Node runtime selection", () => {
         Effect.flip,
       );
       expect(error._tag).toBe("NodeRuntimeUnavailableError");
-      expect(error.message).toContain("Local device support requires Node.js");
-      expect(error.message).toContain("Install Node.js");
+      expect(error.message).toContain("Local device support 需要 Node.js");
+      expect(error.message).toContain("安装 Node.js");
     }).pipe(
       Effect.provideService(HostProcessIsExecutable, true),
       Effect.provide(NodeServices.layer),
@@ -153,7 +153,7 @@ describe("Node runtime selection", () => {
         PATHEXT: ".CMD;.BAT;.EXE",
       }).pipe(Effect.flip);
       expect(error._tag).toBe("NodeRuntimeUnavailableError");
-      expect(error.message).toContain("Install Node.js");
+      expect(error.message).toContain("安装 Node.js");
     }).pipe(
       Effect.scoped,
       Effect.provideService(HostProcessIsExecutable, true),
@@ -178,7 +178,7 @@ describe("Node runtime selection", () => {
         Effect.flip,
       );
       expect(error._tag).toBe("NodeRuntimeUnavailableError");
-      expect(error.message).toContain("Install Node.js");
+      expect(error.message).toContain("安装 Node.js");
     }).pipe(
       Effect.scoped,
       Effect.provideService(HostProcessIsExecutable, true),
@@ -216,7 +216,7 @@ describe("Node runtime selection", () => {
         const error = yield* resolveNodeExecutable("Local device support", {
           PATH: directory,
         }).pipe(Effect.flip);
-        expect(error.message).toContain("Install Node.js");
+        expect(error.message).toContain("安装 Node.js");
       }).pipe(
         Effect.scoped,
         Effect.provideService(HostProcessIsExecutable, true),

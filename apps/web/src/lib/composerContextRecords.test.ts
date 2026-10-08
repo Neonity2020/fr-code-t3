@@ -291,8 +291,8 @@ describe("composerContextRecords", () => {
   });
   it.each([
     ["+181", "a.ts L181"],
-    ["+181 to +183", "a.ts L181 to L183"],
-    ["-63", "a.ts L63 (before)"],
+    ["+181 to +183", "a.ts L181 至 L183"],
+    ["-63", "a.ts L63（改动前）"],
     ["L4", "a.ts L4"],
   ])("presents review range %s consistently as %s", (rangeLabel, expected) => {
     expect(
@@ -335,7 +335,7 @@ describe("composerContextRecords", () => {
     expect(isPullRequestSummaryContext(summary)).toBe(true);
     expect(reviewCommentContextLabel(summary)).toBe("#42");
     expect(pullRequestContextDisplayState(summary)).toBe("open");
-    expect(pullRequestContextKindLabel(summary)).toBe("Open pull request");
+    expect(pullRequestContextKindLabel(summary)).toBe("Open 拉取请求");
     expect(
       pullRequestContextDisplayState({
         ...summary,
@@ -364,7 +364,7 @@ describe("composerContextRecords", () => {
       pageUrl: "http://localhost:3000/checkout",
       pageTitle: "Checkout",
       comment: "Make this   bigger",
-      targetSummary: "1 selected element",
+      targetSummary: "1 个所选元素",
       styleChanges: ["font-size: (unset) → 20px"],
       styleChangeDetails: annotation.styleChanges,
       elementIds: ["el_1"],
@@ -437,14 +437,14 @@ describe("composerContextRecords", () => {
       regions: [{ id: "rg_1", rect: { x: 1, y: 2, width: 3, height: 4 } }],
     };
     const record = previewAnnotationContextRecord(regionOnly, { screenshotContextId: "ann_1" });
-    expect(record.targetSummary).toBe("1 marked region");
+    expect(record.targetSummary).toBe("1 个标记区域");
     expect(record.screenshotContextId).toBe("image_ann_1");
 
     // Re-encoding what a paste rebuilt must not empty the summary or drop the screenshot.
     const reencoded = previewAnnotationContextRecord(previewAnnotationFromRecord(record), {
       screenshotContextId: "ann_1",
     });
-    expect(reencoded.targetSummary).toBe("1 marked region");
+    expect(reencoded.targetSummary).toBe("1 个标记区域");
     expect(reencoded.screenshotContextId).toBe("image_ann_1");
   });
 

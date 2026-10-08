@@ -74,7 +74,7 @@ function menu(overrides: Partial<Parameters<typeof PullRequestFiltersMenu>[0]>) 
 describe("pull request filters menu", () => {
   it("does not emit a change when the selected state is chosen again", () => {
     const onState = vi.fn();
-    const group = findValueChange(findLabeledGroup(menu({ onState }), "State"));
+    const group = findValueChange(findLabeledGroup(menu({ onState }), "状态"));
     expect(group).toBeDefined();
 
     group?.props.onValueChange("open");
@@ -88,7 +88,7 @@ describe("pull request filters menu", () => {
   it("names the chosen narrowing and leaves the others alone", () => {
     const onFilters = vi.fn();
     const group = findValueChange(
-      findLabeledGroup(menu({ filters: { review: "approved" }, onFilters }), "Draft"),
+      findLabeledGroup(menu({ filters: { review: "approved" }, onFilters }), "草稿"),
     );
     expect(group).toBeDefined();
 
@@ -99,10 +99,7 @@ describe("pull request filters menu", () => {
   it("drops a narrowing chosen back to all rather than sending it as undefined", () => {
     const onFilters = vi.fn();
     const group = findValueChange(
-      findLabeledGroup(
-        menu({ filters: { review: "none", checks: "failing" }, onFilters }),
-        "Review",
-      ),
+      findLabeledGroup(menu({ filters: { review: "none", checks: "failing" }, onFilters }), "审查"),
     );
     expect(group).toBeDefined();
 
@@ -127,7 +124,7 @@ describe("pull request filters menu", () => {
       projectEnvironmentId: environmentId,
       onProject,
     });
-    const radioGroup = findValueChange(findLabeledGroup(view, "Project"));
+    const radioGroup = findValueChange(findLabeledGroup(view, "项目"));
     expect(radioGroup).toBeDefined();
 
     radioGroup?.props.onValueChange(pullRequestProjectKey({ id: projectId, environmentId }));
@@ -157,7 +154,7 @@ describe("pull request filters menu", () => {
       ],
       onProject,
     });
-    const radioGroup = findValueChange(findLabeledGroup(view, "Project"));
+    const radioGroup = findValueChange(findLabeledGroup(view, "项目"));
     expect(radioGroup).toBeDefined();
 
     radioGroup?.props.onValueChange(

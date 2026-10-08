@@ -130,7 +130,7 @@ const currentSession = Effect.fn("EnvironmentRpc.currentSession")(function* () {
           Effect.fail(
             new EnvironmentRpcUnavailableError({
               environmentId: supervisor.target.environmentId,
-              message: `${supervisor.target.label} is not connected.`,
+              message: `${supervisor.target.label} 未连接。`,
             }),
           ),
         onSome: Effect.succeed,

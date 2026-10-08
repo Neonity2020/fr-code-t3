@@ -123,19 +123,17 @@ describe("resolveContextWindowModelDisplayName", () => {
 describe("formatContextWindowCompactionMessage", () => {
   it("describes compaction in terms of the selected model", () => {
     expect(formatContextWindowCompactionMessage("GPT-5.6 Sol")).toBe(
-      "Context for GPT-5.6 Sol compacts automatically when needed.",
+      "GPT-5.6 Sol 的上下文会在需要时自动压缩。",
     );
   });
 
   it("uses neutral copy when the model is unavailable", () => {
-    expect(formatContextWindowCompactionMessage(null)).toBe(
-      "Context compacts automatically when needed.",
-    );
+    expect(formatContextWindowCompactionMessage(null)).toBe("上下文会在需要时自动压缩。");
   });
 
   it("shows the configured auto-compaction threshold", () => {
     expect(formatContextWindowCompactionMessage("Claude Sonnet 5", 300_000)).toBe(
-      "Compacts automatically at 300,000 tokens.",
+      "达到 300,000 个 token 时自动压缩。",
     );
   });
 });
@@ -195,6 +193,21 @@ describe("hasDismissedResumeCompaction", () => {
             answers: {
               "This session is 2h 0m old and uses 250,000 tokens. Compact it before continuing?":
                 "Don't ask again",
+            },
+          },
+        },
+      ]),
+    ).toBe(true);
+  });
+
+  it("recognizes permanent dismissal of the localized resume dialog", () => {
+    expect(
+      hasDismissedResumeCompaction([
+        {
+          kind: "user-input.resolved",
+          payload: {
+            answers: {
+              "此会话已持续 2 小时 0 分钟，使用了 250,000 token。继续前压缩上下文？": "不再询问",
             },
           },
         },

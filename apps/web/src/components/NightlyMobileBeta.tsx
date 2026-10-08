@@ -59,13 +59,13 @@ export function NightlyMobileBetaNotice() {
     if (!IS_NIGHTLY_BUILD || noticeShown || isNoticeDismissed()) return;
     noticeShown = true;
     const toastId = toastManager.add({
-      title: "Nightly needs the beta mobile app",
+      title: "每日构建版需要移动端测试版",
       description:
-        "Nightly uses the new orchestrator. The App Store and Google Play versions of FR Code cannot connect to it.",
+        "每日构建版使用新的编排系统。App Store 和 Google Play 上的 FR Code 版本无法连接。",
       timeout: 0,
       onClose: dismissNotice,
       actionProps: {
-        children: "Get the beta app",
+        children: "获取测试版应用",
         onClick: () => {
           toastManager.close(toastId);
           void navigate({ to: "/settings/general", hash: ROW_ID });
@@ -75,7 +75,7 @@ export function NightlyMobileBetaNotice() {
         leadingIcon: <SmartphoneIcon className="size-4" />,
         actionLayout: "stacked-end",
         secondaryActionProps: {
-          children: "Dismiss",
+          children: "关闭",
           onClick: () => toastManager.close(toastId),
         },
         secondaryActionVariant: "ghost",
@@ -95,7 +95,7 @@ function BetaLinkQr({ url, label }: { url: string; label: string }) {
         <QRCodeSvg value={url} size={128} level="M" marginSize={1} title={label} />
       </div>
       <Button size="xs" variant="outline" onClick={() => copyToClipboard(url)}>
-        {isCopied ? "Copied" : "Copy link"}
+        {isCopied ? "已复制" : "复制链接"}
       </Button>
     </div>
   );
@@ -106,8 +106,8 @@ export function NightlyMobileBetaRow() {
   return (
     <SettingsRow
       id={ROW_ID}
-      title="Mobile app"
-      description="Nightly needs the beta app. The App Store and Google Play versions cannot connect."
+      title="移动应用"
+      description="每日构建版需要移动端测试版。App Store 和 Google Play 上的版本无法连接。"
       control={
         <div className="flex items-center gap-2">
           <Popover>
@@ -118,10 +118,10 @@ export function NightlyMobileBetaRow() {
             <PopoverPopup align="end">
               <div className="flex flex-col gap-3">
                 <div className="space-y-1">
-                  <PopoverTitle>TestFlight beta</PopoverTitle>
-                  <p className="text-xs text-muted-foreground">Scan with your iPhone camera.</p>
+                  <PopoverTitle>TestFlight 测试版</PopoverTitle>
+                  <p className="text-xs text-muted-foreground">使用 iPhone 相机扫描。</p>
                 </div>
-                <BetaLinkQr url={IOS_TESTFLIGHT_URL} label="TestFlight beta link" />
+                <BetaLinkQr url={IOS_TESTFLIGHT_URL} label="TestFlight 测试版链接" />
               </div>
             </PopoverPopup>
           </Popover>
@@ -133,20 +133,19 @@ export function NightlyMobileBetaRow() {
             <PopoverPopup align="end">
               <div className="flex flex-col gap-3">
                 <div className="space-y-1">
-                  <PopoverTitle>Google Play beta</PopoverTitle>
+                  <PopoverTitle>Google Play 测试版</PopoverTitle>
                   <p className="max-w-72 text-xs text-muted-foreground">
-                    Use the same Google account for both steps. Step 2 can take up to an hour to
-                    work after you join the group.
+                    两步操作请使用同一个 Google 账号。加入群组后，第二步可能需要等待一小时才能生效。
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <p className="text-center text-xs font-medium">1. Join the group</p>
-                    <BetaLinkQr url={ANDROID_BETA_GROUP_URL} label="Android beta group link" />
+                    <p className="text-center text-xs font-medium">1. 加入群组</p>
+                    <BetaLinkQr url={ANDROID_BETA_GROUP_URL} label="Android 测试群组链接" />
                   </div>
                   <div className="space-y-2">
-                    <p className="text-center text-xs font-medium">2. Become a tester</p>
-                    <BetaLinkQr url={ANDROID_PLAY_TESTING_URL} label="Google Play beta link" />
+                    <p className="text-center text-xs font-medium">2. 成为测试用户</p>
+                    <BetaLinkQr url={ANDROID_PLAY_TESTING_URL} label="Google Play 测试版链接" />
                   </div>
                 </div>
               </div>

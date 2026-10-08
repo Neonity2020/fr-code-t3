@@ -657,7 +657,7 @@ export const useRightPanelStore = create<RightPanelStoreState>()(
             ...current,
             surfaces: current.surfaces.map((surface) =>
               surface.id === surfaceId && surface.kind === "device"
-                ? { ...surface, title: title.trim() || surface.target?.name || "Device" }
+                ? { ...surface, title: title.trim() || surface.target?.name || "设备" }
                 : surface,
             ),
           })),

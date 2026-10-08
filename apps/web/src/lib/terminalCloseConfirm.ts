@@ -22,15 +22,12 @@ export async function confirmTerminalClose(
   try {
     return await localApi.dialogs.confirm(
       labels.length === 1
-        ? [
-            `Close terminal "${labels[0]}"?`,
-            "This stops the running process and clears its history.",
-          ].join("\n")
+        ? [`关闭终端“${labels[0]}”？`, "这会停止正在运行的进程并清除历史记录。"].join("\n")
         : [
-            `Close ${labels.length} terminals?`,
-            `This stops their running processes and clears their histories: ${labels
+            `关闭 ${labels.length} 个终端？`,
+            `这会停止正在运行的进程并清除历史记录：${labels
               .map((label) => `"${label}"`)
-              .join(", ")}.`,
+              .join(", ")}。`,
           ].join("\n"),
       { variant: "destructive" },
     );

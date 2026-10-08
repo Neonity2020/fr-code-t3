@@ -119,7 +119,7 @@ it("offers manual capture on an unsupported GNOME version instead of trapping se
   expect(captureSetupBackend(state)).toBe("picker");
   expect(captureSetupAccessReady(state)).toBe(true);
   expect(captureSetupInitialStep(state)).toBe("access");
-  expect(captureSetupCheckMessage(state)).toContain("choose a window each time");
+  expect(captureSetupCheckMessage(state)).toContain("每次需选择一个窗口");
 });
 
 it.each(["not-installed", "update-required", "error"] as const)(
@@ -199,33 +199,33 @@ it("acknowledges an unchanged recheck while GNOME still needs a sign-out", () =>
     ...gnome,
     gnomeExtension: { status: "restart-required" as const, message: "Sign out" },
   };
-  expect(captureSetupCheckMessage(state)).toBe("Still waiting for you to sign out and back in.");
+  expect(captureSetupCheckMessage(state)).toBe("仍在等待你注销并重新登录。");
   expect(captureSetupAccessReady(state)).toBe(false);
 });
 
 it("only confirms capture access when the rechecked extension is running and reachable", () => {
-  expect(captureSetupCheckMessage(gnome)).toBe("Ready. Continue to choose your shortcut.");
+  expect(captureSetupCheckMessage(gnome)).toBe("已就绪。继续选择快捷键。");
   expect(captureSetupCheckMessage({ ...gnome, linuxBackend: "picker" })).toBe(
-    "Not ready yet. Finish the step above.",
+    "尚未就绪。请完成上方步骤。",
   );
   expect(
     captureSetupCheckMessage({
       ...gnome,
       gnomeExtension: { status: "disabled", message: "Enable it" },
     }),
-  ).toBe("Not ready yet. Finish the step above.");
+  ).toBe("尚未就绪。请完成上方步骤。");
 });
 
 it("does not report a successful check when capture support could not be read", () => {
   expect(captureSetupCheckMessage({ ...gnome, message: "Desktop disconnected" })).toContain(
-    "Still unable to check access",
+    "仍无法检查权限",
   );
   expect(
     captureSetupCheckMessage({
       ...gnome,
       gnomeExtension: { status: "error", message: "Could not read extension state" },
     }),
-  ).toContain("Still unable to check access");
+  ).toContain("仍无法检查权限");
 });
 
 it("uses a capable portal without requiring the optional GNOME extension", () => {
@@ -242,7 +242,7 @@ it("uses a capable portal without requiring the optional GNOME extension", () =>
       ...state,
       gnomeExtension: { status: "error", message: "Optional extension failed" },
     }),
-  ).toBe("Ready. Continue to choose your shortcut.");
+  ).toBe("已就绪。继续选择快捷键。");
 });
 
 it("lets Niri setup finish with configuration instructions without claiming the binding was verified", () => {
@@ -337,5 +337,5 @@ it.each(["kde", "hyprland"] as const)("ignores errors from inactive helpers on %
     hyprlandHelper: { status: backend === "hyprland" ? "ready" : "error", message: "Hyprland" },
   };
   expect(captureSetupAccessReady(state)).toBe(true);
-  expect(captureSetupCheckMessage(state)).toBe("Ready. Continue to choose your shortcut.");
+  expect(captureSetupCheckMessage(state)).toBe("已就绪。继续选择快捷键。");
 });

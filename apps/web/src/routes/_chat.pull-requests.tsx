@@ -231,26 +231,26 @@ function PullRequestGroupHeader({
 
 // The state filters wear the same glyphs the rows do, so the two read as one vocabulary.
 const INVOLVEMENT_TABS = [
-  { value: "all", label: "All", Icon: LayersIcon },
-  { value: "reviewing", label: "Reviewing", Icon: EyeIcon },
-  { value: "authored", label: "Authored", Icon: PenLineIcon },
+  { value: "all", label: "全部", Icon: LayersIcon },
+  { value: "reviewing", label: "正在审查", Icon: EyeIcon },
+  { value: "authored", label: "由我创建", Icon: PenLineIcon },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<PullRequestInvolvement>>;
 
 const STATE_TABS = [
-  { value: "all", label: "All", Icon: LayersIcon },
-  { value: "open", label: "Open", Icon: PullRequestGlyph.pullRequest },
-  { value: "closed", label: "Closed", Icon: PullRequestGlyph.closed },
-  { value: "merged", label: "Merged", Icon: PullRequestGlyph.merged },
+  { value: "all", label: "全部", Icon: LayersIcon },
+  { value: "open", label: "打开", Icon: PullRequestGlyph.pullRequest },
+  { value: "closed", label: "已关闭", Icon: PullRequestGlyph.closed },
+  { value: "merged", label: "已合并", Icon: PullRequestGlyph.merged },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<PullRequestListState>>;
 
 const SORT_OPTIONS = [
-  { value: "ready", label: "Merge readiness", Icon: ListChecksIcon },
-  { value: "blocked", label: "Blocked on me", Icon: UserLockIcon },
-  { value: "updated", label: "Recently updated", Icon: ClockIcon },
-  { value: "newest", label: "Newest shown", Icon: CalendarArrowDownIcon },
-  { value: "oldest", label: "Oldest shown", Icon: CalendarArrowUpIcon },
-  { value: "largest", label: "Largest shown", Icon: Maximize2Icon },
-  { value: "smallest", label: "Smallest shown", Icon: Minimize2Icon },
+  { value: "ready", label: "合并就绪程度", Icon: ListChecksIcon },
+  { value: "blocked", label: "等待我处理", Icon: UserLockIcon },
+  { value: "updated", label: "最近更新", Icon: ClockIcon },
+  { value: "newest", label: "最新在前", Icon: CalendarArrowDownIcon },
+  { value: "oldest", label: "最早在前", Icon: CalendarArrowUpIcon },
+  { value: "largest", label: "最大在前", Icon: Maximize2Icon },
+  { value: "smallest", label: "最小在前", Icon: Minimize2Icon },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<PullRequestListSort>>;
 
 /** Long enough that a keystroke does not become a request, short enough to feel answered. */
@@ -1848,7 +1848,7 @@ function PullRequestsRouteView() {
       rightPanelAvailable={rightPanelAvailable}
       rightPanelOpen={rightPanelState.isOpen}
       rightPanelShortcutLabel={shortcutLabelForCommand(keybindings, "rightPanel.toggle")}
-      rightPanelUnavailableLabel="Select a pull request first"
+      rightPanelUnavailableLabel="请先选择一个拉取请求"
       onToggleTerminal={() => undefined}
       onToggleRightPanel={toggleRightPanel}
     />
@@ -1878,7 +1878,7 @@ function PullRequestsRouteView() {
         <PullRequestListGhost rows={7} />
       ) : !pullRequestsSupported ? (
         <PullRequestsUnavailableState
-          title="Pull requests unavailable"
+          title="拉取请求不可用"
           error="Update your FR Code servers to browse pull requests."
         />
       ) : firstLoad ? (
@@ -1957,9 +1957,9 @@ function PullRequestsRouteView() {
 
       {listQuery.error && shownCount > 0 ? (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-warning/30 bg-warning-surface px-3 py-2 text-xs">
-          <span>{listQuery.error} Showing the last pull requests loaded.</span>
+          <span>{listQuery.error} 显示上次加载的拉取请求。</span>
           <Button size="xs" variant="outline" onClick={() => listQuery.refresh()}>
-            Retry
+            重试
           </Button>
         </div>
       ) : null}
@@ -1968,7 +1968,7 @@ function PullRequestsRouteView() {
           {loadingMore ? (
             <span className="flex items-center gap-2">
               <Spinner aria-hidden size="sm" />
-              {sentCursors === null ? "Updating pull requests" : "Loading more"}
+              {sentCursors === null ? "正在更新拉取请求" : "正在加载更多"}
             </span>
           ) : canContinue || pageSize < MAX_PAGE_SIZE ? (
             <Button
@@ -1977,10 +1977,10 @@ function PullRequestsRouteView() {
               onClick={loadMore}
               disabled={listQuery.isPending || showingCarried}
             >
-              Load more pull requests
+              加载更多拉取请求
             </Button>
           ) : (
-            <span>Narrow your search to find more pull requests.</span>
+            <span>缩小搜索范围以查找更多拉取请求。</span>
           )}
         </div>
       ) : null}
@@ -1991,7 +1991,7 @@ function PullRequestsRouteView() {
   // kind force the hostname to tell them apart.
   const hostEntries = hosts.length > 0 ? hosts : expectedHosts;
   const hostMenuOptions: ReadonlyArray<PullRequestFilterOption<string>> = [
-    { value: "", label: "All", Icon: Plug2Icon },
+    { value: "", label: "全部", Icon: Plug2Icon },
     ...hostEntries.map((entry) => {
       // `expectedHosts` stands in before the server has answered, and nothing is known to be
       // unreadable yet; once the summaries arrive they carry whether each one could be read.
@@ -2009,7 +2009,7 @@ function PullRequestsRouteView() {
   // The same shape the host pills take, so the two groups read as one control. Each server
   // wears the machine it runs on.
   const serverMenuOptions: ReadonlyArray<PullRequestFilterOption<string>> = [
-    { value: "", label: "All servers", Icon: LayersIcon },
+    { value: "", label: "所有服务器", Icon: LayersIcon },
     ...capableEnvironments.map((environment) => ({
       value: environment.environmentId,
       label: environment.label,
@@ -2018,9 +2018,9 @@ function PullRequestsRouteView() {
   ];
   const sortMenu = (
     <CompactFilterMenu
-      label="Sort pull requests"
+      label="拉取请求排序"
       triggerIcon={<ArrowDownUpIcon aria-hidden className="size-4" />}
-      triggerLabel="Sort"
+      triggerLabel="排序"
       outlined
       value={sort}
       options={SORT_OPTIONS}
@@ -2097,7 +2097,7 @@ function PullRequestsRouteView() {
           )}
           style={
             panelAnimationsActive
-              ? { transitionDuration: `${panelAnimationDurationMs}ms` }
+              ? { transitionDuration: `${panelAnimationDurationMs} 毫秒` }
               : undefined
           }
         />
@@ -2167,13 +2167,13 @@ function PullRequestsRouteView() {
     void writeTextToClipboard(url, "pull request link").then(
       (didCopy) => {
         if (didCopy)
-          toastManager.add({ type: "success", title: "PR link copied", description: url });
+          toastManager.add({ type: "success", title: "拉取请求链接已复制", description: url });
       },
       (error) => {
         toastManager.add({
           type: "error",
-          title: "Failed to copy PR link",
-          description: error instanceof Error ? error.message : "An error occurred.",
+          title: "无法复制拉取请求链接",
+          description: error instanceof Error ? error.message : "发生错误。",
         });
       },
     );
@@ -2480,7 +2480,7 @@ function ExpandableSearch({
     <Button
       size="icon-sm"
       variant="ghost"
-      aria-label="Search pull requests"
+      aria-label="搜索拉取请求"
       onClick={() => onOpenChange(true)}
     >
       <SearchIcon className="size-4" />
@@ -2608,30 +2608,30 @@ function PullRequestsColumn({
       >
         {titlebarControls}
         {condensed ? (
-          <WorkspaceBreadcrumb ariaLabel="Pull request scope" className="overflow-hidden">
+          <WorkspaceBreadcrumb ariaLabel="拉取请求范围" className="overflow-hidden">
             {/* An expanded search owns the scarce horizontal space. The page title stays
                 available to readers while the live filters remain available in both states. */}
             <WorkspaceBreadcrumbItem current className={cn(searchExpanded && "sr-only")}>
-              <h1 className="truncate">Pull Requests</h1>
+              <h1 className="truncate">拉取请求</h1>
             </WorkspaceBreadcrumbItem>
             {searchExpanded ? null : <WorkspaceBreadcrumbSeparator />}
             <WorkspaceBreadcrumbItem className="shrink gap-1.5">
               <CompactFilterMenu
-                label="Filter by state"
+                label="按状态筛选"
                 value={state}
                 options={STATE_TABS}
                 onChange={onState}
                 className="shrink-0"
               />
               <CompactFilterMenu
-                label="Filter by involvement"
+                label="按参与情况筛选"
                 value={involvement}
                 options={INVOLVEMENT_TABS}
                 onChange={onInvolvement}
               />
               {hostMenuOptions.length > 2 ? (
                 <CompactFilterMenu
-                  label="Filter by host"
+                  label="按主机筛选"
                   value={host ?? ""}
                   options={hostMenuOptions}
                   onChange={(next) => onHost(next === "" ? undefined : next)}
@@ -2640,9 +2640,9 @@ function PullRequestsColumn({
             </WorkspaceBreadcrumbItem>
           </WorkspaceBreadcrumb>
         ) : (
-          <WorkspaceBreadcrumb ariaLabel="Pull requests breadcrumb">
+          <WorkspaceBreadcrumb ariaLabel="拉取请求导航">
             <WorkspaceBreadcrumbItem current>
-              <h1 className="truncate">Pull Requests</h1>
+              <h1 className="truncate">拉取请求</h1>
             </WorkspaceBreadcrumbItem>
           </WorkspaceBreadcrumb>
         )}
@@ -2681,11 +2681,11 @@ function PullRequestsColumn({
               {sortMenu}
               {filtersMenu}
               <CompactFilterMenu
-                label="Filter by provider"
+                label="按提供方筛选"
                 outlined
                 iconOnly={host !== undefined}
                 triggerIcon={<Plug2Icon aria-hidden className="size-4" />}
-                triggerLabel="All"
+                triggerLabel="全部"
                 value={host ?? ""}
                 options={hostMenuOptions}
                 onChange={(next) => onHost(next === "" ? undefined : next)}
@@ -2718,7 +2718,7 @@ function PullRequestRefreshControl({
     <Button
       size={compact ? "icon-sm" : "icon"}
       variant={compact ? "ghost" : "outline"}
-      aria-label="Refresh pull requests"
+      aria-label="刷新拉取请求"
       onClick={onRefresh}
       disabled={refreshing}
     >

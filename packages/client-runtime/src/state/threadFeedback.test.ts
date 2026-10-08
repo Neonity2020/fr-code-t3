@@ -83,7 +83,7 @@ describe("submitCodexFeedback", () => {
     expect(draft).toBe("");
     expect(states).toEqual([{ ...submission, status: "uploading" }]);
     expect(codexFeedbackNotice(states[0]!)).toEqual({
-      title: "Sending feedback to OpenAI...",
+      title: "正在向 OpenAI 发送反馈…",
       description: undefined,
     });
 

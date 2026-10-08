@@ -69,7 +69,7 @@ describe("derivePendingBackgroundWork", () => {
       derivePendingBackgroundWork({
         latestRun: { id: "run-1" as never, ordinal: 1, status: "completed" },
         providerThreads: [],
-        turnItems: [{ id: "idle-child", type: "subagent", status: "idle", title: "Review" }],
+        turnItems: [{ id: "idle-child", type: "subagent", status: "idle", title: "审查" }],
       }),
     ).toEqual([]);
   });
@@ -557,7 +557,7 @@ describe("derivePendingBackgroundWork kinds", () => {
       expect(tasks).toEqual([
         {
           taskId: "pull-request-watch:github.com/acme/app#1",
-          description: "Watching pull request #1",
+          description: "正在关注拉取请求 #1",
           kind: "monitor",
         },
       ]);

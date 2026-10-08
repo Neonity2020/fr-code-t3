@@ -173,7 +173,7 @@ function ProviderUpdateEnvironmentsNotification() {
         ),
         timeout: 0,
         actionProps: {
-          children: "Settings",
+          children: "设置",
           onClick: openProviderSettings,
         },
         actionVariant: "outline",

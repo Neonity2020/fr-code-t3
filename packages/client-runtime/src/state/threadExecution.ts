@@ -186,15 +186,15 @@ export function formatModelSelectionEffort(
 }
 
 const SUBAGENT_STATUS_LABELS: Record<OrchestrationV2ExecutionNode["status"], string> = {
-  idle: "Idle",
-  pending: "Working",
-  running: "Working",
-  waiting: "Waiting",
-  completed: "Completed",
-  interrupted: "Interrupted",
-  failed: "Failed",
-  cancelled: "Cancelled",
-  rolled_back: "Cancelled",
+  idle: "空闲",
+  pending: "正在工作",
+  running: "正在工作",
+  waiting: "等待中",
+  completed: "已完成",
+  interrupted: "已中断",
+  failed: "失败",
+  cancelled: "已取消",
+  rolled_back: "已取消",
 };
 
 /**
@@ -205,7 +205,7 @@ export function formatProviderSubagentStatus(
   status: ProviderSubagentStatus | null,
   nowMs: number,
 ): string {
-  if (status === null) return "Starting";
+  if (status === null) return "正在启动";
   const label = SUBAGENT_STATUS_LABELS[status.status];
   const live = isOrchestrationV2WorkActive(status.status);
   if (!live && status.status !== "completed") return label;
@@ -218,7 +218,7 @@ export function formatProviderSubagentStatus(
   if (!Number.isFinite(start) || !Number.isFinite(end)) return label;
   // Whole seconds: a ticking label must not flicker through tenths.
   const elapsed = formatDuration(Math.max(1_000, Math.floor((end - start) / 1_000) * 1_000));
-  return live ? `${label} ${elapsed}` : `${label} in ${elapsed}`;
+  return live ? `${label} ${elapsed}` : `${label}，耗时 ${elapsed}`;
 }
 
 export function deriveThreadRuntime(
@@ -294,10 +294,10 @@ const BACKGROUND_WORK_KINDS: Record<
   BackgroundWorkKind,
   { readonly order: number; readonly singular: string; readonly plural: string }
 > = {
-  subagent: { order: 0, singular: "subagent", plural: "subagents" },
-  command: { order: 1, singular: "command", plural: "commands" },
-  monitor: { order: 2, singular: "monitor", plural: "monitors" },
-  background_task: { order: 3, singular: "background task", plural: "background tasks" },
+  subagent: { order: 0, singular: "子智能体", plural: "子智能体" },
+  command: { order: 1, singular: "命令", plural: "命令" },
+  monitor: { order: 2, singular: "监控任务", plural: "监控任务" },
+  background_task: { order: 3, singular: "后台任务", plural: "后台任务" },
 };
 
 export interface PendingBackgroundWorkItem {
@@ -325,7 +325,7 @@ export interface PendingBackgroundWorkPresentation {
 
 function joinWithAnd(parts: ReadonlyArray<string>): string {
   if (parts.length <= 1) return parts.join("");
-  return `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`;
+  return parts.join("、");
 }
 
 /** Names what a settled thread still runs, grouped by kind, for the composer strip. */
@@ -362,20 +362,20 @@ export function presentPendingBackgroundWork(
     const named = only.label !== noun;
     const title = waiting
       ? named
-        ? `Waiting on ${noun} ${only.label}`
-        : `Waiting on a ${noun}`
+        ? `正在等待${noun}：${only.label}`
+        : `正在等待${noun}`
       : named
-        ? `Running: ${only.label}`
-        : `Running a ${noun}`;
+        ? `正在运行：${only.label}`
+        : `正在运行${noun}`;
     return { title, items, waiting };
   }
   const counts = new Map<BackgroundWorkKind, number>();
   for (const item of items) counts.set(item.kind, (counts.get(item.kind) ?? 0) + 1);
   const groups = Array.from(counts, ([kind, count]) => {
     const { singular, plural } = BACKGROUND_WORK_KINDS[kind];
-    return `${count} ${count === 1 ? singular : plural}`;
+    return `${count} 个${count === 1 ? singular : plural}`;
   });
-  return { title: `${waiting ? "Waiting on" : "Running"} ${joinWithAnd(groups)}`, items, waiting };
+  return { title: `${waiting ? "正在等待" : "正在运行"} ${joinWithAnd(groups)}`, items, waiting };
 }
 
 export interface ProviderGoalPresentation {
@@ -389,12 +389,12 @@ export interface ProviderGoalPresentation {
 }
 
 const PROVIDER_GOAL_TITLES: Record<OrchestrationV2ProviderGoal["status"], string> = {
-  active: "Pursuing goal",
-  paused: "Goal paused",
-  blocked: "Goal blocked",
-  usage_limited: "Goal hit a usage limit",
-  budget_limited: "Goal reached its token budget",
-  complete: "Goal complete",
+  active: "正在追求目标",
+  paused: "目标已暂停",
+  blocked: "目标受阻",
+  usage_limited: "目标达到用量限制",
+  budget_limited: "目标达到 token 预算",
+  complete: "目标已完成",
 };
 
 function formatGoalTokens(tokens: number): string {
@@ -426,7 +426,7 @@ export function presentProviderGoal(
     usage.push(`${goal.checks} ${goal.checks === 1 ? "check" : "checks"}`);
   }
   return {
-    title: goal.status === "active" && !working ? "Goal set" : PROVIDER_GOAL_TITLES[goal.status],
+    title: goal.status === "active" && !working ? "目标已设置" : PROVIDER_GOAL_TITLES[goal.status],
     objective: goal.objective,
     usage: usage.length === 0 ? null : usage.join(" · "),
     canResume: goal.status !== "active" && goal.status !== "complete",

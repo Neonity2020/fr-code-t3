@@ -157,7 +157,7 @@ export function useVcsInitAction(scope: SourceControlActionScope) {
       input: { cwd: target.cwd },
     });
   }, [init, scope]);
-  return useAction({ kind: "init", label: "Initializing repository", scope, action });
+  return useAction({ kind: "init", label: "正在初始化仓库", scope, action });
 }
 
 export function useVcsPullAction(scope: SourceControlActionScope) {
@@ -190,7 +190,7 @@ export function useVcsPullAction(scope: SourceControlActionScope) {
   }, [pull, scope]);
   return useAction({
     kind: "pull",
-    label: "Pulling latest changes...",
+    label: "正在拉取最新更改…",
     scope,
     action,
     onSuccess: status.refresh,
@@ -230,7 +230,7 @@ export function useGitStackedAction(scope: SourceControlActionScope) {
 
   return useAction({
     kind: "runStackedAction",
-    label: "Running source control action",
+    label: "正在执行版本控制操作",
     scope,
     action,
     onSuccess: status.refresh,
@@ -282,7 +282,7 @@ export function useSourceControlPublishRepositoryAction(scope: SourceControlActi
   );
   return useAction({
     kind: "publishRepository",
-    label: "Publishing repository",
+    label: "正在发布仓库",
     scope,
     action,
     onSuccess: status.refresh,
@@ -321,7 +321,7 @@ export function usePreparePullRequestThreadAction(scope: SourceControlActionScop
   );
   return useAction({
     kind: "preparePullRequestThread",
-    label: "Preparing pull request thread",
+    label: "正在准备拉取请求会话",
     scope,
     action,
   });

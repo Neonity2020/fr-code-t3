@@ -124,7 +124,7 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
         <>
           <ThreadDetailsSection
             headingId="thread-details-workspace-heading"
-            title="Workspace"
+            title="工作区"
             separated={false}
             showHeading={false}
           >
@@ -132,16 +132,16 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
               <div className="mx-1 mb-2 flex gap-2 rounded-xl border border-warning/30 bg-warning/6 p-3">
                 <AlertTriangleIcon className="mt-0.5 size-3.5 shrink-0 text-warning" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium">Client and server versions differ</p>
+                  <p className="text-xs font-medium">客户端与服务器版本不一致</p>
                   <p className="mt-1 text-2xs leading-relaxed text-muted-foreground">
-                    Client {props.versionMismatch.clientVersion} ·{" "}
+                    客户端 {props.versionMismatch.clientVersion} ·{" "}
                     {props.versionMismatch.serverLabel} {props.versionMismatch.serverVersion}
                   </p>
                 </div>
                 <Button
                   size="icon-xs"
                   variant="ghost"
-                  aria-label="Dismiss version mismatch warning"
+                  aria-label="关闭版本不一致警告"
                   onClick={props.onDismissVersionMismatch}
                 >
                   <XIcon className="size-3.5" />
@@ -197,7 +197,7 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
           {props.gitCwd ? (
             <ThreadDetailsSection
               headingId="thread-details-version-control-heading"
-              title="Version Control"
+              title="版本控制"
               showHeading={false}
               separated={density === "full"}
             >

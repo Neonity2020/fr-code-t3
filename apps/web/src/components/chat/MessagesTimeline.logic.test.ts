@@ -110,14 +110,14 @@ describe("work entry labels", () => {
         true,
       ),
     ).toBe("First paragraph. Second paragraph.");
-    expect(liveWorkEntryLabel({ ...thought, detail: "  " }, undefined, true)).toBe("Thinking");
+    expect(liveWorkEntryLabel({ ...thought, detail: "  " }, undefined, true)).toBe("正在思考");
     expect(
       liveWorkEntryLabel(
         { ...thought, detail: "", toolLifecycleStatus: "completed" },
         undefined,
         false,
       ),
-    ).toBe("Thought");
+    ).toBe("思考");
     expect(
       liveWorkEntryLabel({ ...thought, toolLifecycleStatus: "completed" }, undefined, false),
     ).toBe(thought.detail);
@@ -128,11 +128,11 @@ describe("work entry labels", () => {
   });
 
   it.each([
-    ["inProgress", "Clicking in the preview browser"],
-    ["completed", "Clicked in the preview browser"],
-    ["failed", "Failed to click in the preview browser"],
-    ["declined", "Declined to click in the preview browser"],
-    ["stopped", "Stopped clicking in the preview browser"],
+    ["inProgress", "正在点击 预览浏览器"],
+    ["completed", "已点击 预览浏览器"],
+    ["failed", "无法点击 预览浏览器"],
+    ["declined", "已拒绝点击 预览浏览器"],
+    ["stopped", "已停止点击 预览浏览器"],
   ] as const)("uses the same friendly %s label in both views", (toolLifecycleStatus, label) => {
     const browserEntry = {
       ...entry,
@@ -148,12 +148,8 @@ describe("work entry labels", () => {
 
   it("uses the active summary state for legacy tools without a lifecycle status", () => {
     const browserEntry = { ...entry, toolTitle: "T3-code.preview_click" };
-    expect(liveWorkEntryLabel(browserEntry, undefined, true)).toBe(
-      "Clicking in the preview browser",
-    );
-    expect(liveWorkEntryLabel(browserEntry, undefined, false)).toBe(
-      "Clicked in the preview browser",
-    );
+    expect(liveWorkEntryLabel(browserEntry, undefined, true)).toBe("正在点击 预览浏览器");
+    expect(liveWorkEntryLabel(browserEntry, undefined, false)).toBe("已点击 预览浏览器");
   });
 
   it("keeps the latest live activity in the present tense after the call completes", () => {
@@ -162,12 +158,8 @@ describe("work entry labels", () => {
       toolTitle: "T3-code.preview_click",
       toolLifecycleStatus: "completed" as const,
     };
-    expect(liveWorkEntryLabel(browserEntry, undefined, true)).toBe(
-      "Clicking in the preview browser",
-    );
-    expect(liveWorkEntryLabel(browserEntry, undefined, false)).toBe(
-      "Clicked in the preview browser",
-    );
+    expect(liveWorkEntryLabel(browserEntry, undefined, true)).toBe("正在点击 预览浏览器");
+    expect(liveWorkEntryLabel(browserEntry, undefined, false)).toBe("已点击 预览浏览器");
   });
 
   it("labels file reads with the path and never the file body", () => {
@@ -184,7 +176,7 @@ describe("work entry labels", () => {
         input: { file_path: "src/env.ts" },
       } as NonNullable<WorkLogEntry["structuredPayload"]>,
     };
-    expect(workEntryDisplayLabel(readEntry, undefined)).toBe("Read src/env.ts");
+    expect(workEntryDisplayLabel(readEntry, undefined)).toBe("读取了 src/env.ts");
     expect(workEntryReadOutput(readEntry, undefined)).toBe("src/env.ts");
     expect(workEntryReadOutput(readEntry, "/workspace/ohseearr")).toBe(
       "/workspace/ohseearr/src/env.ts",
@@ -222,7 +214,7 @@ describe("work entry labels", () => {
         },
         undefined,
       ),
-    ).toBe("Searched TODO in web");
+    ).toBe("在 web 中搜索了 TODO");
   });
 
   it("labels file searches with the adapter title and its search target", () => {
@@ -261,7 +253,7 @@ describe("work entry labels", () => {
 
   it("keeps command summaries compact without replacing the full command in expanded rows", () => {
     const commandEntry = { ...entry, command: "vp test run", detail: "All tests passed" };
-    expect(liveWorkEntryLabel(commandEntry, undefined, true)).toBe("Running vp");
+    expect(liveWorkEntryLabel(commandEntry, undefined, true)).toBe("正在运行 vp");
     expect(liveWorkEntryLabel(commandEntry, undefined, false)).toBe("Ran vp");
     expect(workEntryDisplayLabel(commandEntry, undefined)).toBe("vp test run");
   });
@@ -269,7 +261,7 @@ describe("work entry labels", () => {
   it("summarizes the program inside a shell wrapper while preserving the expanded command", () => {
     const command = "/bin/zsh -lc 'vp test run apps/web/src/session-logic.test.ts'";
     const commandEntry = { ...entry, command };
-    expect(liveWorkEntryLabel(commandEntry, undefined, true)).toBe("Running vp");
+    expect(liveWorkEntryLabel(commandEntry, undefined, true)).toBe("正在运行 vp");
     expect(liveWorkEntryLabel(commandEntry, undefined, false)).toBe("Ran vp");
     expect(workEntryDisplayLabel(commandEntry, undefined)).toBe(
       "vp test run apps/web/src/session-logic.test.ts",
@@ -278,8 +270,8 @@ describe("work entry labels", () => {
   });
 
   it.each([
-    ["inProgress", "Running vp", "Running vp"],
-    ["completed", "Running vp", "Ran vp"],
+    ["inProgress", "正在运行 vp", "正在运行 vp"],
+    ["completed", "正在运行 vp", "Ran vp"],
     ["failed", "Failed vp", "Failed vp"],
     ["declined", "Declined vp", "Declined vp"],
     ["stopped", "Stopped vp", "Stopped vp"],
@@ -297,8 +289,8 @@ describe("work entry labels", () => {
   );
 
   it.each([
-    ["preview_click", "Clicked in the preview browser"],
-    ["task_status", "Got delegated task status"],
+    ["preview_click", "已点击 预览浏览器"],
+    ["task_status", "已获取 委派任务状态"],
   ] as const)(
     "renders a settled legacy %s call directly with its completed presentation",
     (tool, label) => {
@@ -770,9 +762,9 @@ describe("deriveMessagesTimelineRows", () => {
       optimisticMessages: [],
     });
     const work = entries.flatMap((entry) => (entry.kind === "work" ? [entry.entry] : []));
-    expect(workEntryDisplayLabel(work[0]!, undefined)).toBe("Listed projects");
-    expect(workEntryDisplayLabel(work[1]!, undefined)).toBe("Cloned a repository");
-    expect(workEntryDisplayLabel(work[2]!, undefined)).toBe("Failed to clone a repository");
+    expect(workEntryDisplayLabel(work[0]!, undefined)).toBe("已列出 项目");
+    expect(workEntryDisplayLabel(work[1]!, undefined)).toBe("已克隆 仓库");
+    expect(workEntryDisplayLabel(work[2]!, undefined)).toBe("无法克隆 仓库");
     expect(
       resolveTimelineToolPresentation(items[1]!.type === "dynamic_tool" ? items[1].toolName : null)
         ?.logo,
@@ -786,7 +778,7 @@ describe("deriveMessagesTimelineRows", () => {
       supportsConversationRollback: false,
     });
     expect(rows.find((row) => row.kind === "work-toggle")).toMatchObject({
-      summary: "Listed projects 1 time and cloned 1 repository",
+      summary: "已列出 项目 1 次；已克隆 1 个仓库",
       hasFailure: true,
     });
   });
@@ -1031,7 +1023,7 @@ describe("deriveMessagesTimelineRows", () => {
     const runningRows = deriveMessagesTimelineRows({ ...input, timelineEntries: runningEntries });
     expect(runningRows.find((row) => row.kind === "context-compaction")).toMatchObject({
       active: true,
-      label: "Compacting context",
+      label: "正在压缩上下文",
     });
     expect(runningRows.some((row) => row.kind === "thinking")).toBe(false);
 
@@ -1050,7 +1042,7 @@ describe("deriveMessagesTimelineRows", () => {
     });
     expect(completedRows.find((row) => row.kind === "context-compaction")).toMatchObject({
       active: false,
-      label: "Context compacted 899K → 19K tokens",
+      label: "上下文已压缩：899K → 19K token",
     });
     expect(completedRows.at(-1)?.kind).toBe("thinking");
 
@@ -1317,7 +1309,7 @@ describe("deriveMessagesTimelineRows", () => {
     expect(foldRow?.runId).toBe("turn-1");
     expect(foldRow?.expanded).toBe(false);
     // User message boundary (00:00:00) → terminal message updatedAt (00:00:22).
-    expect(foldRow?.label).toBe("Worked for 22s");
+    expect(foldRow?.label).toBe("已工作 22 秒");
     expect(collapsedRows.map((row) => row.id)).toEqual([
       "user-entry",
       "turn-fold:turn-1",
@@ -1609,7 +1601,7 @@ describe("deriveMessagesTimelineRows", () => {
     );
     // User message (00:00:00) → trailing work entry (00:00:12).
     expect(foldRow?.runId).toBe("turn-1");
-    expect(foldRow?.label).toBe("Worked for 12s");
+    expect(foldRow?.label).toBe("已工作 12 秒");
   });
 
   it("uses latest-turn timings and the stopped label for an interrupted latest turn", () => {
@@ -1644,7 +1636,7 @@ describe("deriveMessagesTimelineRows", () => {
       expect.objectContaining({
         kind: "turn-fold",
         runId: "turn-1",
-        label: "You stopped after 47s",
+        label: "你在 47 秒 后停止了回复",
         expanded: false,
       }),
     ]);
@@ -1761,7 +1753,7 @@ describe("deriveMessagesTimelineRows", () => {
             "steer",
           ]);
           expect(rows[1]?.createdAt).toBe(time(0));
-          if (!isWorking) expect(rows[1]).toMatchObject({ label: "Worked for 20s", expanded });
+          if (!isWorking) expect(rows[1]).toMatchObject({ label: "已工作 20 秒", expanded });
           expect(rows.some((row) => row.id === "final")).toBe(true);
           expect(rows.some((row) => row.id === "work")).toBe(isWorking || expanded);
         }
@@ -2116,7 +2108,7 @@ describe("deriveMessagesTimelineRows", () => {
         {
           ...base("launch-thinking", 3, 8),
           type: "reasoning" as const,
-          title: "Thinking",
+          title: "正在思考",
           text: "Not there.",
           streaming: false,
         },
@@ -2183,10 +2175,10 @@ describe("deriveMessagesTimelineRows", () => {
     const settled = rows({ resume: "completed", working: false });
     expect(shape(settled)).toEqual([
       "user:launch",
-      "fold:Worked for 8.0s",
+      "fold:已工作 8.0 秒",
       "assistant:launch-answer",
       "user:resume",
-      "fold:Worked for 8.0s",
+      "fold:已工作 8.0 秒",
       "assistant:resume-answer",
     ]);
 
@@ -2200,18 +2192,18 @@ describe("deriveMessagesTimelineRows", () => {
     });
     expect(shape(expanded)).toEqual([
       "user:launch",
-      "fold:Worked for 8.0s",
+      "fold:已工作 8.0 秒",
       "work-toggle",
       "assistant:launch-answer",
       "user:resume",
-      "fold:Worked for 8.0s",
+      "fold:已工作 8.0 秒",
       "assistant:resume-answer",
     ]);
 
     // While the resume runs, only the settled launch folds.
     expect(shape(rows({ resume: "running", working: true }))).toEqual([
       "user:launch",
-      "fold:Worked for 8.0s",
+      "fold:已工作 8.0 秒",
       "assistant:launch-answer",
       "user:resume",
       "working",
@@ -2221,7 +2213,7 @@ describe("deriveMessagesTimelineRows", () => {
     // A failed run stays open, as on a normal thread.
     expect(shape(rows({ resume: "failed", working: false }))).toEqual([
       "user:launch",
-      "fold:Worked for 8.0s",
+      "fold:已工作 8.0 秒",
       "assistant:launch-answer",
       "user:resume",
       "work",
@@ -2906,8 +2898,8 @@ describe("deriveMessagesTimelineRows", () => {
   });
 
   it.each([
-    ["tools", "tool", "Used 3 tools"],
-    ["tools and status updates", "info", "Used 2 tools and received 1 update"],
+    ["tools", "tool", "已使用 3 个工具"],
+    ["tools and status updates", "info", "已使用 2 个工具；已收到 1 条更新"],
   ] as const)("expands %s through the same activity group", (_, middleTone, summary) => {
     const timelineEntries = [
       {
@@ -3055,7 +3047,7 @@ describe("deriveMessagesTimelineRows", () => {
 
     expect(row).toMatchObject({
       kind: "work-toggle",
-      summary: "Used Chrome integration and ran 1 command",
+      summary: "已使用 Chrome 集成；已运行 1 条命令",
       toolSurface: "browser",
       toolIcon: {
         _tag: "website",
@@ -3190,8 +3182,8 @@ describe("deriveMessagesTimelineRows", () => {
       expect(rows.find((row) => row.kind === "work-toggle")).toMatchObject({
         hiddenCount: statuses.some((status) => status === "error") ? 2 : 3,
         summary: statuses.some((status) => status === "error")
-          ? "Received 1 update and used 1 tool"
-          : "Used 2 tools and received 1 update",
+          ? "已收到 1 条更新；已使用 1 个工具"
+          : "已使用 2 个工具；已收到 1 条更新",
         hasFailure,
       });
       if (statuses.some((status) => status === "error")) {
@@ -3442,21 +3434,21 @@ describe("computeStableMessagesTimelineRows", () => {
 describe("resolveTimelineToolPresentation", () => {
   it("pretty prints Claude and Cursor T3 MCP tool names", () => {
     expect(resolveTimelineToolPresentation("mcp__t3-code__t3_thread_read")).toEqual({
-      displayName: "Read a T3 thread",
+      displayName: "读取 T3 会话",
       logo: "t3-code",
     });
   });
 
   it("pretty prints Codex T3 MCP tool names", () => {
     expect(resolveTimelineToolPresentation("t3-code.create_threads")).toEqual({
-      displayName: "Create T3 threads",
+      displayName: "创建 T3 会话",
       logo: "t3-code",
     });
   });
 
   it("pretty prints bare T3 MCP toolkit names", () => {
     expect(resolveTimelineToolPresentation("list_scheduled_tasks")).toEqual({
-      displayName: "List scheduled tasks",
+      displayName: "列出 定时任务",
       logo: "t3-code",
     });
   });
@@ -3563,7 +3555,7 @@ describe("v2 run and attempt history", () => {
     expect(foldRow?.runId).toBe("turn-1");
     expect(foldRow?.expanded).toBe(false);
     // User message boundary (00:00:00) → terminal message updatedAt (00:00:22).
-    expect(foldRow?.label).toBe("Worked for 22s");
+    expect(foldRow?.label).toBe("已工作 22 秒");
     expect(collapsedRows.map((row) => row.id)).toEqual([
       "user-entry",
       "turn-fold:turn-1",
@@ -3805,7 +3797,7 @@ describe("v2 run and attempt history", () => {
     expect(collapsedRows.find((row) => row.kind === "attempt-fold")).toMatchObject({
       attemptId: supersededAttemptId,
       runId,
-      label: "Superseded attempt",
+      label: "已被替代的尝试",
       expanded: false,
     });
 

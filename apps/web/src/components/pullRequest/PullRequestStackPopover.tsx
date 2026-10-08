@@ -28,7 +28,7 @@ function StackBody({
           notice={query.notice}
           stale={!!query.error}
         />
-        {query.error ? <MenuItem onClick={query.refresh}>Retry stack refresh</MenuItem> : null}
+        {query.error ? <MenuItem onClick={query.refresh}>重试刷新堆栈</MenuItem> : null}
         <PullRequestStackLayers stack={query.data} reference={reference} onSelect={onSelect} />
       </>
     );
@@ -37,8 +37,7 @@ function StackBody({
     <>
       <PullRequestStackHeader number={stackNumber} />
       <MenuGroupLabel>
-        {query.error ??
-          (query.isPending ? "Loading stack…" : "This pull request is no longer in a stack.")}
+        {query.error ?? (query.isPending ? "正在加载堆叠…" : "此拉取请求已不在堆叠中。")}
       </MenuGroupLabel>
     </>
   );
@@ -70,7 +69,7 @@ export function PullRequestStackPopover({
                   className="inline-flex shrink-0 cursor-pointer items-center gap-1 text-xs font-normal text-muted-foreground"
                 />
               }
-              aria-label={`Stack ${membership.number}, layer ${membership.position} of ${membership.size}`}
+              aria-label={`堆叠 ${membership.number}，第 ${membership.position} 层，共 ${membership.size} 层`}
               onClick={(event) => event.stopPropagation()}
               onKeyDown={(event) => event.stopPropagation()}
             >
@@ -80,7 +79,7 @@ export function PullRequestStackPopover({
           }
         />
         <TooltipPopup>
-          View stack #{membership.number}, layer {membership.position} of {membership.size}
+          查看堆栈 #{membership.number}，层 {membership.position} / {membership.size}
         </TooltipPopup>
       </Tooltip>
       <MenuPopup

@@ -125,8 +125,8 @@ describe("resolveSubagentPillSegment", () => {
     });
 
     expect(resolveSubagentPillSegment(turn)).toEqual({
-      label: "1 done",
-      accessibilityLabel: "1 agent done",
+      label: "1 已完成",
+      accessibilityLabel: "1 个智能体 done",
     });
   });
 

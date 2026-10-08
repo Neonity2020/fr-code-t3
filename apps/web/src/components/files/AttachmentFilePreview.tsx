@@ -42,9 +42,9 @@ export function ReadOnlySourcePreview(props: { name: string; text: string }) {
 }
 
 function renderedToggleLabel(mode: "markdown" | "html" | "table", rendered: boolean): string {
-  if (mode === "markdown") return rendered ? "Show markdown source" : "Show rendered markdown";
-  if (mode === "table") return rendered ? "Show source" : "Show table";
-  return rendered ? "Show HTML source" : "Show rendered page";
+  if (mode === "markdown") return rendered ? "显示 Markdown 源码" : "显示渲染后的 Markdown";
+  if (mode === "table") return rendered ? "显示源码" : "显示表格";
+  return rendered ? "显示 HTML 源码" : "显示渲染后的页面";
 }
 
 /**
@@ -122,13 +122,12 @@ export function AttachmentFilePreview(props: {
     void refresh()
       .then((url) => {
         if (cancelled) return;
-        if (!url) throw new Error("Reconnect to the environment and try again.");
+        if (!url) throw new Error("重新连接环境后重试。");
         authorizedAt.current = Date.now();
         setRemoteUrl(url);
       })
       .catch((cause: unknown) => {
-        if (!cancelled)
-          setError(cause instanceof Error ? cause.message : "The attachment is unavailable.");
+        if (!cancelled) setError(cause instanceof Error ? cause.message : "附件不可用。");
       });
     return () => {
       cancelled = true;
@@ -150,7 +149,7 @@ export function AttachmentFilePreview(props: {
       if (!file && Date.now() - authorizedAt.current > STALE_URL_MS) {
         const target = await refresh();
         if (controller.signal.aborted) return;
-        if (!target) throw new Error("Reconnect to the environment and try again.");
+        if (!target) throw new Error("重新连接环境后重试。");
         authorizedAt.current = Date.now();
         if (target !== url) {
           setRemoteUrl(target);
@@ -171,7 +170,7 @@ export function AttachmentFilePreview(props: {
       if (!controller.signal.aborted) setContent(result);
     })().catch((cause: unknown) => {
       if (!controller.signal.aborted)
-        setContentError(cause instanceof Error ? cause.message : "Could not load this file.");
+        setContentError(cause instanceof Error ? cause.message : "无法加载此文件。");
     });
     return () => controller.abort();
   }, [url, needsText, revision, props.sizeBytes, props.file, refresh]);
@@ -194,7 +193,7 @@ export function AttachmentFilePreview(props: {
         let file = props.file;
         if (!file) {
           const target = await prepareDownload();
-          if (!target) throw new Error("Reconnect to the environment and try again.");
+          if (!target) throw new Error("重新连接环境后重试。");
           const response = await fetch(target);
           if (!response.ok) throw new Error("The file could not be loaded. Try again.");
           file = await response.blob();
@@ -213,8 +212,8 @@ export function AttachmentFilePreview(props: {
       } catch (cause) {
         toastManager.add({
           type: "error",
-          title: "Could not save file",
-          description: cause instanceof Error ? cause.message : "Please try again.",
+          title: "无法保存文件",
+          description: cause instanceof Error ? cause.message : "请重试。",
         });
       } finally {
         setSaving(false);
@@ -252,7 +251,7 @@ export function AttachmentFilePreview(props: {
       htmlRender={props.htmlRender === true}
     />
   ) : kind === "audio" ? (
-    <AudioPreview src={url} name={props.name} onError={() => setError("Unable to load audio.")} />
+    <AudioPreview src={url} name={props.name} onError={() => setError("无法加载音频。")} />
   ) : kind === "video" ? (
     <div className="flex min-h-0 flex-1 items-center justify-center bg-black">
       <video
@@ -261,7 +260,7 @@ export function AttachmentFilePreview(props: {
         src={url}
         aria-label={props.name}
         className="max-h-full max-w-full"
-        onError={() => setError("Unable to load video.")}
+        onError={() => setError("无法加载视频。")}
       />
     </div>
   ) : kind === "image" ? (
@@ -270,15 +269,14 @@ export function AttachmentFilePreview(props: {
         src={url}
         alt={props.name}
         className="max-h-full max-w-full object-contain"
-        onError={() => setError("Unable to load image.")}
+        onError={() => setError("无法加载图片。")}
       />
     </div>
   ) : (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 px-6 text-center">
-      <p className="text-sm font-medium">No preview for this file</p>
+      <p className="text-sm font-medium">此文件无法预览</p>
       <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
-        Save it to open in an app that supports {props.name.split(".").at(-1) || "this format"}{" "}
-        files.
+        请保存后使用支持以下格式的应用打开： {props.name.split(".").at(-1) || "此格式"} 文件。
       </p>
     </div>
   );
@@ -287,9 +285,7 @@ export function AttachmentFilePreview(props: {
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
       <div className={cn(FILE_SURFACE_SUBHEADER_CLASS)} data-surface-subheader>
         <div className="flex min-w-0 flex-1 items-center text-xs">
-          <span className="shrink-0 px-0.5 text-muted-foreground">
-            {props.origin ?? "Attachment"}
-          </span>
+          <span className="shrink-0 px-0.5 text-muted-foreground">{props.origin ?? "附件"}</span>
           <ChevronRightIcon className="mx-1 size-3.5 shrink-0 text-muted-foreground/60" />
           <span aria-current="page" className="min-w-0 truncate px-0.5 font-medium text-foreground">
             {props.name}
@@ -314,7 +310,7 @@ export function AttachmentFilePreview(props: {
         ) : null}
         {showsRawText ? (
           <FileSurfaceAction
-            label={wordWrap ? "Disable word wrap" : "Enable word wrap"}
+            label={wordWrap ? "关闭自动换行" : "开启自动换行"}
             pressed={wordWrap}
             onPress={() => updateClientSettings({ wordWrap: !wordWrap })}
           >
@@ -323,7 +319,7 @@ export function AttachmentFilePreview(props: {
         ) : null}
         {content ? (
           <FileSurfaceAction
-            label={isCopied ? "Copied" : content.truncated ? "Copy preview" : "Copy contents"}
+            label={isCopied ? "已复制" : content.truncated ? "复制预览" : "复制内容"}
             onPress={() => copyToClipboard(content.text, undefined)}
           >
             <MorphIcon className="size-3.5" icon={isCopied ? Check : Copy} />
@@ -331,7 +327,7 @@ export function AttachmentFilePreview(props: {
         ) : null}
         {url ? (
           <FileSurfaceAction
-            label={saving ? "Preparing file…" : "Save file"}
+            label={saving ? "正在准备文件…" : "保存文件"}
             disabled={saving}
             onPress={save}
           >
@@ -339,21 +335,21 @@ export function AttachmentFilePreview(props: {
           </FileSurfaceAction>
         ) : null}
         {props.onRemove ? (
-          <FileSurfaceAction label="Remove from draft" onPress={props.onRemove}>
+          <FileSurfaceAction label="从草稿中移除" onPress={props.onRemove}>
             <Trash2Icon className="size-3.5" />
           </FileSurfaceAction>
         ) : null}
         {props.onClose ? (
-          <FileSurfaceAction label="Close" onPress={props.onClose}>
+          <FileSurfaceAction label="关闭" onPress={props.onClose}>
             <XIcon className="size-3.5" />
           </FileSurfaceAction>
         ) : null}
       </div>
       {content?.truncated ? (
         <FileSurfaceNotice>
-          Preview limited to the first 1 MB
-          {props.sizeBytes > 0 ? ` of a ${props.sizeBytes.toLocaleString()} byte file` : ""}. Save
-          the file to read it in full.
+          预览仅显示前 1 MB
+          {props.sizeBytes > 0 ? `（文件共 ${props.sizeBytes.toLocaleString()} 字节）` : ""}
+          。请保存文件以查看完整内容。
         </FileSurfaceNotice>
       ) : null}
       {body}

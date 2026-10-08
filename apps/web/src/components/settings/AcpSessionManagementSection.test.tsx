@@ -190,7 +190,7 @@ describe("AcpSessionManagementSection", () => {
 
   it("lists and imports native sessions through the owning environment", async () => {
     const initial = render();
-    (findByLabel(initial, "List sessions").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(initial, "列出会话").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
 
     expect(commands.list).toHaveBeenCalledWith({
@@ -199,7 +199,7 @@ describe("AcpSessionManagementSection", () => {
     });
 
     const listed = render();
-    (findByLabel(listed, "Import").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(listed, "导入").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
 
     expect(commands.import).toHaveBeenCalledWith({
@@ -212,12 +212,12 @@ describe("AcpSessionManagementSection", () => {
         updatedAt: session.updatedAt,
       },
     });
-    expect(findByLabel(render(), "Imported")).not.toBeNull();
+    expect(findByLabel(render(), "已导入")).not.toBeNull();
   });
 
   it("logs out the provider instance through the owning environment", async () => {
     const tree = render();
-    (findByLabel(tree, "Log out").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(tree, "退出登录").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
 
     expect(commands.logout).toHaveBeenCalledWith({
@@ -227,9 +227,9 @@ describe("AcpSessionManagementSection", () => {
   });
 
   it("deletes unimported native sessions after destructive confirmation", async () => {
-    (findByLabel(render(), "List sessions").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(render(), "列出会话").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
-    (findByLabel(render(), "Delete").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(render(), "删除").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
 
     expect(dialogs.confirm).toHaveBeenCalledOnce();
@@ -249,7 +249,7 @@ describe("AcpSessionManagementSection", () => {
         resolveProviders = resolve;
       }),
     );
-    (findByLabel(render(), "List providers").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(render(), "列出提供方").props.onClick as (() => void) | undefined)?.();
 
     const projectSelect = visitElements(
       render(),
@@ -262,7 +262,7 @@ describe("AcpSessionManagementSection", () => {
   });
 
   it("lists, saves, and disables configurable ACP providers", async () => {
-    (findByLabel(render(), "List providers").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(render(), "列出提供方").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
 
     expect(commands.listProviders).toHaveBeenCalledWith({
@@ -270,8 +270,8 @@ describe("AcpSessionManagementSection", () => {
       input: { instanceId, projectId },
     });
     const providers = render();
-    expect(findByAriaLabel(providers, "google protocol").props.size).toBe("sm");
-    (findByLabel(providers, "Save").props.onClick as (() => void) | undefined)?.();
+    expect(findByAriaLabel(providers, "google 协议").props.size).toBe("sm");
+    (findByLabel(providers, "保存").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
     expect(commands.setProvider).toHaveBeenCalledWith({
       environmentId,
@@ -284,7 +284,7 @@ describe("AcpSessionManagementSection", () => {
       },
     });
 
-    (findByLabel(render(), "Disable").props.onClick as (() => void) | undefined)?.();
+    (findByLabel(render(), "禁用").props.onClick as (() => void) | undefined)?.();
     await flushPromises();
     expect(commands.disableProvider).toHaveBeenCalledWith({
       environmentId,

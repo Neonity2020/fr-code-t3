@@ -122,7 +122,7 @@ describe("buildTraitsTriggerDisplay", () => {
         primarySelectDescriptorId: "reasoning",
         ultrathinkPromptControlled: false,
       }),
-    ).toEqual({ label: "High Fast · Thinking On" });
+    ).toEqual({ label: "High Fast · Thinking 开启" });
   });
 
   it.each([true, false])("keeps boolean thinking %s independent of Fast", (currentValue) => {
@@ -132,7 +132,7 @@ describe("buildTraitsTriggerDisplay", () => {
       type: "boolean" as const,
       currentValue,
     };
-    const label = `Thinking ${currentValue ? "On" : "Off"}`;
+    const label = `Thinking ${currentValue ? "开启" : "关闭"}`;
     expect(display([thinking, fastModeDescriptor(true)])).toEqual({ label: `${label} · Fast` });
     expect(display([thinking, { ...EFFORT, id: "reasoning" }, fastModeDescriptor(true)])).toEqual({
       label: `${label} · High Fast`,
@@ -144,7 +144,7 @@ describe("buildTraitsTriggerDisplay", () => {
     expect(display([CONTEXT_WINDOW, fastModeDescriptor(true)])).toEqual({ label: "1M · Fast" });
   });
 
-  it.each(["Low", "Medium", "High", "Extra High", "Max", "Ultra"])(
+  it.each(["低", "中", "高", "极高", "最大", "Ultra"])(
     "preserves %s reasoning with Fast across harnesses",
     (label) => {
       for (const provider of ["codex", "claudeAgent", "cursor"]) {
@@ -214,7 +214,7 @@ describe("buildTraitsTriggerDisplay", () => {
       type: "boolean",
       currentValue: true,
     };
-    expect(display([EFFORT, thinking])).toEqual({ label: "High · Thinking On" });
+    expect(display([EFFORT, thinking])).toEqual({ label: "High · Thinking 开启" });
   });
 
   it("falls back to a text label when fast mode is the only trait", () => {
@@ -265,14 +265,14 @@ describe("buildUnavailableModelOptionDescriptors", () => {
     ).toEqual([
       {
         id: "variant",
-        label: "Reasoning",
+        label: "推理",
         type: "select",
         options: [{ id: "max", label: "max" }],
         currentValue: "max",
       },
       {
         id: "agent",
-        label: "Agent",
+        label: "智能体",
         type: "select",
         options: [{ id: "build", label: "build" }],
         currentValue: "build",
@@ -309,11 +309,11 @@ it("shows Unknown until a matching provider report provides Default", () => {
     ultrathinkPromptControlled: false,
     modelSelection: selection,
   };
-  expect(buildTraitsTriggerDisplay(input).label).toBe("Unknown");
+  expect(buildTraitsTriggerDisplay(input).label).toBe("未知");
   expect(
     buildTraitsTriggerDisplay({
       ...input,
       reportedModelSelection: { ...selection, options: [{ id: "variant", value: "default" }] },
     }).label,
-  ).toBe("Default");
+  ).toBe("默认");
 });

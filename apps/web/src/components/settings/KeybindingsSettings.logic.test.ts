@@ -42,14 +42,14 @@ describe("KeybindingsSettings.logic", () => {
     }
   });
   it("finds the editable shortcut for sending the first queued message", () => {
-    expect(buildKeybindingRows(DEFAULT_RESOLVED_KEYBINDINGS, "first queued")).toContainEqual(
+    expect(buildKeybindingRows(DEFAULT_RESOLVED_KEYBINDINGS, "首条排队消息")).toContainEqual(
       expect.objectContaining({
         command: "thread.steerQueuedMessage",
         key: "mod+shift+enter",
       }),
     );
   });
-  it.each(["pu", "pull request", "copy link", "thread id"])(
+  it.each(["拉取请求", "链接", "复制链接", "会话 ID"])(
     "finds the copy link shortcut with %s",
     (query) => {
       const rows = buildKeybindingRows(DEFAULT_RESOLVED_KEYBINDINGS, query);
@@ -231,7 +231,7 @@ describe("KeybindingsSettings.logic", () => {
     });
     expect(parseWhenExpressionDraft("editorFocus &&")).toEqual({
       ok: false,
-      message: "Use variables with !, &&, ||, and parentheses.",
+      message: "使用变量、!、&&、|| 和括号。",
     });
 
     expect(parseWhenExpressionDraft("!(terminalFocus || modelPickerOpen)")).toEqual({
@@ -253,18 +253,18 @@ describe("KeybindingsSettings.logic", () => {
     const group = { type: "and", left: condition, right: negatedCondition } as const;
     const negatedGroup = { type: "not", node: group } as const;
 
-    expect(whenNodeRemoveLabel(group, 0)).toBe("Clear all conditions");
-    expect(whenNodeRemoveLabel(condition, 1)).toBe("Remove condition");
-    expect(whenNodeRemoveLabel(negatedCondition, 1)).toBe("Remove condition");
-    expect(whenNodeRemoveLabel(group, 1)).toBe("Remove group and its conditions");
-    expect(whenNodeRemoveLabel(negatedGroup, 1)).toBe("Remove group and its conditions");
+    expect(whenNodeRemoveLabel(group, 0)).toBe("清除所有条件");
+    expect(whenNodeRemoveLabel(condition, 1)).toBe("移除条件");
+    expect(whenNodeRemoveLabel(negatedCondition, 1)).toBe("移除条件");
+    expect(whenNodeRemoveLabel(group, 1)).toBe("移除组及其条件");
+    expect(whenNodeRemoveLabel(negatedGroup, 1)).toBe("移除组及其条件");
   });
 
   it("formats static and project script command labels", () => {
-    expect(commandLabel("commandPalette.toggle")).toBe("Command Palette: Toggle");
-    expect(commandLabel("themeEditor.toggle")).toBe("Theme Editor: Toggle");
-    expect(commandLabel("view.reopenClosed")).toBe("Reopen Closed Tab");
-    expect(commandLabel("script.setup-db.run")).toBe("Run Script: Setup Db");
+    expect(commandLabel("commandPalette.toggle")).toBe("命令面板：切换");
+    expect(commandLabel("themeEditor.toggle")).toBe("主题编辑器：切换");
+    expect(commandLabel("view.reopenClosed")).toBe("重新打开已关闭的标签页");
+    expect(commandLabel("script.setup-db.run")).toBe("运行脚本：Setup Db");
   });
 
   it("builds known when variable options from defaults without frontend labels", () => {
@@ -401,13 +401,13 @@ describe("KeybindingsSettings.logic", () => {
       "",
     );
 
-    expect(rows[0]?.conflicts).toEqual(["Chat: New Local"]);
+    expect(rows[0]?.conflicts).toEqual(["会话：新建本地会话"]);
     expect(
       keybindingConflictLabels(rows, {
         rowId: rows[0]?.id ?? "",
         key: "mod+n",
         when: "",
       }),
-    ).toEqual(["Chat: New Local"]);
+    ).toEqual(["会话：新建本地会话"]);
   });
 });

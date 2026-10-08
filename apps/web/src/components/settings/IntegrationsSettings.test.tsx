@@ -133,8 +133,8 @@ const deviceState = (overrides: Partial<DeviceServiceState> = {}): DeviceService
 
 describe("device setup guidance", () => {
   it("directs users to install an iOS runtime and create an Android virtual device", () => {
-    expect(platformSetupStatus(deviceState(), "ios").message).toContain("Xcode Settings");
-    expect(platformSetupStatus(deviceState(), "android").message).toContain("Device Manager");
+    expect(platformSetupStatus(deviceState(), "ios").message).toContain("Xcode 设置");
+    expect(platformSetupStatus(deviceState(), "android").message).toContain("设备管理器");
   });
 
   it("preserves a specific missing-tool explanation from the server", () => {

@@ -346,8 +346,8 @@ export function useOpenPrLink(threadRef?: ScopedThreadRef) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open pull request link",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "无法打开拉取请求链接",
+            description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
       });

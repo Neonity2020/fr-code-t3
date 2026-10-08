@@ -978,7 +978,7 @@ export const make = Effect.gen(function* () {
         if (reordered.length !== routes.length || new Set(routeIds).size !== routes.length) {
           return yield* new ConnectionBlockedError({
             reason: "configuration",
-            detail: "The route order must list every saved route once.",
+            detail: "路由顺序必须包含每条已保存路由，且只能出现一次。",
           });
         }
         if (reordered.every((route, index) => route === routes[index])) return;

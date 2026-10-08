@@ -70,12 +70,12 @@ describe("pace", () => {
   });
 
   it("phrases the reset as a countdown", () => {
-    expect(formatResetsIn(window, now)).toBe("resets in 2h 0m");
+    expect(formatResetsIn(window, now)).toBe("2h 0m 后重置");
     expect(formatResetsIn({ ...window, resetsAt: "2026-09-06T15:30:00.000Z" }, now)).toBe(
-      "resets in 3d 3h",
+      "3d 3h 后重置",
     );
     expect(formatResetsIn({ ...window, resetsAt: "2026-09-03T11:00:00.000Z" }, now)).toBe(
-      "resets now",
+      "现在重置",
     );
   });
 });
@@ -985,7 +985,7 @@ describe("/usage-limits", () => {
     });
     expect(report?.accounts[2]).toMatchObject({
       label: "Accounts · oss",
-      sourceLabel: "CLI Proxy",
+      sourceLabel: "CLI 代理",
       plan: "Codex OSS",
     });
     expect(report?.notices).toEqual([]);

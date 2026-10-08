@@ -175,7 +175,7 @@ export function formatShortcutKeyLabel(key: string): string {
   if (key === "escape") return "Esc";
   if (key === "arrowup") return "Up";
   if (key === "arrowdown") return "Down";
-  if (key === "arrowleft") return "Left";
+  if (key === "arrowleft") return "剩余";
   if (key === "arrowright") return "Right";
   return key.slice(0, 1).toUpperCase() + key.slice(1);
 }

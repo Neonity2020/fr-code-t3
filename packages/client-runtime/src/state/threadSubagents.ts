@@ -84,7 +84,7 @@ export function resolveSubagentPillSegment(
     };
   }
   return {
-    label: `${total} done`,
-    accessibilityLabel: `${total} ${total === 1 ? "agent" : "agents"} done`,
+    label: `${total} 已完成`,
+    accessibilityLabel: `${total} ${"个智能体"} done`,
   };
 }

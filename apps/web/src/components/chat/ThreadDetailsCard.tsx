@@ -126,7 +126,7 @@ export function ThreadDetailsCard({
       {placement ? (
         inlineOpen ? (
           <aside
-            aria-label="Thread details"
+            aria-label="会话详情"
             className="absolute z-20"
             style={{
               left: placement.x,

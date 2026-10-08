@@ -32,22 +32,22 @@ export interface PullRequestStatePresentation {
 
 export const PULL_REQUEST_STATE_PRESENTATION = {
   open: {
-    label: "Open",
+    label: "打开",
     toneClassName: "text-emerald-600 dark:text-emerald-300/90",
     Icon: PullRequestGlyph.pullRequest,
   },
   draft: {
-    label: "Draft",
+    label: "草稿",
     toneClassName: "text-zinc-500 dark:text-zinc-400/80",
     Icon: PullRequestGlyph.draft,
   },
   closed: {
-    label: "Closed",
+    label: "已关闭",
     toneClassName: "text-red-600 dark:text-red-300/90",
     Icon: PullRequestGlyph.closed,
   },
   merged: {
-    label: "Merged",
+    label: "已合并",
     toneClassName: "text-violet-600 dark:text-violet-300/90",
     Icon: PullRequestGlyph.merged,
   },

@@ -27,7 +27,7 @@ export class PrimaryEnvironmentUrlInvalidError extends Schema.TaggedError<Primar
   },
 ) {
   override get message(): string {
-    return `Could not parse ${this.urlKind} for the ${this.source} primary environment target.`;
+    return `无法解析来源 ${this.source} 的主环境目标 ${this.urlKind}。`;
   }
 }
 

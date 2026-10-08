@@ -192,7 +192,7 @@ function ProviderAuthEmail(props: { readonly email: string | undefined }) {
   return (
     <RedactedSensitiveText
       value={email}
-      ariaLabel="Toggle account email visibility"
+      ariaLabel="切换账号邮箱可见性"
       revealTooltip="Click to reveal email"
       hideTooltip="Click to hide email"
       className="max-w-full truncate"
@@ -285,7 +285,7 @@ function ProviderEnvironmentFieldRow(props: {
               size="icon-sm"
               variant="ghost-destructive"
               onClick={() => props.onRemove(props.field)}
-              aria-label={`Clear ${props.field.label}`}
+              aria-label={`清除 ${props.field.label}`}
             >
               <XIcon className="size-3.5" />
             </Button>
@@ -379,12 +379,12 @@ export function ProviderEnvironmentSection(props: {
 
   return (
     <SettingsRow
-      title="Variables"
-      description="API keys, base URLs, and other per-instance CLI settings."
+      title="变量"
+      description="API 密钥、基础网址和其他实例专属 CLI 设置。"
       control={
         <Button type="button" size="sm" variant="outline" onClick={addVariable}>
           <PlusIcon className="size-3" />
-          Add variable
+          添加变量
         </Button>
       }
     >
@@ -400,7 +400,7 @@ export function ProviderEnvironmentSection(props: {
                 onCommit={(name) => updateVariable(variable.id, { name: name.trim() })}
                 placeholder="VARIABLE_NAME"
                 spellCheck={false}
-                aria-label={`Environment variable name ${index + 1}`}
+                aria-label={`环境变量名称 ${index + 1}`}
               />
               <span className="hidden text-xs text-muted-foreground sm:inline" aria-hidden>
                 =
@@ -413,11 +413,9 @@ export function ProviderEnvironmentSection(props: {
                 onCommit={(value) => updateVariable(variable.id, { value })}
                 type={variable.sensitive ? "password" : undefined}
                 autoComplete="off"
-                placeholder={
-                  variable.valueRedacted ? "Stored secret, enter a new value to replace" : "value"
-                }
+                placeholder={variable.valueRedacted ? "已保存密钥，输入新值可替换" : "value"}
                 spellCheck={false}
-                aria-label={`Environment variable value ${index + 1}`}
+                aria-label={`环境变量值 ${index + 1}`}
               />
               <Tooltip>
                 <TooltipTrigger
@@ -436,7 +434,7 @@ export function ProviderEnvironmentSection(props: {
                         });
                       }}
                       aria-pressed={variable.sensitive}
-                      aria-label={`Mark environment variable ${variable.name || index + 1} as sensitive`}
+                      aria-label={`将环境变量 ${variable.name || index + 1} 标记为敏感`}
                     >
                       <MorphIcon
                         className="size-3"
@@ -446,7 +444,7 @@ export function ProviderEnvironmentSection(props: {
                   }
                 />
                 <TooltipPopup side="top">
-                  {variable.sensitive ? "Sensitive, stored separately" : "Plain text"}
+                  {variable.sensitive ? "敏感，单独存储" : "明文"}
                 </TooltipPopup>
               </Tooltip>
               <Button
@@ -454,15 +452,13 @@ export function ProviderEnvironmentSection(props: {
                 size="icon-micro"
                 variant="ghost-destructive"
                 onClick={() => removeVariable(variable.id)}
-                aria-label={`Remove environment variable ${variable.name || index + 1}`}
+                aria-label={`移除环境变量 ${variable.name || index + 1}`}
               >
                 <XIcon className="size-3" />
               </Button>
             </div>
           ))}
-          <p className="text-xs text-muted-foreground">
-            Sensitive values are stored separately and never returned to the app.
-          </p>
+          <p className="text-xs text-muted-foreground">敏感值单独存储，绝不会返回应用。</p>
         </div>
       ) : null}
     </SettingsRow>
@@ -606,15 +602,15 @@ export function ProviderInstanceCard({
     onCopy: ({ providerName }) => {
       toastManager.add({
         type: "success",
-        title: `${providerName} update command copied`,
-        description: "Run it in a terminal when you are ready to update.",
+        title: `${providerName} 更新命令已复制`,
+        description: "准备好更新时，请在终端运行。",
       });
     },
     onError: (error, { providerName }) => {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `Could not copy ${providerName} update command`,
+          title: `无法复制 ${providerName} 更新命令`,
           description: error.message,
         }),
       );
@@ -761,7 +757,7 @@ export function ProviderInstanceCard({
     isAuthenticated && authEmail ? (
       <>
         {needsAttention ? statusDotNode : null}
-        <span>Authenticated as</span>
+        <span>已认证为</span>
         <ProviderAuthEmail email={authEmail} />
         {authLabel ? <span>· {authLabel}</span> : null}
         {inlineStatusDetail ? (
@@ -789,7 +785,7 @@ export function ProviderInstanceCard({
                   size={mode === "list" ? "icon-micro" : "icon-xs"}
                   variant="ghost-muted"
                   className={mode === "list" ? "pointer-events-auto relative shrink-0" : undefined}
-                  aria-label={`${versionAdvisory.title} — view details`}
+                  aria-label={`${versionAdvisory.title} — 查看详情`}
                 >
                   <VersionAdvisoryIcon
                     className={cn(
@@ -830,16 +826,16 @@ export function ProviderInstanceCard({
             >
               {isUpdating ? <Spinner /> : <DownloadIcon />}
               {isUpdating
-                ? "Updating"
+                ? "正在更新"
                 : versionAdvisory.targetVersion
-                  ? `Install ${getProviderVersionLabel(versionAdvisory.targetVersion)}`
-                  : "Update now"}
+                  ? `安装 ${getProviderVersionLabel(versionAdvisory.targetVersion)}`
+                  : "立即更新"}
             </Button>
           ) : null}
           {onRunVersionAction && updateCommand ? (
             <div className="flex items-center gap-2 text-3xs font-medium uppercase tracking-wider text-muted-foreground">
               <span aria-hidden className="h-px flex-1 bg-border" />
-              or, update manually using
+              或使用以下命令手动更新：
               <span aria-hidden className="h-px flex-1 bg-border" />
             </div>
           ) : null}
@@ -857,13 +853,13 @@ export function ProviderInstanceCard({
                       variant="ghost-muted"
                       className="shrink-0"
                       onClick={() => copyToClipboard(updateCommand, { providerName: displayName })}
-                      aria-label="Copy update command"
+                      aria-label="复制更新命令"
                     >
                       <CopyIcon className="size-3" />
                     </Button>
                   }
                 />
-                <TooltipPopup side="top">Copy command</TooltipPopup>
+                <TooltipPopup side="top">复制命令</TooltipPopup>
               </Tooltip>
             </div>
           ) : null}
@@ -891,7 +887,7 @@ export function ProviderInstanceCard({
             type="button"
             className="pointer-events-auto absolute inset-0 cursor-pointer rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={onSelect}
-            aria-label={`Select ${displayName}`}
+            aria-label={`选择 ${displayName}`}
             aria-pressed={selected}
           />
           {titleIconNode}
@@ -926,7 +922,7 @@ export function ProviderInstanceCard({
             checked={enabled}
             disabled={readOnly}
             onCheckedChange={(checked) => updateEnabled(Boolean(checked))}
-            aria-label={`Enable ${displayName}`}
+            aria-label={`启用 ${displayName}`}
           />
         </span>
       </div>
@@ -955,7 +951,7 @@ export function ProviderInstanceCard({
             variant="ghost-destructive"
             disabled={readOnly}
             onClick={onDelete}
-            aria-label={`Delete instance ${instanceId}`}
+            aria-label={`删除实例 ${instanceId}`}
           >
             <Trash2Icon />
           </Button>
@@ -974,11 +970,11 @@ export function ProviderInstanceCard({
     />
   ) : (
     <SettingsRow
-      title="Driver"
+      title="驱动"
       description={
         <span>
-          This instance uses <code className="text-foreground">{String(instance.driver)}</code>,
-          which is not available in this build. Its configuration is preserved.
+          此实例使用 <code className="text-foreground">{String(instance.driver)}</code>
+          ，此驱动在本版本中不可用，其配置将被保留。
         </span>
       }
     />
@@ -988,7 +984,7 @@ export function ProviderInstanceCard({
     <>
       <SettingsSection title={displayName} icon={titleIconNode} headerAction={editorHeaderAction}>
         <SettingsRow
-          title="Display name"
+          title="显示名称"
           status={
             <>
               <ProviderStatusDiagnostic detail={statusDiagnostic}>
@@ -1018,7 +1014,7 @@ export function ProviderInstanceCard({
                     disabled={readOnly}
                   >
                     <ExternalLinkIcon />
-                    Continue authentication
+                    继续认证
                   </Button>
                 </div>
               ) : null}
@@ -1046,7 +1042,7 @@ export function ProviderInstanceCard({
                 className="min-w-0 flex-1 @min-[32rem]/settings-row:w-56"
                 value={instance.displayName ?? ""}
                 onCommit={updateDisplayName}
-                placeholder={driverOption?.label ?? "Instance label"}
+                placeholder={driverOption?.label ?? "实例标签"}
                 spellCheck={false}
               />
             </div>
@@ -1055,7 +1051,7 @@ export function ProviderInstanceCard({
       </SettingsSection>
 
       {setup || environmentFields.length > 0 ? (
-        <SettingsSection title="Setup">
+        <SettingsSection title="配置">
           {setup}
           <div
             inert={readOnly}
@@ -1089,7 +1085,7 @@ export function ProviderInstanceCard({
           <FoldedSettingsSection
             key={instanceId}
             id={`provider-instance-${instanceId}-runtime`}
-            title="Runtime"
+            title="运行时"
             headerPlacement="outside"
           >
             {runtime ?? runtimeFields}
@@ -1097,7 +1093,7 @@ export function ProviderInstanceCard({
         </div>
       ) : !driverOption || deriveProviderSettingsFields(driverOption).length > 0 ? (
         <SettingsSection
-          title="Runtime"
+          title="运行时"
           inert={readOnly}
           aria-disabled={readOnly || undefined}
           className={readOnly ? "opacity-50 select-none" : undefined}
@@ -1107,7 +1103,7 @@ export function ProviderInstanceCard({
       ) : null}
 
       <SettingsSection
-        title="Environment"
+        title="环境"
         inert={readOnly}
         aria-disabled={readOnly || undefined}
         className={readOnly ? "opacity-50 select-none" : undefined}
@@ -1129,15 +1125,14 @@ export function ProviderInstanceCard({
 
       {driverOption !== undefined ? (
         <SettingsSection
-          title="Models"
+          title="模型"
           inert={readOnly}
           aria-disabled={readOnly || undefined}
           className={readOnly ? "opacity-50 select-none" : undefined}
         >
           <div className="px-3 py-3 sm:px-4">
             <p className="mb-3 text-xs text-muted-foreground">
-              Favorites, visibility, and ordering are saved on this device. Custom models are saved
-              on the selected environment.
+              收藏、可见性和排序保存在此设备。自定义模型保存在所选环境。
             </p>
             <ProviderModelsSection
               instanceId={instanceId}

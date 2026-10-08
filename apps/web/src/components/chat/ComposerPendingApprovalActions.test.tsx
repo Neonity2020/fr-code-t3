@@ -15,10 +15,10 @@ describe("ComposerPendingApprovalActions", () => {
       />,
     );
 
-    expect(markup).toContain(">Decline<");
-    expect(markup).toContain(">Approve<");
+    expect(markup).toContain(">拒绝<");
+    expect(markup).toContain(">批准<");
     expect(markup).not.toContain(">Cancel<");
-    expect(markup).not.toContain("Always allow this session");
+    expect(markup).not.toContain("始终允许此会话");
   });
 
   it("keeps secondary provider labels out of the compact action row", () => {
@@ -38,7 +38,7 @@ describe("ComposerPendingApprovalActions", () => {
 
     expect(markup).not.toContain("Always allow Safari");
     expect(markup).toContain(">Approve<");
-    expect(markup).not.toContain("Always allow this session");
+    expect(markup).not.toContain("始终允许此会话");
   });
 
   it("preserves provider labels for the main decisions", () => {
@@ -57,7 +57,7 @@ describe("ComposerPendingApprovalActions", () => {
 
     expect(markup).toContain("Allow once");
     expect(markup).toContain("Deny");
-    expect(markup).not.toContain(">Approve<");
-    expect(markup).not.toContain(">Decline<");
+    expect(markup).not.toContain(">批准<");
+    expect(markup).not.toContain(">拒绝<");
   });
 });

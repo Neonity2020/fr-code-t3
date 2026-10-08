@@ -456,10 +456,10 @@ describe("DesktopServerExposure", () => {
         assert.deepEqual(endpoints, [
           {
             id: "desktop-loopback:3773",
-            label: "This machine",
+            label: "此机器",
             provider: {
               id: "desktop-core",
-              label: "Desktop",
+              label: "桌面端",
               kind: "core",
               isAddon: false,
             },
@@ -472,14 +472,14 @@ describe("DesktopServerExposure", () => {
             },
             source: "desktop-core",
             status: "available",
-            description: "Loopback endpoint for this desktop app.",
+            description: "此桌面应用的回环端点。",
           },
           {
             id: "desktop-lan:http://192.168.1.20:3773",
-            label: "Local network",
+            label: "本地网络",
             provider: {
               id: "desktop-core",
-              label: "Desktop",
+              label: "桌面端",
               kind: "core",
               isAddon: false,
             },
@@ -493,14 +493,14 @@ describe("DesktopServerExposure", () => {
             source: "desktop-core",
             status: "available",
             isDefault: true,
-            description: "Reachable from devices on the same network.",
+            description: "同一网络上的设备可访问。",
           },
           {
             id: "manual:https://desktop.example.ts.net",
-            label: "Custom HTTPS",
+            label: "自定义 HTTPS",
             provider: {
               id: "manual",
-              label: "Manual",
+              label: "手动",
               kind: "manual",
               isAddon: false,
             },
@@ -513,14 +513,14 @@ describe("DesktopServerExposure", () => {
             },
             source: "user",
             status: "unknown",
-            description: "User-configured HTTPS endpoint for this desktop backend.",
+            description: "用户配置的桌面后端 HTTPS 端点。",
           },
           {
             id: "manual:http://desktop.example.test:3773",
-            label: "Custom endpoint",
+            label: "自定义端点",
             provider: {
               id: "manual",
-              label: "Manual",
+              label: "手动",
               kind: "manual",
               isAddon: false,
             },
@@ -533,7 +533,7 @@ describe("DesktopServerExposure", () => {
             },
             source: "user",
             status: "unknown",
-            description: "User-configured endpoint for this desktop backend.",
+            description: "用户配置的桌面后端端点。",
           },
         ]);
       }),

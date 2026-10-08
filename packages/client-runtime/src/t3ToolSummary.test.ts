@@ -14,26 +14,26 @@ describe("summarizeT3ToolCalls", () => {
         completed({}, { id: "project-1" }),
         completed({}, { id: "project-2" }),
       ]).label,
-    ).toBe("Registered 2 projects");
+    ).toBe("已注册 2 个项目");
     expect(
       summarizeT3ToolCalls("project-clone", [
         completed({}, { cwd: "/tmp/first" }),
         completed({}, { cwd: "/tmp/second" }),
       ]).label,
-    ).toBe("Cloned 2 repositories");
+    ).toBe("已克隆 2 个仓库");
     expect(
       summarizeT3ToolCalls("thread-create", [
         completed({}, { threadId: "launched-thread", status: "preparing" }),
       ]).label,
-    ).toBe("Created 1 thread");
+    ).toBe("已创建 1 个会话");
   });
 
   it.each([
-    ["queue-read", "Read 1 queued message"],
-    ["queue-edit", "Edited 1 queued message"],
-    ["queue-cancel", "Requested cancellation of 1 queued run"],
-    ["queue-reorder", "Reordered 1 queued run"],
-    ["queue-steer", "Requested steering with 1 queued message"],
+    ["queue-read", "已读取 1 条排队消息"],
+    ["queue-edit", "已编辑 1 条排队消息"],
+    ["queue-cancel", "已请求取消 1 次排队运行"],
+    ["queue-reorder", "已重新排序 1 次排队运行"],
+    ["queue-steer", "已请求使用消息引导 1 条排队消息"],
   ] as const)("deduplicates the queued run target for %s", (action, label) => {
     expect(
       summarizeT3ToolCalls(action, [
@@ -51,7 +51,7 @@ describe("summarizeT3ToolCalls", () => {
         completed({ requestId: "request-1" }),
         completed({ requestId: "request-2" }),
       ]).label,
-    ).toBe("Answered 2 pending question requests");
+    ).toBe("已回答 2 个待回答问题请求");
   });
 
   it("counts attachments in distinct messages and falls back when attachment counts are missing", () => {
@@ -64,12 +64,12 @@ describe("summarizeT3ToolCalls", () => {
       { messageId: "message-2", threadId: "thread-2" },
     );
     expect(summarizeT3ToolCalls("attachment-send", [first, first, second])).toEqual({
-      label: "Sent 3 attachments to 2 threads",
+      label: "已发送 3 个附件 到 2 个会话",
       failedCount: 0,
     });
     expect(
       summarizeT3ToolCalls("attachment-send", [first, completed({ threadId: "thread-1" })]).label,
-    ).toBe("Sent attachments to 1 thread 2 times");
+    ).toBe("已发送 附件 到 1 个会话 2 次");
   });
 
   it("keeps repeated manual runs separate and describes asynchronous controls as requests", () => {
@@ -78,16 +78,16 @@ describe("summarizeT3ToolCalls", () => {
         completed({ taskId: "schedule-1" }, { lastRunStatus: "running" }),
         completed({ taskId: "schedule-1" }, { lastRunStatus: "skipped" }),
       ]).label,
-    ).toBe("Requested 2 scheduled task runs");
+    ).toBe("已请求 2 次定时任务运行");
     expect(
       summarizeT3ToolCalls("thread-fork", [completed({}, { targetThreadId: "fork", sequence: 3 })])
         .label,
-    ).toBe("Requested 1 thread fork");
+    ).toBe("已请求 1 次会话分叉");
     expect(
       summarizeT3ToolCalls("thread-merge", [
         completed({ targetThreadId: "parent" }, { sequence: 4 }),
       ]).label,
-    ).toBe("Requested 1 context merge");
+    ).toBe("已请求 1 次上下文合并");
   });
 
   it.each([
@@ -103,7 +103,7 @@ describe("summarizeT3ToolCalls", () => {
       },
     ];
     expect(summarizeT3ToolCalls("browser", [completed({}, output)])).toEqual({
-      label: "Tried to use browser 1 time",
+      label: "尝试使用 浏览器 1 次",
       failedCount: 1,
     });
   });
@@ -115,7 +115,7 @@ describe("summarizeT3ToolCalls", () => {
       ),
     );
     expect(summarizeT3ToolCalls("thread-send", [...calls, calls[0]!])).toEqual({
-      label: "Sent 5 messages to 2 threads",
+      label: "已发送 5 条消息 到 2 个会话",
       failedCount: 0,
     });
   });
@@ -139,13 +139,13 @@ describe("summarizeT3ToolCalls", () => {
         output,
       ),
     );
-    expect(summarizeT3ToolCalls("thread-send", calls).label).toBe("Sent 1 message to 1 thread");
+    expect(summarizeT3ToolCalls("thread-send", calls).label).toBe("已发送 1 条消息 到 1 个会话");
     expect(
       summarizeT3ToolCalls("thread-send", [
         completed({ toolName: "t3_thread_send", args: { threadId: "input-thread" } }),
         completed({ threadId: "input-thread" }),
       ]).label,
-    ).toBe("Sent 2 messages to 1 thread");
+    ).toBe("已发送 2 条消息 到 1 个会话");
   });
 
   it("falls back to message counts when a destination is missing or a result is malformed", () => {
@@ -155,7 +155,7 @@ describe("summarizeT3ToolCalls", () => {
         completed({ message: '{"threadId":"not-a-destination"}' }, "{truncated"),
         completed(undefined, "Message sent"),
       ]).label,
-    ).toBe("Sent 3 messages");
+    ).toBe("已发送 3 条消息");
   });
 
   it("counts batch-created threads, excludes rollbacks, and deduplicates returned thread IDs", () => {
@@ -171,12 +171,12 @@ describe("summarizeT3ToolCalls", () => {
         ),
         completed({}, { threadId: "thread-0", status: "running" }),
       ]).label,
-    ).toBe("Created 4 threads");
+    ).toBe("已创建 4 个会话");
     expect(
       summarizeT3ToolCalls("thread-create", [
         completed({ threads: [{ title: "Requested, not confirmed" }] }),
       ]).label,
-    ).toBe("Requested thread creation 1 time");
+    ).toBe("已请求创建会话 1 次");
   });
 
   it("excludes failed and unfinished sends even if the provider reports completed", () => {
@@ -192,11 +192,11 @@ describe("summarizeT3ToolCalls", () => {
       { input: { threadId: "cancelled" }, output: undefined, outcome: "unfinished" },
     ];
     expect(summarizeT3ToolCalls("thread-send", calls)).toEqual({
-      label: "Sent 1 message to 1 thread",
+      label: "已发送 1 条消息 到 1 个会话",
       failedCount: 2,
     });
     expect(summarizeT3ToolCalls("thread-send", [calls[1]!])).toEqual({
-      label: "Tried to send 1 message to 1 thread",
+      label: "尝试发送 1 条消息 到 1 个会话",
       failedCount: 1,
     });
   });
@@ -206,7 +206,7 @@ describe("summarizeT3ToolCalls", () => {
     expect(
       summarizeT3ToolCalls("delegate", [completed({}, failedChild), completed({}, failedChild)]),
     ).toEqual({
-      label: "Delegated 1 task",
+      label: "已委派 1 个任务",
       failedCount: 0,
     });
     expect(
@@ -214,13 +214,13 @@ describe("summarizeT3ToolCalls", () => {
         "task-status",
         Array.from({ length: 4 }, () => completed({ taskId: "task-1" }, failedChild)),
       ).label,
-    ).toBe("Checked task status 4 times");
+    ).toBe("已检查 任务状态 4 次");
     expect(
       summarizeT3ToolCalls("thread-wait", [
         completed({ threadId: "thread-1" }, { threadId: "thread-1", timedOut: true }),
       ]),
     ).toEqual({
-      label: "Waited on 1 thread",
+      label: "已等待 1 个会话",
       failedCount: 0,
     });
   });
@@ -233,12 +233,12 @@ describe("summarizeT3ToolCalls", () => {
           { threadId: "thread-1", status: "interrupt_requested" },
         ),
       ]).label,
-    ).toBe("Requested interrupts for 1 thread");
+    ).toBe("已请求中断 1 个会话");
     expect(
       summarizeT3ToolCalls("task-cancel", [
         completed({ taskId: "task-1" }, { taskId: "task-1", status: "cancel_requested" }),
       ]).label,
-    ).toBe("Requested cancellation of 1 task");
+    ).toBe("已请求取消 1 个任务");
     expect(
       summarizeT3ToolCalls("schedule-delete", [
         completed(
@@ -246,6 +246,6 @@ describe("summarizeT3ToolCalls", () => {
           { scheduledTaskId: "schedule-1", deleted: false },
         ),
       ]).label,
-    ).toBe("Requested deletion of 1 scheduled task");
+    ).toBe("已请求删除 1 个定时任务");
   });
 });

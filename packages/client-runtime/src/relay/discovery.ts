@@ -62,7 +62,7 @@ function validateStatus(
     return Effect.fail(
       new ConnectionBlockedError({
         reason: "configuration",
-        detail: "Relay returned status for a different environment.",
+        detail: "中继返回了其他环境的状态。",
       }),
     );
   }
@@ -74,7 +74,7 @@ function validateStatus(
     return Effect.fail(
       new ConnectionBlockedError({
         reason: "configuration",
-        detail: "Relay returned status for a different environment endpoint.",
+        detail: "中继返回了其他环境端点的状态。",
       }),
     );
   }
@@ -85,7 +85,7 @@ function validateStatus(
     return Effect.fail(
       new ConnectionBlockedError({
         reason: "configuration",
-        detail: "Relay returned a descriptor for a different environment.",
+        detail: "中继返回了其他环境的描述信息。",
       }),
     );
   }

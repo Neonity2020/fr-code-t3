@@ -20,7 +20,7 @@ const provider: ServerProvider = {
 describe("getProviderSummary", () => {
   it("reports ready providers with unknown authentication as available", () => {
     expect(getProviderSummary({ ...provider, auth: { status: "unknown" } })).toEqual({
-      headline: "Available",
+      headline: "可用",
       detail: null,
     });
   });
@@ -33,7 +33,7 @@ describe("getProviderSummary", () => {
         message: "The provider process failed to start.",
       }),
     ).toEqual({
-      headline: "Unavailable",
+      headline: "不可用",
       detail: "The provider process failed to start.",
     });
   });
@@ -46,7 +46,7 @@ describe("getProviderSummary", () => {
         message: "The provider version is unsupported.",
       }),
     ).toEqual({
-      headline: "Needs attention",
+      headline: "需要处理",
       detail: "The provider version is unsupported.",
     });
   });
@@ -60,13 +60,13 @@ describe("getProviderSummary", () => {
         message: "Run codex login.",
       }),
     ).toEqual({
-      headline: "Not authenticated",
+      headline: "未验证身份",
       detail: "Run codex login.",
     });
   });
 
   it("treats a disabled provider status as disabled even before its enabled flag updates", () => {
-    expect(getProviderSummary({ ...provider, status: "disabled" }).headline).toBe("Disabled");
+    expect(getProviderSummary({ ...provider, status: "disabled" }).headline).toBe("已禁用");
   });
 });
 
@@ -117,7 +117,7 @@ it("shows compatibility in the version popover even when the installed version i
     recommendedVersion: "1.9.0",
   };
   expect(getProviderVersionAdvisoryPresentation(advisory, compatibility)).toEqual({
-    title: "Known broken version",
+    title: "已知有问题的版本",
     detail: compatibility.message,
     updateCommand: null,
     emphasis: "strong",
@@ -132,8 +132,8 @@ it("shows compatibility in the version popover even when the installed version i
       message: null,
     }),
   ).toEqual({
-    title: "Limited support",
-    detail: "Use >=2.1.0 for full support.",
+    title: "支持受限",
+    detail: "使用 >=2.1.0 以获得完整支持。",
     updateCommand: null,
     emphasis: "normal",
     targetVersion: null,
@@ -151,7 +151,7 @@ describe("provider status copy", () => {
     } as ServerProvider;
 
     expect(getProviderSummary(provider)).toEqual({
-      headline: "Not authenticated · Company login",
+      headline: "未验证身份 · Company login",
       detail: "Complete this authentication method on the server.",
     });
   });

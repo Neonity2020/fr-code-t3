@@ -169,7 +169,7 @@ export function buildAddProjectRemoteSourceReadiness(
 ): AddProjectRemoteSourceReadiness {
   const unavailable = {
     ready: false,
-    hint: "Provider status unavailable. Open Source Control settings and rescan.",
+    hint: "提供方状态不可用。请打开版本控制设置并重新扫描。",
   } as const;
   const readiness: AddProjectRemoteSourceReadiness = {
     url: { ready: true, hint: null },
@@ -204,7 +204,7 @@ export function buildAddProjectRemoteSourceReadiness(
         ready: false,
         hint:
           Option.getOrNull(provider.auth.detail) ??
-          `${provider.label} is not authenticated. Open Source Control settings for setup guidance.`,
+          `${provider.label} 尚未验证身份。请打开版本控制设置查看设置指引。`,
       };
       continue;
     }

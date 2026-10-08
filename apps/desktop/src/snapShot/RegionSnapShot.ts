@@ -81,7 +81,7 @@ export function startRegionSnapShotProcess(
     settled = true;
     ready.resolve();
     if (value) result.resolve(value);
-    else result.reject(error ?? new Error("Windows window capture failed."));
+    else result.reject(error ?? new Error("Windows 窗口截图失败。"));
     child.kill();
   };
   child.onMessage((message) => {

@@ -227,7 +227,11 @@ export interface SnoozePreset {
 }
 
 function snoozeTimeOfDayLabel(date: Date): string {
-  return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  return date.toLocaleTimeString("zh-CN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: new Intl.DateTimeFormat(undefined, { hour: "numeric" }).resolvedOptions().hour12,
+  });
 }
 
 function snoozeAtHour(base: Date, hour: number): Date {
@@ -258,13 +262,13 @@ export function resolveSnoozePresets(now: Date): ReadonlyArray<SnoozePreset> {
   const presets: SnoozePreset[] = [
     {
       id: "hour",
-      label: "In 1 hour",
+      label: "1 小时后",
       whenLabel: snoozeTimeOfDayLabel(inAnHour),
       snoozedUntil: inAnHour.toISOString(),
     },
     {
       id: "three-hours",
-      label: "In 3 hours",
+      label: "3 小时后",
       whenLabel: snoozeTimeOfDayLabel(inThreeHours),
       snoozedUntil: inThreeHours.toISOString(),
     },
@@ -274,7 +278,7 @@ export function resolveSnoozePresets(now: Date): ReadonlyArray<SnoozePreset> {
   if (evening.getTime() - now.getTime() > HOUR_MS) {
     presets.push({
       id: "evening",
-      label: "This evening",
+      label: "今晚",
       whenLabel: snoozeTimeOfDayLabel(evening),
       snoozedUntil: evening.toISOString(),
     });
@@ -283,7 +287,7 @@ export function resolveSnoozePresets(now: Date): ReadonlyArray<SnoozePreset> {
   const tomorrow = snoozeAtHour(addSnoozeDays(now, 1), MORNING_HOUR);
   presets.push({
     id: "tomorrow",
-    label: "Tomorrow",
+    label: "明天",
     whenLabel: snoozeTimeOfDayLabel(tomorrow),
     snoozedUntil: tomorrow.toISOString(),
   });
@@ -293,8 +297,8 @@ export function resolveSnoozePresets(now: Date): ReadonlyArray<SnoozePreset> {
   if (nextWeek.getTime() !== tomorrow.getTime()) {
     presets.push({
       id: "next-week",
-      label: "Next week",
-      whenLabel: `${nextWeek.toLocaleDateString(undefined, { weekday: "short" })} ${snoozeTimeOfDayLabel(nextWeek)}`,
+      label: "下周",
+      whenLabel: `${nextWeek.toLocaleDateString("zh-CN", { weekday: "short" })} ${snoozeTimeOfDayLabel(nextWeek)}`,
       snoozedUntil: nextWeek.toISOString(),
     });
   }
@@ -310,12 +314,12 @@ export function resolveSnoozePresets(now: Date): ReadonlyArray<SnoozePreset> {
 export function snoozeWakeLabel(snoozedUntil: string, options: { readonly now: string }): string {
   const wakeMs = Date.parse(snoozedUntil);
   const nowMs = Date.parse(options.now);
-  if (Number.isNaN(wakeMs) || Number.isNaN(nowMs)) return "now";
+  if (Number.isNaN(wakeMs) || Number.isNaN(nowMs)) return "现在";
   const remainingMs = wakeMs - nowMs;
-  if (remainingMs <= 0) return "now";
-  if (remainingMs < HOUR_MS) return `${Math.max(1, Math.ceil(remainingMs / 60_000))}m`;
-  if (remainingMs < DAY_MS) return `${Math.ceil(remainingMs / HOUR_MS)}h`;
-  return `${Math.ceil(remainingMs / DAY_MS)}d`;
+  if (remainingMs <= 0) return "现在";
+  if (remainingMs < HOUR_MS) return `${Math.max(1, Math.ceil(remainingMs / 60_000))} 分钟`;
+  if (remainingMs < DAY_MS) return `${Math.ceil(remainingMs / HOUR_MS)} 小时`;
+  return `${Math.ceil(remainingMs / DAY_MS)} 天`;
 }
 
 export type CustomSnoozeInput =

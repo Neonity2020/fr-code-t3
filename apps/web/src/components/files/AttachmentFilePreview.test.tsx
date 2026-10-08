@@ -25,7 +25,7 @@ vi.mock("./fileSurfaceChrome", () => ({
     <button aria-label={label} onClick={onPress} />
   ),
   FileSurfaceFailure: ({ message }: { message: string }) => <div role="alert">{message}</div>,
-  FileSurfaceLoading: () => <div role="status">Loading</div>,
+  FileSurfaceLoading: () => <div role="status">正在加载</div>,
   FileSurfaceNotice: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
@@ -74,12 +74,12 @@ describe("attachment HTML preview recovery", () => {
   it("keeps a renewed URL for subsequent rendered and source views", async () => {
     await openRemote();
     now = 61 * 60_000;
-    await toggleMode("Show HTML source");
+    await toggleMode("显示 HTML 源码");
     expect(fetch).toHaveBeenCalledExactlyOnceWith(renewedUrl, expect.any(Object));
 
-    await toggleMode("Show rendered page");
+    await toggleMode("显示渲染后的页面");
     expect(renderer.root.findByType("iframe").props.src).toBe(renewedUrl);
-    await toggleMode("Show HTML source");
+    await toggleMode("显示 HTML 源码");
     expect(refresh).toHaveBeenCalledTimes(2);
     expect(fetch).toHaveBeenCalledTimes(2);
     expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([renewedUrl, renewedUrl]);
@@ -89,14 +89,12 @@ describe("attachment HTML preview recovery", () => {
     await openRemote();
     now = 61 * 60_000;
     refresh.mockResolvedValue(null);
-    await toggleMode("Show HTML source");
+    await toggleMode("显示 HTML 源码");
     expect(fetch).not.toHaveBeenCalled();
-    expect(renderer.root.findByProps({ role: "alert" }).children).toEqual([
-      "Reconnect to the environment and try again.",
-    ]);
+    expect(renderer.root.findByProps({ role: "alert" }).children).toEqual(["重新连接环境后重试。"]);
 
-    await toggleMode("Show rendered page");
-    await toggleMode("Show HTML source");
+    await toggleMode("显示渲染后的页面");
+    await toggleMode("显示 HTML 源码");
     expect(refresh).toHaveBeenCalledTimes(3);
     expect(fetch).not.toHaveBeenCalled();
   });
@@ -123,10 +121,10 @@ describe("attachment HTML preview recovery", () => {
         />,
       );
     });
-    await toggleMode("Show HTML source");
+    await toggleMode("显示 HTML 源码");
     expect(renderer.root.findByProps({ role: "alert" }).children.join("")).toContain("not UTF-8");
 
-    await toggleMode("Show rendered page");
+    await toggleMode("显示渲染后的页面");
     expect(renderer.root.findAllByProps({ role: "alert" })).toHaveLength(0);
     expect(renderer.root.findByType("iframe").props.title).toBe("document.html");
   });

@@ -73,7 +73,7 @@ export function reviewCommentContextLabel(comment: ReviewCommentPresentation): s
   }
   const diffRange = /^([+-])(\d+)(?: to \1(\d+))?$/u.exec(comment.rangeLabel);
   const rangeLabel = diffRange
-    ? `L${diffRange[2]}${diffRange[3] ? ` to L${diffRange[3]}` : ""}${diffRange[1] === "-" ? " (before)" : ""}`
+    ? `L${diffRange[2]}${diffRange[3] ? ` 至 L${diffRange[3]}` : ""}${diffRange[1] === "-" ? "（改动前）" : ""}`
     : comment.rangeLabel;
   return `${basename(comment.filePath)} ${rangeLabel}`;
 }
@@ -105,8 +105,8 @@ export function pullRequestContextDisplayState(
 
 export function pullRequestContextKindLabel(comment: ReviewCommentPresentation): string {
   const state = pullRequestContextDisplayState(comment);
-  if (state === null) return "Pull request";
-  return `${state[0]!.toUpperCase()}${state.slice(1)} pull request`;
+  if (state === null) return "拉取请求";
+  return `${state[0]!.toUpperCase()}${state.slice(1)} 拉取请求`;
 }
 
 export function previewAnnotationContextLabel(annotation: PreviewAnnotationPayload): string {
@@ -116,7 +116,7 @@ export function previewAnnotationContextLabel(annotation: PreviewAnnotationPaylo
       ? `${comment.slice(0, PREVIEW_LABEL_MAX_CHARS - 1)}…`
       : comment;
   }
-  return annotation.pageTitle?.trim() || "Preview annotation";
+  return annotation.pageTitle?.trim() || "预览批注";
 }
 
 export function terminalContextReference(context: TerminalContextDraft): ComposerContextReference {
@@ -216,12 +216,11 @@ export function reviewCommentContextRecord(
 
 function previewAnnotationTargetSummary(annotation: PreviewAnnotationPayload): string {
   const parts: string[] = [];
-  const plural = (count: number, noun: string) => `${count} ${noun}${count === 1 ? "" : "s"}`;
-  if (annotation.elements.length > 0)
-    parts.push(plural(annotation.elements.length, "selected element"));
-  if (annotation.regions.length > 0) parts.push(plural(annotation.regions.length, "marked region"));
-  if (annotation.strokes.length > 0) parts.push(plural(annotation.strokes.length, "drawing"));
-  return parts.join(", ");
+  const plural = (count: number, noun: string) => `${count} 个${noun}`;
+  if (annotation.elements.length > 0) parts.push(plural(annotation.elements.length, "所选元素"));
+  if (annotation.regions.length > 0) parts.push(plural(annotation.regions.length, "标记区域"));
+  if (annotation.strokes.length > 0) parts.push(plural(annotation.strokes.length, "绘图"));
+  return parts.join("、");
 }
 
 export function previewAnnotationContextRecord(

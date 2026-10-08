@@ -8,9 +8,9 @@ import {
 
 describe("revealInFileExplorerLabel", () => {
   it.each([
-    ["MacIntel", "Reveal in Finder"],
-    ["Win32", "Reveal in File Explorer"],
-    ["Linux x86_64", "Reveal in Files"],
+    ["MacIntel", "在访达中显示"],
+    ["Win32", "在文件资源管理器中显示"],
+    ["Linux x86_64", "在文件管理器中显示"],
   ])("maps %s to %s", (platform, expected) => {
     expect(revealInFileExplorerLabel(platform)).toBe(expected);
   });
@@ -18,10 +18,10 @@ describe("revealInFileExplorerLabel", () => {
 
 describe("revealInFileExplorerLabelForOs", () => {
   it.each([
-    ["darwin", "Reveal in Finder"],
-    ["windows", "Reveal in File Explorer"],
-    ["linux", "Reveal in Files"],
-    ["unknown", "Reveal in Files"],
+    ["darwin", "在访达中显示"],
+    ["windows", "在文件资源管理器中显示"],
+    ["linux", "在文件管理器中显示"],
+    ["unknown", "在文件管理器中显示"],
   ] as const)("maps %s to %s", (os, expected) => {
     expect(revealInFileExplorerLabelForOs(os)).toBe(expected);
   });
@@ -29,9 +29,9 @@ describe("revealInFileExplorerLabelForOs", () => {
 
 describe("revealInFileExplorerLabelForKind", () => {
   it.each([
-    ["finder", "Reveal in Finder"],
-    ["file-explorer", "Reveal in File Explorer"],
-    ["files", "Reveal in Files"],
+    ["finder", "在访达中显示"],
+    ["file-explorer", "在文件资源管理器中显示"],
+    ["files", "在文件管理器中显示"],
   ] as const)("maps %s to %s", (kind, expected) => {
     expect(revealInFileExplorerLabelForKind(kind)).toBe(expected);
   });

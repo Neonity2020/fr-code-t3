@@ -70,10 +70,10 @@ export function CodexSetupSection(props: CodexSetupSectionProps) {
           existingReady ? (
             props.provider?.auth.email?.trim() ? (
               <>
-                Signed in as{" "}
+                已登录为{" "}
                 <RedactedSensitiveText
                   value={props.provider.auth.email.trim()}
-                  ariaLabel="Toggle account email visibility"
+                  ariaLabel="切换账号邮箱可见性"
                   revealTooltip="Click to reveal email"
                   hideTooltip="Click to hide email"
                   className="break-all"
@@ -81,24 +81,24 @@ export function CodexSetupSection(props: CodexSetupSectionProps) {
                 .
               </>
             ) : (
-              "Connected with your Codex CLI."
+              "已通过你的 Codex CLI 连接。"
             )
           ) : existingChecking ? (
-            "Checking your Codex CLI..."
+            "正在检查你的 Codex CLI…"
           ) : props.provider?.installed ? (
             existingSummary.headline
           ) : (
-            "Code with your ChatGPT subscription."
+            "使用 ChatGPT 订阅编程。"
           )
         }
         control={
           existingReady ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success-foreground">
               <CheckIcon className="size-3.5" />
-              Ready
+              就绪
             </span>
           ) : existingChecking ? (
-            <span className="text-xs text-muted-foreground">Checking...</span>
+            <span className="text-xs text-muted-foreground">正在检查…</span>
           ) : existingAuthenticated ? (
             <span className="text-xs text-muted-foreground">{existingSummary.headline}</span>
           ) : (
@@ -110,14 +110,14 @@ export function CodexSetupSection(props: CodexSetupSectionProps) {
                 props.onModeChange("managed");
               }}
             >
-              Continue with ChatGPT
+              使用 ChatGPT 继续
             </ChatGptConnectionButton>
           )
         }
         secondaryControl={
           !existingAuthenticated && !existingReady && !existingChecking ? (
             <Button size="sm" variant="ghost-muted" onClick={() => props.onModeChange("existing")}>
-              Use existing CLI
+              使用现有 CLI
             </Button>
           ) : null
         }
@@ -129,17 +129,17 @@ export function CodexSetupSection(props: CodexSetupSectionProps) {
           description={<CodexSignInDescription />}
           control={
             <Button size="sm" variant="outline" className="min-w-44" disabled>
-              Open sign-in page
+              打开登录页面
             </Button>
           }
           secondaryControl={
             <Button size="sm" variant="ghost-muted" disabled>
-              Cancel
+              取消
             </Button>
           }
         />
       ) : (
-        <SettingsRow title="ChatGPT account" description="Preparing sign-in." />
+        <SettingsRow title="ChatGPT 账户" description="正在准备登录。" />
       )
     ) : (
       <ManagedCodexSetup
@@ -330,14 +330,14 @@ function ManagedCodexSetup({
         if (result._tag === "Failure") {
           if (!isAtomCommandInterrupted(result)) {
             const failure = squashAtomCommandFailure(result);
-            setError(failure instanceof Error ? failure.message : "Codex setup failed. Try again.");
+            setError(failure instanceof Error ? failure.message : "Codex 设置失败。请重试。");
           }
         } else {
           succeeded = true;
           onSuccess?.(result.value);
         }
       } catch {
-        setError("Codex setup failed. Try again.");
+        setError("Codex 设置失败。请重试。");
       }
       pendingRef.current = false;
       setPending(false);
@@ -379,8 +379,8 @@ function ManagedCodexSetup({
     ) {
       setError(
         handoffQuery.data?.phase === "auth"
-          ? (handoffQuery.data.state.message ?? "ChatGPT sign-in could not finish. Try again.")
-          : "ChatGPT sign-in on the primary environment was interrupted. Try again.",
+          ? (handoffQuery.data.state.message ?? "无法完成 ChatGPT 登录。请重试。")
+          : "主环境上的 ChatGPT 登录已中断。请重试。",
       );
       setHandoff(null);
     }
@@ -535,9 +535,7 @@ function ManagedCodexSetup({
           await ensureLocalApi().shell.openExternal(authorizationUrl);
         }
       } catch {
-        setError(
-          "Could not finish sign-in on this computer. Try again or paste the redirect URL below.",
-        );
+        setError("无法在此计算机完成登录。请重试或在下方粘贴重定向网址。");
       }
     },
     [clientCallback, flowId, run, completeAuth, environmentId, instanceId],
@@ -567,41 +565,41 @@ function ManagedCodexSetup({
 
   const runtimeDescription =
     installation?.phase === "downloading"
-      ? `Downloading ${(installation.downloadedBytes / 1_000_000).toFixed(1)}${installation.totalBytes === null ? "" : ` of ${(installation.totalBytes / 1_000_000).toFixed(1)}`} MB.`
+      ? `正在下载 ${(installation.downloadedBytes / 1_000_000).toFixed(1)}${installation.totalBytes === null ? "" : `，共 ${(installation.totalBytes / 1_000_000).toFixed(1)}`} MB。`
       : installation?.phase === "extracting"
-        ? "Installing Codex."
+        ? "正在安装 Codex。"
         : installation?.phase === "verifying"
-          ? "Checking Codex."
+          ? "正在检查 Codex。"
           : installed
-            ? `${installation?.source === "local" ? "Using your installed Codex" : "Managed by FR Code"}${installation?.installedVersion ? ` · v${installation.installedVersion}` : ""}.`
-            : (installation?.message ?? "FR Code downloads and manages Codex for you.");
+            ? `${installation?.source === "local" ? "使用已安装的 Codex" : "由 FR Code 管理"}${installation?.installedVersion ? ` · v${installation.installedVersion}` : ""}.`
+            : (installation?.message ?? "FR Code 会为你下载并管理 Codex。");
   const accountDescription = finishingSignIn ? (
-    "Finishing sign-in..."
+    "正在完成登录…"
   ) : installActive ? (
     runtimeDescription
   ) : authActive || auth?.phase === "failed" || auth?.phase === "cancelled" ? (
     auth?.phase === "waiting" && requestedAccountEmail ? (
-      `Continue as ${requestedAccountEmail} on OpenAI.`
+      `在 OpenAI 上以 ${requestedAccountEmail} 继续。`
     ) : (
-      (auth?.message ?? "Finish signing in in your browser.")
+      (auth?.message ?? "请在浏览器中完成登录。")
     )
   ) : authenticated ? (
     provider?.auth.email?.trim() ? (
       <>
-        Signed in as{" "}
+        已登录为{" "}
         <RedactedSensitiveText
           value={provider.auth.email.trim()}
-          ariaLabel="Toggle account email visibility"
+          ariaLabel="切换账号邮箱可见性"
           revealTooltip="Click to reveal email"
           hideTooltip="Click to hide email"
         />
         .
       </>
     ) : (
-      "Signed in with ChatGPT."
+      "已通过 ChatGPT 登录。"
     )
   ) : (
-    (reconnectEmail ?? "Use your ChatGPT subscription.")
+    (reconnectEmail ?? "使用你的 ChatGPT 订阅。")
   );
 
   const handoffUrl =
@@ -634,24 +632,24 @@ function ManagedCodexSetup({
       }}
     >
       {finishingSignIn
-        ? "Finishing sign-in..."
+        ? "正在完成登录…"
         : handoffQuery.data?.phase === "finished"
           ? transferFailed
-            ? "Retry connection"
-            : "Finishing sign-in..."
+            ? "重试连接"
+            : "正在完成登录…"
           : auth?.phase === "waiting"
             ? remoteWeb
-              ? "Open ChatGPT sign-in"
-              : "Open sign-in page"
+              ? "打开 ChatGPT 登录"
+              : "打开登录页面"
             : presentation === "onboarding"
-              ? "Open sign-in page"
-              : "Signing in..."}
+              ? "打开登录页面"
+              : "正在登录…"}
     </Button>
   );
   const callbackCompletion =
     !handoff && auth?.phase === "waiting" && url ? (
       <div className="flex w-full flex-col gap-3 text-xs leading-relaxed text-muted-foreground">
-        <p>If sign-in doesn't return to FR Code, paste the URL from the final localhost page.</p>
+        <p>若登录后未返回 FR Code，请粘贴最后一个 localhost 页面的完整网址。</p>
         <form
           className="flex flex-col gap-2 sm:flex-row sm:items-center"
           onSubmit={(event) => {
@@ -671,10 +669,10 @@ function ManagedCodexSetup({
         >
           <div className="min-w-0 flex-1">
             <Input
-              aria-label="ChatGPT sign-in redirect URL"
+              aria-label="ChatGPT 登录重定向网址"
               type="password"
               autoComplete="off"
-              placeholder="Paste the URL from the sign-in tab"
+              placeholder="粘贴登录标签页中的网址"
               value={callbackUrl}
               maxLength={16_384}
               disabled={pending || readOnly}
@@ -688,7 +686,7 @@ function ManagedCodexSetup({
             type="submit"
             disabled={pending || readOnly || !callbackUrl.trim()}
           >
-            Connect
+            连接
           </Button>
         </form>
         {!remoteWeb ? (
@@ -698,16 +696,16 @@ function ManagedCodexSetup({
               variant="ghost-muted"
               onClick={() => void ensureLocalApi().shell.openExternal(url)}
             >
-              Try sign-in in your browser
+              在浏览器中尝试登录
               <ExternalLinkIcon className="size-3.5" />
             </Button>
           </div>
         ) : null}
         {handoffUrl ? (
           <details>
-            <summary className="cursor-pointer">Other ways to connect</summary>
+            <summary className="cursor-pointer">其他连接方式</summary>
             <Button className="mt-2" size="sm" variant="outline" render={<a href={handoffUrl} />}>
-              Use T3 desktop for automatic return
+              使用 T3 桌面端以自动返回
             </Button>
           </details>
         ) : null}
@@ -724,7 +722,7 @@ function ManagedCodexSetup({
   ) : callbackCompletion ? (
     <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
       <CodexSignInDescription
-        label="Having trouble signing in?"
+        label="登录遇到问题？"
         expanded={callbackHelpOpen}
         controls={callbackHelpId}
         onToggle={() => setCallbackHelpOpen((open) => !open)}
@@ -757,7 +755,7 @@ function ManagedCodexSetup({
       logoutWarning ??
       error ??
       (authQuery.error || installQuery.error
-        ? "Could not read setup status. Reconnect and try again."
+        ? "无法读取配置状态，请重新连接后重试。"
         : installation?.phase === "failed"
           ? installation.message
           : null);
@@ -772,10 +770,10 @@ function ManagedCodexSetup({
             ) : authenticated ? (
               provider?.auth.email?.trim() ? (
                 <>
-                  Signed in as{" "}
+                  已登录为{" "}
                   <RedactedSensitiveText
                     value={provider.auth.email.trim()}
-                    ariaLabel="Toggle account email visibility"
+                    ariaLabel="切换账号邮箱可见性"
                     revealTooltip="Click to reveal email"
                     hideTooltip="Click to hide email"
                     className="break-all"
@@ -783,7 +781,7 @@ function ManagedCodexSetup({
                   .
                 </>
               ) : (
-                "Connected to ChatGPT."
+                "已连接 ChatGPT。"
               )
             ) : callbackCompletion && !needsManualCallback ? (
               <CodexSignInDescription
@@ -800,14 +798,14 @@ function ManagedCodexSetup({
             ) : authActive || auth?.phase === "failed" || auth?.phase === "cancelled" ? (
               accountDescription
             ) : (
-              "Code with your ChatGPT subscription."
+              "使用 ChatGPT 订阅编程。"
             )
           }
           control={
             authenticated && !busy ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success-foreground">
                 <CheckIcon className="size-3.5" />
-                Ready
+                就绪
               </span>
             ) : authActive ? (
               waitingControl
@@ -825,10 +823,10 @@ function ManagedCodexSetup({
                 }}
               >
                 {installActive || pending
-                  ? "Setting up..."
+                  ? "正在设置…"
                   : hasSavedAccount
-                    ? "Reconnect account"
-                    : "Continue with ChatGPT"}
+                    ? "重新连接账户"
+                    : "使用 ChatGPT 继续"}
               </ChatGptConnectionButton>
             )
           }
@@ -851,7 +849,7 @@ function ManagedCodexSetup({
                     );
                 }}
               >
-                Cancel
+                取消
               </Button>
             ) : !authActive && !authenticated && hasSavedAccount ? (
               <Button
@@ -860,7 +858,7 @@ function ManagedCodexSetup({
                 disabled={unavailable || busy}
                 onClick={() => void setup("chatgpt-change-account")}
               >
-                Use a different account
+                使用其他账号
               </Button>
             ) : !authActive && !authenticated && allowExistingCli ? (
               <Button
@@ -869,7 +867,7 @@ function ManagedCodexSetup({
                 disabled={readOnly || busy}
                 onClick={() => onModeChange("existing")}
               >
-                Use existing CLI
+                使用现有 CLI
               </Button>
             ) : null
           }
@@ -886,10 +884,10 @@ function ManagedCodexSetup({
   }
 
   return (
-    <section aria-label="Codex setup" className="divide-y divide-border/50">
+    <section aria-label="Codex 设置" className="divide-y divide-border/50">
       {accountPicker}
       <SettingsRow
-        title="ChatGPT account"
+        title="ChatGPT 账户"
         description={accountDescription}
         control={
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -908,7 +906,7 @@ function ManagedCodexSetup({
                       onSignInCancelled?.();
                     }}
                   >
-                    Cancel
+                    取消
                   </Button>
                 )}
               </>
@@ -928,7 +926,7 @@ function ManagedCodexSetup({
                   );
                 }}
               >
-                Cancel
+                取消
               </Button>
             ) : authenticated ? (
               <>
@@ -938,7 +936,7 @@ function ManagedCodexSetup({
                   disabled={unavailable || busy}
                   onClick={() => setAccountPickerOpen(true)}
                 >
-                  Change account
+                  切换账号
                 </Button>
                 <Button
                   size="sm"
@@ -946,7 +944,7 @@ function ManagedCodexSetup({
                   disabled={unavailable || busy}
                   onClick={() => void run(() => logoutAuth(target))}
                 >
-                  Disconnect
+                  断开连接
                 </Button>
               </>
             ) : (
@@ -963,11 +961,7 @@ function ManagedCodexSetup({
                     else void setup();
                   }}
                 >
-                  {pending
-                    ? "Setting up..."
-                    : hasSavedAccount
-                      ? "Reconnect account"
-                      : "Continue with ChatGPT"}
+                  {pending ? "正在设置…" : hasSavedAccount ? "重新连接账户" : "使用 ChatGPT 继续"}
                 </ChatGptConnectionButton>
                 {hasSavedAccount ? (
                   <Button
@@ -976,7 +970,7 @@ function ManagedCodexSetup({
                     disabled={unavailable || busy}
                     onClick={() => void setup("chatgpt-change-account")}
                   >
-                    Use a different account
+                    使用其他账号
                   </Button>
                 ) : null}
               </>
@@ -1000,7 +994,7 @@ function ManagedCodexSetup({
           {error ??
             (installation?.phase === "failed"
               ? installation.message
-              : "Could not read Codex setup status. Reconnect and try again.")}
+              : "无法读取 Codex 设置状态。请重新连接后重试。")}
         </p>
       ) : null}
     </section>
@@ -1027,49 +1021,49 @@ export function CodexManagedRuntimeFields({
   return (
     <>
       <SettingsRow
-        title="Binary path"
-        description="Selected by FR Code."
+        title="可执行程序路径"
+        description="由 FR Code 选择。"
         control={
           <div className="w-full sm:w-80">
             <Input
-              aria-label="Codex binary path"
+              aria-label="Codex 可执行程序路径"
               value={executablePath}
               title={executablePath}
-              placeholder={installation.error ? "Could not read runtime path" : "Not installed"}
+              placeholder={installation.error ? "无法读取运行时路径" : "未安装"}
               disabled
             />
           </div>
         }
       />
       <SettingsRow
-        title="CODEX_HOME path"
-        description="Shared Codex config, sessions, and state."
+        title="CODEX_HOME 路径"
+        description="共享的 Codex 配置、会话和状态。"
         control={
           <div className="w-full sm:w-80">
             <Input
-              aria-label="Codex home path"
+              aria-label="Codex 主目录路径"
               value={provider?.runtimePaths?.homePath ?? ""}
               title={provider?.runtimePaths?.homePath}
-              placeholder="Unavailable"
+              placeholder="不可用"
               disabled
             />
           </div>
         }
       />
       <SettingsRow
-        title="Shadow home path"
+        title="影子主目录路径"
         description={
           provider?.runtimePaths?.shadowHomePath
-            ? "Account-specific home sharing the Codex state above."
-            : "This instance uses the shared Codex home directly."
+            ? "账户专属主目录，共享上述 Codex 状态。"
+            : "此实例直接使用共享的 Codex 主目录。"
         }
         control={
           <div className="w-full sm:w-80">
             <Input
-              aria-label="Codex shadow home path"
+              aria-label="Codex 影子主目录路径"
               value={provider?.runtimePaths?.shadowHomePath ?? ""}
               title={provider?.runtimePaths?.shadowHomePath ?? undefined}
-              placeholder={provider?.runtimePaths ? "Not used" : "Unavailable"}
+              placeholder={provider?.runtimePaths ? "未使用" : "不可用"}
               disabled
             />
           </div>
@@ -1080,7 +1074,7 @@ export function CodexManagedRuntimeFields({
 }
 
 function CodexSignInDescription({
-  label = "Complete sign-in in your browser.",
+  label = "请在浏览器中完成登录。",
   expanded = false,
   controls,
   onToggle,
@@ -1095,7 +1089,7 @@ function CodexSignInDescription({
     <button
       type="button"
       className="inline-flex items-center gap-1.5 rounded-sm text-left leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      aria-label="Having trouble signing in?"
+      aria-label="登录遇到问题？"
       aria-expanded={expanded}
       aria-controls={controls}
       onClick={onToggle}

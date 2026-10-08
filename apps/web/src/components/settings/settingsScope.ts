@@ -72,7 +72,7 @@ export function resolveSettingsScope(
   ): ResolvedSettingsScope => ({
     kind: "unavailable",
     reason,
-    label: "Unavailable selection",
+    label: "所选项不可用",
     message,
     members: [],
     environmentIds: [],
@@ -89,7 +89,7 @@ export function resolveSettingsScope(
 
   if (search.project) {
     const group = groups.find((candidate) => candidate.projectKey === search.project);
-    if (!group) return unavailable("project-missing", "This project is no longer available.");
+    if (!group) return unavailable("project-missing", "此项目已不可用。");
     const members = group.memberProjects.filter(
       (member) =>
         (search.machine === undefined || member.environmentId === search.machine) &&
@@ -99,7 +99,7 @@ export function resolveSettingsScope(
       return unavailable(
         "checkout-missing",
         search.checkout
-          ? "This checkout is no longer available in the selected project and environment."
+          ? "此工作目录在所选项目和环境中已不可用。"
           : "This project has no checkout on this environment.",
       );
     }
@@ -133,7 +133,7 @@ export function resolveSettingsScope(
       kind: "project",
       group,
       environmentId: environment?.environmentId ?? null,
-      label: `${group.displayName} / ${environment?.label ?? "All checkouts"}`,
+      label: `${group.displayName} / ${environment?.label ?? "所有工作目录"}`,
       members,
       environmentIds: [...new Set(members.map((member) => member.environmentId))],
     };
@@ -149,7 +149,7 @@ export function resolveSettingsScope(
   }
   return {
     kind: "all",
-    label: "All environments",
+    label: "所有环境",
     members: [],
     environmentIds: environments.map((candidate) => candidate.environmentId),
   };

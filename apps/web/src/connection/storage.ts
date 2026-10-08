@@ -78,7 +78,7 @@ const encodeStoredVcsRefs = Schema.encodeEffect(StoredVcsRefsJson);
 function catalogError(operation: string, cause: unknown) {
   return new ConnectionTransientError({
     reason: "remote-unavailable",
-    detail: `Could not ${operation} the local connection catalog: ${String(cause)}`,
+    detail: `无法${operation}本地连接目录：${String(cause)}`,
   });
 }
 
@@ -106,7 +106,7 @@ function persistenceError(
 ) {
   return new Persistence.ConnectionPersistenceError({
     operation,
-    message: `Could not ${operation.replaceAll("-", " ")}: ${String(cause)}`,
+    message: `无法${operation.replaceAll("-", " ")}：${String(cause)}`,
   });
 }
 
@@ -582,7 +582,7 @@ export function makeBrowserGitHubRoutingPermissions(
         return Effect.fail(
           new ConnectionBlockedError({
             reason: "configuration",
-            detail: "This environment does not have a saved connection endpoint.",
+            detail: "此环境没有已保存的连接端点。",
           }),
         );
       return write(

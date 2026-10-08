@@ -29,16 +29,16 @@ export interface PreviewStreamControl {
 /** Status line shown above a viewer; `null` control means the socket is not connected. */
 export const previewStreamControlLabel = (control: PreviewStreamControl | null): string =>
   !control
-    ? "Connecting..."
+    ? "正在连接…"
     : !control.canOperate
-      ? "Read-only"
+      ? "只读"
       : control.controller === "you"
-        ? "You have control"
+        ? "你拥有控制权"
         : control.controller === "agent"
-          ? "Agent has control"
+          ? "智能体拥有控制权"
           : control.controller === "another-viewer"
-            ? "Another viewer has control"
-            : "Watching";
+            ? "其他查看者拥有控制权"
+            : "正在关注";
 
 const isPreviewStreamDialog = (value: unknown): value is PreviewStreamControl["dialog"] =>
   value === null ||
@@ -472,5 +472,5 @@ const decodeHostSetup = (reason: string): PreviewStreamHostSetup => {
 /** What a viewer tells the person; `command` is shown beside it, ready to copy. */
 export const previewStreamHostSetupMessage = (setup: PreviewStreamHostSetup) =>
   setup.need === "sandbox"
-    ? "This server's host blocks the sandbox its browser runs in. Run this once on the host, then try again:"
-    : "This server's host is missing libraries its browser needs. Run this once on the host, then try again:";
+    ? "此服务器主机阻止了浏览器沙箱。在主机运行一次以下命令，然后重试："
+    : "此服务器主机缺少浏览器所需的库。在主机运行一次以下命令，然后重试：";

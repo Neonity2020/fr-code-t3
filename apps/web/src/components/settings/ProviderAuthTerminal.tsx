@@ -44,7 +44,7 @@ export default function ProviderAuthTerminal({
         if (/^https?:\/\//i.test(url))
           void ensureLocalApi()
             .shell.openExternal(url)
-            .catch(() => setError("Could not open the provider link."));
+            .catch(() => setError("无法打开提供方链接。"));
       },
     })
       .then((terminal) => {
@@ -56,7 +56,7 @@ export default function ProviderAuthTerminal({
         terminal.write(latest.current.output);
         written.current = latest.current.offset;
       })
-      .catch(() => setError("Could not load the sign-in terminal. Cancel and retry sign-in."));
+      .catch(() => setError("无法加载登录终端。请取消后重试登录。"));
     return () => {
       disposed = true;
       surface.current?.dispose();
@@ -67,7 +67,7 @@ export default function ProviderAuthTerminal({
     <>
       <div
         ref={mount}
-        aria-label="Provider sign-in terminal"
+        aria-label="提供方登录终端"
         className="relative h-64 overflow-hidden rounded-md border border-border"
       />
       {error ? (

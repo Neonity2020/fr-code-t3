@@ -75,7 +75,7 @@ export function buildMenuItems(
   return [
     {
       id: "commit",
-      label: "Commit",
+      label: "提交",
       disabled: !canCommit,
       icon: "commit",
       kind: "open_dialog",
@@ -83,7 +83,7 @@ export function buildMenuItems(
     },
     {
       id: "push",
-      label: "Push",
+      label: "推送",
       disabled: !canPush,
       icon: "push",
       kind: "open_dialog",
@@ -92,14 +92,14 @@ export function buildMenuItems(
     hasOpenPr
       ? {
           id: "pr",
-          label: "View PR",
+          label: "查看拉取请求",
           disabled: !canOpenPr,
           icon: "pr",
           kind: "open_pr",
         }
       : {
           id: "pr",
-          label: "Create PR",
+          label: "创建拉取请求",
           disabled: !canCreatePr,
           icon: "pr",
           kind: "open_dialog",
@@ -115,15 +115,15 @@ export function resolveQuickAction(
   hasOriginRemote = true,
 ): GitQuickAction {
   if (isBusy) {
-    return { label: "Commit", disabled: true, kind: "show_hint", hint: "Git action in progress." };
+    return { label: "提交", disabled: true, kind: "show_hint", hint: "Git 操作正在进行。" };
   }
 
   if (!gitStatus) {
     return {
-      label: "Commit",
+      label: "提交",
       disabled: true,
       kind: "show_hint",
-      hint: "Git status is unavailable.",
+      hint: "Git 状态不可用。",
     };
   }
 
@@ -136,22 +136,22 @@ export function resolveQuickAction(
 
   if (!hasBranch) {
     return {
-      label: "Commit",
+      label: "提交",
       disabled: true,
       kind: "show_hint",
-      hint: "Create and checkout a branch before pushing or opening a PR.",
+      hint: "推送或打开拉取请求前请创建并检出分支。",
     };
   }
 
   if (hasChanges) {
     if (!gitStatus.hasUpstream && !hasOriginRemote) {
-      return { label: "Commit", disabled: false, kind: "run_action", action: "commit" };
+      return { label: "提交", disabled: false, kind: "run_action", action: "commit" };
     }
     if (hasOpenPr || isDefaultBranch) {
-      return { label: "Commit & push", disabled: false, kind: "run_action", action: "commit_push" };
+      return { label: "提交并推送", disabled: false, kind: "run_action", action: "commit_push" };
     }
     return {
-      label: "Commit, push & PR",
+      label: "提交、推送并创建拉取请求",
       disabled: false,
       kind: "run_action",
       action: "commit_push_pr",
@@ -161,36 +161,36 @@ export function resolveQuickAction(
   if (!gitStatus.hasUpstream) {
     if (!hasOriginRemote) {
       if (hasOpenPr && !isAhead) {
-        return { label: "View PR", disabled: false, kind: "open_pr" };
+        return { label: "查看拉取请求", disabled: false, kind: "open_pr" };
       }
       return {
-        label: "Push",
+        label: "推送",
         disabled: true,
         kind: "show_hint",
-        hint: 'Add an "origin" remote before pushing or creating a PR.',
+        hint: "推送或创建拉取请求前请添加“origin”远程仓库。",
       };
     }
     if (!isAhead) {
       if (hasOpenPr) {
-        return { label: "View PR", disabled: false, kind: "open_pr" };
+        return { label: "查看拉取请求", disabled: false, kind: "open_pr" };
       }
       return {
-        label: "Push",
+        label: "推送",
         disabled: true,
         kind: "show_hint",
-        hint: "No local commits to push.",
+        hint: "没有需要推送的本地提交。",
       };
     }
     if (hasOpenPr || isDefaultBranch) {
       return {
-        label: "Push",
+        label: "推送",
         disabled: false,
         kind: "run_action",
         action: isDefaultBranch ? "commit_push" : "push",
       };
     }
     return {
-      label: "Push & create PR",
+      label: "推送并创建拉取请求",
       disabled: false,
       kind: "run_action",
       action: "create_pr",
@@ -199,16 +199,16 @@ export function resolveQuickAction(
 
   if (isDiverged) {
     return {
-      label: "Sync branch",
+      label: "同步分支",
       disabled: true,
       kind: "show_hint",
-      hint: "Branch has diverged from upstream. Rebase/merge first.",
+      hint: "分支已与上游分叉，请先变基或合并。",
     };
   }
 
   if (isBehind) {
     return {
-      label: "Pull",
+      label: "拉取",
       disabled: false,
       kind: "run_pull",
     };
@@ -217,14 +217,14 @@ export function resolveQuickAction(
   if (isAhead) {
     if (hasOpenPr || isDefaultBranch) {
       return {
-        label: "Push",
+        label: "推送",
         disabled: false,
         kind: "run_action",
         action: isDefaultBranch ? "commit_push" : "push",
       };
     }
     return {
-      label: "Push & create PR",
+      label: "推送并创建拉取请求",
       disabled: false,
       kind: "run_action",
       action: "create_pr",
@@ -232,14 +232,14 @@ export function resolveQuickAction(
   }
 
   if (hasOpenPr && gitStatus.hasUpstream) {
-    return { label: "View PR", disabled: false, kind: "open_pr" };
+    return { label: "查看拉取请求", disabled: false, kind: "open_pr" };
   }
 
   return {
-    label: "Commit",
+    label: "提交",
     disabled: true,
     kind: "show_hint",
-    hint: "Branch is up to date. No action needed.",
+    hint: "分支已是最新，无需操作。",
   };
 }
 
@@ -251,8 +251,8 @@ export function getGitActionDisabledReason(input: {
 }): string | null {
   const { item, gitStatus, isBusy, hasOriginRemote } = input;
   if (!item.disabled) return null;
-  if (isBusy) return "Git action in progress.";
-  if (!gitStatus) return "Git status is unavailable.";
+  if (isBusy) return "Git 操作正在进行。";
+  if (!gitStatus) return "Git 状态不可用。";
 
   const hasBranch = gitStatus.refName !== null;
   const hasChanges = gitStatus.hasWorkingTreeChanges;
@@ -281,7 +281,7 @@ export function getGitActionDisabledReason(input: {
       return 'Add an "origin" remote before pushing.';
     }
     if (!isAhead) {
-      return "No local commits to push.";
+      return "没有需要推送的本地提交。";
     }
     return "Push is currently unavailable.";
   }
@@ -331,28 +331,28 @@ export function resolveDefaultBranchActionDialogCopy(input: {
   if (input.action === "push" || input.action === "commit_push") {
     if (input.includesCommit) {
       return {
-        title: "Commit & push to default branch?",
-        description: `This action will commit and push changes${suffix}`,
+        title: "提交并推送到默认分支？",
+        description: `此操作会提交并推送更改${suffix}`,
         continueLabel: `Commit & push to ${branchLabel}`,
       };
     }
     return {
-      title: "Push to default branch?",
-      description: `This action will push local commits${suffix}`,
+      title: "推送到默认分支？",
+      description: `此操作会推送本地提交${suffix}`,
       continueLabel: `Push to ${branchLabel}`,
     };
   }
 
   if (input.includesCommit) {
     return {
-      title: "Commit, push & create PR from default branch?",
-      description: `This action will commit, push, and create a PR${suffix}`,
+      title: "从默认分支提交、推送并创建拉取请求？",
+      description: `此操作将提交、推送并创建拉取请求${suffix}`,
       continueLabel: "Commit, push & create PR",
     };
   }
   return {
-    title: "Push & create PR from default branch?",
-    description: `This action will push local commits and create a PR${suffix}`,
-    continueLabel: "Push & create PR",
+    title: "从默认分支推送并创建拉取请求？",
+    description: `此操作将推送本地提交并创建拉取请求${suffix}`,
+    continueLabel: "推送并创建拉取请求",
   };
 }

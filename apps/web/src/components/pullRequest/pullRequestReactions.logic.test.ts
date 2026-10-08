@@ -41,8 +41,8 @@ describe("reaction presentation", () => {
       "🚀",
       "👀",
     ]);
-    expect(pullRequestReactionName("thumbs-up")).toBe("thumbs up");
-    expect(pullRequestReactionName("eyes")).toBe("eyes");
+    expect(pullRequestReactionName("thumbs-up")).toBe("赞");
+    expect(pullRequestReactionName("eyes")).toBe("关注");
   });
 });
 
@@ -50,9 +50,9 @@ describe("reaction tooltip", () => {
   it("reads as GitHub's sentence for one, two and three names", () => {
     expect(
       pullRequestReactionTooltip(reaction({ content: "thumbs-up", count: 1, actors: ["Bil0000"] })),
-    ).toBe("Bil0000 reacted with thumbs up emoji");
+    ).toBe("Bil0000 使用 赞 表情回应");
     expect(pullRequestReactionTooltip(reaction({ count: 2, actors: ["Bil0000", "octocat"] }))).toBe(
-      "Bil0000 and octocat reacted with heart emoji",
+      "Bil0000和octocat 使用 爱心 表情回应",
     );
     expect(
       pullRequestReactionTooltip(
@@ -63,7 +63,7 @@ describe("reaction tooltip", () => {
           viewerHasReacted: true,
         }),
       ),
-    ).toBe("You, Bil0000, and octocat reacted with eyes emoji");
+    ).toBe("你、Bil0000和octocat 使用 关注 表情回应");
   });
 
   it("counts everyone past the third name, including the ones the host never named", () => {
@@ -76,17 +76,17 @@ describe("reaction tooltip", () => {
           viewerHasReacted: true,
         }),
       ),
-    ).toBe("You, a, b, and 12 others reacted with rocket emoji");
+    ).toBe("你、a、b和12 位其他用户 使用 火箭 表情回应");
     // A host that counted more than it named still says who is missing.
     expect(pullRequestReactionTooltip(reaction({ count: 2, actors: ["octocat"] }))).toBe(
-      "octocat and 1 other reacted with heart emoji",
+      "octocat和1 位其他用户 使用 爱心 表情回应",
     );
     // Nothing named at all leaves the count to speak for itself, and nobody to be "other" than.
     expect(pullRequestReactionTooltip(reaction({ count: 4, actors: [] }))).toBe(
-      "4 people reacted with heart emoji",
+      "4 位用户 使用 爱心 表情回应",
     );
     expect(pullRequestReactionTooltip(reaction({ count: 1, actors: [] }))).toBe(
-      "1 person reacted with heart emoji",
+      "1 位用户 使用 爱心 表情回应",
     );
   });
 
@@ -96,7 +96,7 @@ describe("reaction tooltip", () => {
       pullRequestReactionTooltip(
         reaction({ count: 3, actors: ["Bil0000", "octocat"], viewerHasReacted: true }),
       ),
-    ).toBe("You, Bil0000, and octocat reacted with heart emoji");
+    ).toBe("你、Bil0000和octocat 使用 爱心 表情回应");
   });
 
   it("names nobody as You when the viewer has not reacted", () => {
@@ -104,7 +104,7 @@ describe("reaction tooltip", () => {
       pullRequestReactionTooltip(
         reaction({ count: 2, actors: ["Bil0000", "octocat"], viewerHasReacted: false }),
       ),
-    ).toBe("Bil0000 and octocat reacted with heart emoji");
+    ).toBe("Bil0000和octocat 使用 爱心 表情回应");
   });
 
   it("names actors as given, and leaves off You, for a host with no room for the viewer", () => {
@@ -114,7 +114,7 @@ describe("reaction tooltip", () => {
       pullRequestReactionTooltip(
         reaction({ count: 2, actors: ["Bil0000", "octocat"], viewerHasReacted: true }),
       ),
-    ).toBe("Bil0000 and octocat reacted with heart emoji");
+    ).toBe("Bil0000和octocat 使用 爱心 表情回应");
     // Same shape past the naming cap: the display limit still leaves an honest remainder.
     expect(
       pullRequestReactionTooltip(
@@ -124,7 +124,7 @@ describe("reaction tooltip", () => {
           viewerHasReacted: true,
         }),
       ),
-    ).toBe("Bil0000, octocat, hubot, and 1 other reacted with heart emoji");
+    ).toBe("Bil0000、octocat、hubot和1 位其他用户 使用 爱心 表情回应");
   });
 
   it("keeps naming the viewer You when the host does leave them room", () => {
@@ -133,7 +133,7 @@ describe("reaction tooltip", () => {
       pullRequestReactionTooltip(
         reaction({ count: 2, actors: ["octocat"], viewerHasReacted: true }),
       ),
-    ).toBe("You and octocat reacted with heart emoji");
+    ).toBe("你和octocat 使用 爱心 表情回应");
   });
 });
 
@@ -146,7 +146,7 @@ describe("reaction tooltip, with a reaction in flight", () => {
       [reaction({ count: 2, actors: ["a", "b"], viewerHasReacted: false })],
       new Map([["heart", true] as const]),
     );
-    expect(pullRequestReactionTooltip(applied[0]!)).toBe("You, a, and b reacted with heart emoji");
+    expect(pullRequestReactionTooltip(applied[0]!)).toBe("你、a和b 使用 爱心 表情回应");
   });
 
   it("drops You after an optimistic un-react, without treating the host as non-compliant", () => {
@@ -154,7 +154,7 @@ describe("reaction tooltip, with a reaction in flight", () => {
       [reaction({ count: 2, actors: ["octocat"], viewerHasReacted: true })],
       new Map([["heart", false] as const]),
     );
-    expect(pullRequestReactionTooltip(applied[0]!)).toBe("octocat reacted with heart emoji");
+    expect(pullRequestReactionTooltip(applied[0]!)).toBe("octocat 使用 爱心 表情回应");
   });
 });
 

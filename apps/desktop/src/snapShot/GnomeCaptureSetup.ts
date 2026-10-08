@@ -172,53 +172,50 @@ export class GnomeCaptureSetup {
       if (!bundled["shell-version"].includes(major))
         return {
           status: "unsupported",
-          message: `The bundled extension supports GNOME ${bundled["shell-version"].join(", ")}. This session runs GNOME ${major}.`,
+          message: `内置扩展支持 GNOME ${bundled["shell-version"].join(", ")}，当前会话使用 GNOME ${major}。`,
         };
       if (!info.state && !installed)
         return {
           status: "not-installed",
-          message:
-            "Install the bundled extension to capture the active window without a picker. No download or administrator password is needed.",
+          message: "安装内置扩展后可直接截取活动窗口，无需选择器、下载或管理员密码。",
         };
       if (installed && (!info.state || (info.version && installed.version > info.version.value)))
         return {
           status: "restart-required",
           message:
-            "Installed. Save your work, sign out of GNOME and sign back in, then return here to enable the extension. Restarting FR Code alone is not enough.",
+            "已安装。请保存工作，退出 GNOME 并重新登录，然后返回启用扩展。仅重启 FR Code 不会生效。",
         };
       if ((installed?.version ?? info.version?.value ?? 0) < bundled.version)
         return {
           status: "update-required",
-          message:
-            "A newer extension is bundled with this app. Install it, then sign out and back in to load the update.",
+          message: "此应用包含更新的扩展。请安装后退出系统并重新登录，以加载更新。",
         };
       if (!properties.UserExtensionsEnabled.value)
         return {
           status: "extensions-disabled",
           message:
-            "GNOME has disabled user extensions. Turn on Extensions in the GNOME Extensions app, then check again. FR Code will not enable your other extensions for you.",
+            "GNOME 已禁用用户扩展。请在 GNOME 扩展应用中启用扩展后重新检查。FR Code 不会替您启用其他扩展。",
         };
       if (info.state?.value === 1)
         return {
           status: "enabled",
-          message: "The FR Code extension is running. Active-window snapshots are available.",
+          message: "FR Code 扩展正在运行，可以截取活动窗口。",
         };
       if (info.state?.value === 3 || info.state?.value === 4)
         return {
           status: "error",
           message:
             info.error?.value ||
-            "GNOME could not load the extension. Check GNOME Extensions for details, or sign out and back in.",
+            "GNOME 无法加载扩展。请在 GNOME 扩展中查看详情，或退出系统并重新登录。",
         };
       return {
         status: "disabled",
-        message:
-          "Enable the FR Code extension to allow active-window snapshots. You can disable it here at any time.",
+        message: "启用 FR Code 扩展以截取活动窗口。您可随时在此禁用。",
       };
     } catch (error) {
       return {
         status: "error",
-        message: error instanceof Error ? error.message : "Could not check GNOME extension setup.",
+        message: error instanceof Error ? error.message : "无法检查 GNOME 扩展配置。",
       };
     }
   }

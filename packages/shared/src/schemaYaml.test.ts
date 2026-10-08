@@ -88,7 +88,7 @@ tags:
     if (!Schema.isSchemaError(error)) {
       throw new Error("Expected a schema error");
     }
-    expect(error.message).toBe("Failed to stringify YAML.");
+    expect(error.message).toBe("无法序列化为 YAML。");
     expect(error.message).not.toContain(secret);
   });
 });

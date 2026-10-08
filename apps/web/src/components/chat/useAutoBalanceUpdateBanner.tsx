@@ -87,8 +87,8 @@ export function useAutoBalanceUpdateBanner(
   );
   const count = running || failed || machines.length;
   const status = running ? "running" : failed ? "failed" : "idle";
-  const prefix = running ? "Updating" : failed ? "Could not update" : "Update available for";
-  const title = `${prefix} ${count} ${count === 1 ? "machine" : "machines"}`;
+  const prefix = running ? "正在更新" : failed ? "无法更新" : "可更新";
+  const title = `${prefix} ${count} 台机器`;
   return {
     id: `auto-balance-server-updates-${dismissedNotices.size}`,
     variant: failed ? "error" : "default",
@@ -99,7 +99,7 @@ export function useAutoBalanceUpdateBanner(
         <PopoverTrigger
           render={<InlineButton />}
           className="max-w-full"
-          aria-label={`${title}. View machines`}
+          aria-label={`${title}。查看机器`}
         >
           <span className="min-w-0 truncate">{title}</span>
         </PopoverTrigger>
@@ -112,14 +112,14 @@ export function useAutoBalanceUpdateBanner(
                   <ServerUpdateProgress state={machine.state} />
                 ) : !machine.remoteUpdate ? (
                   <>
-                    <div className="text-muted-foreground">Manual update required</div>
+                    <div className="text-muted-foreground">需要手动更新</div>
                     <ServerUpdateAction {...machine} />
                   </>
                 ) : (
                   <div className="text-muted-foreground">
                     {machine.connected
-                      ? `Ready to update to ${machine.targetVersion}`
-                      : "Reconnect this machine to update"}
+                      ? `已可更新到 ${machine.targetVersion}`
+                      : "重新连接此机器以更新"}
                   </div>
                 )}
               </div>
@@ -128,8 +128,7 @@ export function useAutoBalanceUpdateBanner(
         </PopoverPopup>
       </Popover>
     ),
-    description:
-      manual > 0 ? `${manual} ${manual === 1 ? "needs" : "need"} a manual update` : undefined,
+    description: manual > 0 ? `${manual} 台机器需要手动更新` : undefined,
     actions:
       running === 0 && targets.length > 0 ? (
         <ServerUpdatesAction
@@ -137,10 +136,10 @@ export function useAutoBalanceUpdateBanner(
           variant="ghost"
           label={
             failed > 0
-              ? "Retry"
+              ? "重试"
               : targets.length === machines.length
-                ? "Update all"
-                : `Update ${targets.length} ${targets.length === 1 ? "machine" : "machines"}`
+                ? "全部更新"
+                : `更新 ${targets.length} 台机器`
           }
         />
       ) : undefined,

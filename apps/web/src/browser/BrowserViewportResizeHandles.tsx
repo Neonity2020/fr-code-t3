@@ -59,7 +59,7 @@ function ResizeHandle(props: {
   return (
     <button
       type="button"
-      aria-label={`${label}. Use arrow keys to resize.`}
+      aria-label={`${label}。使用方向键调整大小。`}
       className={cn(EDGE_BUTTON_CLASS, kind === "corner" && "z-30", cursorClassName)}
       style={style}
       onPointerDown={(event) => onPointerDown(direction, event)}
@@ -115,7 +115,7 @@ export function BrowserViewportResizeHandles({
     <>
       <ResizeHandle
         direction="west"
-        label="Resize browser viewport from left edge"
+        label="从左侧调整浏览器视口大小"
         kind="vertical"
         cursorClassName="cursor-ew-resize"
         style={{ left: left - railSize, top, width: railSize, height: layout.viewportHeight }}
@@ -125,7 +125,7 @@ export function BrowserViewportResizeHandles({
       />
       <ResizeHandle
         direction="east"
-        label="Resize browser viewport from right edge"
+        label="从右侧调整浏览器视口大小"
         kind="vertical"
         cursorClassName="cursor-ew-resize"
         style={{ left: right, top, width: railSize, height: layout.viewportHeight }}
@@ -135,7 +135,7 @@ export function BrowserViewportResizeHandles({
       />
       <ResizeHandle
         direction="south"
-        label="Resize browser viewport from bottom edge"
+        label="从底部调整浏览器视口大小"
         kind="horizontal"
         cursorClassName="cursor-ns-resize"
         style={{ left, top: bottom, width: layout.viewportWidth, height: railSize }}
@@ -145,7 +145,7 @@ export function BrowserViewportResizeHandles({
       />
       <ResizeHandle
         direction="southwest"
-        label="Resize browser viewport from bottom-left corner"
+        label="从左下角调整浏览器视口大小"
         kind="corner"
         cursorClassName="cursor-nesw-resize"
         style={{ left: left - railSize, top: bottom, width: railSize, height: railSize }}
@@ -156,7 +156,7 @@ export function BrowserViewportResizeHandles({
       />
       <ResizeHandle
         direction="southeast"
-        label="Resize browser viewport from bottom-right corner"
+        label="从右下角调整浏览器视口大小"
         kind="corner"
         cursorClassName="cursor-nwse-resize"
         style={{ left: right, top: bottom, width: railSize, height: railSize }}

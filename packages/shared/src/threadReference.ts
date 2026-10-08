@@ -27,14 +27,14 @@ export function resolveThreadReferenceCopyTarget(input: {
         kind: "pull-request",
         value: pullRequestUrl,
         clipboardTarget: "pull request link",
-        successTitle: "PR link copied",
-        failureTitle: "Failed to copy PR link",
+        successTitle: "拉取请求链接已复制",
+        failureTitle: "无法复制拉取请求链接",
       }
     : {
         kind: "thread",
         value: input.threadId,
         clipboardTarget: "thread ID",
-        successTitle: "Thread ID copied",
-        failureTitle: "Failed to copy thread ID",
+        successTitle: "会话 ID 已复制",
+        failureTitle: "复制会话 ID 失败",
       };
 }

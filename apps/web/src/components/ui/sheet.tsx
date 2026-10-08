@@ -109,7 +109,7 @@ function SheetPopup({
           {children}
           {showCloseButton && (
             <SheetPrimitive.Close
-              aria-label="Close"
+              aria-label="关闭"
               className="absolute end-2 top-2"
               render={<Button size="icon" variant="ghost" />}
             >

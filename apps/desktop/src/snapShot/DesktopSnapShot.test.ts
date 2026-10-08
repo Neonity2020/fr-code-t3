@@ -3373,10 +3373,7 @@ it.effect("keeps shortcut registration errors off the capture status", () => {
 
       const state = yield* service.state;
       assert.isNull(state.message);
-      assert.equal(
-        state.shortcutMessage,
-        "This shortcut is already used by the system or another app.",
-      );
+      assert.equal(state.shortcutMessage, "此快捷键已被系统或其他应用占用。");
     }),
   ).pipe(Effect.provide(layerTest("win32")));
 });
@@ -3397,7 +3394,7 @@ it.effect("uses an external Niri shortcut without registering an Electron accele
       assert.isFalse(state.shortcutRegistered);
       assert.include(state.shortcutBinding, "gdbus");
       assert.match(state.shortcutBinding ?? "", /^Ctrl\+Shift\+2 repeat=false \{/);
-      assert.include(state.shortcutMessage, "Niri config");
+      assert.include(state.shortcutMessage, "Niri 配置");
       assert.isTrue(state.shortcutActionRegistered);
       assert.lengthOf(registerShortcutMock.mock.calls, 0);
       assert.lengthOf(niriShortcutMock.mock.calls, 1);
@@ -3441,7 +3438,7 @@ it.effect("defers ordinary Wayland shortcut registration until settings are appl
       });
       assert.isFalse(conflict.available);
       assert.isTrue(available.available);
-      assert.match(available.message ?? "", /desktop will confirm/);
+      assert.match(available.message ?? "", /桌面环境会请求确认/);
 
       const pair = yield* service.checkShortcut({
         kind: "modifier-pair",
@@ -3772,7 +3769,7 @@ it.effect(
         assert.isTrue((yield* service.state).shortcutActionRegistered);
         const check = yield* service.checkShortcut(settings.snapShotShortcut);
         assert.isFalse(check.available);
-        assert.include(check.message, "Hyprland config");
+        assert.include(check.message, "Hyprland 配置");
         yield* service.configure({ ...settings, snapShotPlaySound: false });
         assert.lengthOf(portalShortcutInstances, 1);
         assert.lengthOf(first.close.mock.calls, 0);
@@ -3793,8 +3790,8 @@ it.effect("advises about the system menu for a meta pair on Windows", () =>
       const service = yield* DesktopSnapShot.make;
       const result = yield* service.checkShortcut({ kind: "modifier-pair", modifier: "meta" });
       assert.isTrue(result.available);
-      assert.match(result.message ?? "", /Super \+ Super is observed/);
-      assert.match(result.message ?? "", /system's own menu/);
+      assert.match(result.message ?? "", /Super \+ Super 的按键可被监听/);
+      assert.match(result.message ?? "", /系统菜单/);
     }),
   ).pipe(Effect.provide(layerTest("win32"))),
 );
@@ -3806,7 +3803,7 @@ it.effect("probes macOS modifier pairs with the flags poller", () => {
       const service = yield* DesktopSnapShot.make;
       const result = yield* service.checkShortcut({ kind: "both-shift-keys" });
       assert.isTrue(result.available);
-      assert.match(result.message ?? "", /Shift \+ Shift is observed/);
+      assert.match(result.message ?? "", /Shift \+ Shift 的按键可被监听/);
       assert.notMatch(result.message ?? "", /Input Monitoring/);
       assert.lengthOf(spawnedPollers, 1);
       assert.deepEqual(spawnedPollers[0]?.args.slice(-2), ["2", "4"]);

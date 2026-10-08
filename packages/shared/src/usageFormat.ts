@@ -56,8 +56,8 @@ export function formatUsageContractMismatch(
   mismatch: Pick<UsageContractMismatch, "direction">,
 ): string {
   return mismatch.direction === "serverBehind"
-    ? `${environmentLabel} runs an older server version and is excluded from totals.`
-    : `This client is older than the server on ${environmentLabel}; its usage is excluded from totals.`;
+    ? `${environmentLabel} 的服务器版本较旧，已从总计中排除。`
+    : `此客户端版本比 ${environmentLabel} 的服务器旧，其用量已从总计中排除。`;
 }
 
 /** `2026-08-07` to `Aug 7`. */
@@ -196,8 +196,8 @@ export function formatRelativeHourShort(
   const calendarDaysAgo = Math.round((referenceDay - instantDay) / (24 * HOUR_MS));
   const hour = formatHourShort(hourStart, timeZone);
 
-  if (calendarDaysAgo === 0) return `${hour} today`;
-  if (calendarDaysAgo === 1) return `${hour} yesterday`;
+  if (calendarDaysAgo === 0) return `${hour} 今天`;
+  if (calendarDaysAgo === 1) return `${hour} 昨天`;
   return formatDateTimeShort(hourStart, timeZone);
 }
 

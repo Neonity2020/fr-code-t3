@@ -43,7 +43,7 @@ export class RemoteEnvironmentAuthUndeclaredStatusError extends Data.TaggedError
 }> {
   constructor(requestUrl: string, status: number) {
     super({
-      message: `Remote environment endpoint ${requestUrl} returned undeclared status ${status}.`,
+      message: `远程环境端点 ${requestUrl} 返回了未声明的状态 ${status}。`,
       requestUrl,
       status,
     });
@@ -59,7 +59,7 @@ export class RemoteEnvironmentAuthTimeoutError extends Data.TaggedError(
 }> {
   constructor(requestUrl: string, timeoutMs: number) {
     super({
-      message: `Remote environment endpoint ${requestUrl} timed out after ${timeoutMs}ms.`,
+      message: `远程环境端点 ${requestUrl} 在 ${timeoutMs} 毫秒后超时。`,
       requestUrl,
       timeoutMs,
     });
@@ -132,7 +132,7 @@ const failRemoteRequest = (
   if (Schema.isSchemaError(cause)) {
     return Effect.fail(
       new RemoteEnvironmentAuthInvalidJsonError({
-        message: `Remote environment endpoint returned an invalid response from ${requestUrl}.`,
+        message: `远程环境端点从 ${requestUrl} 返回了无效响应。`,
         cause,
       }),
     );
@@ -146,14 +146,14 @@ const failRemoteRequest = (
     }
     return Effect.fail(
       new RemoteEnvironmentAuthInvalidJsonError({
-        message: `Remote environment endpoint returned an invalid response from ${requestUrl}.`,
+        message: `远程环境端点从 ${requestUrl} 返回了无效响应。`,
         cause,
       }),
     );
   }
   return Effect.fail(
     new RemoteEnvironmentAuthFetchError({
-      message: `Failed to fetch remote environment endpoint ${requestUrl} (${String(cause)}).`,
+      message: `获取远程环境端点 ${requestUrl} 失败（${String(cause)}）。`,
       cause,
     }),
   );

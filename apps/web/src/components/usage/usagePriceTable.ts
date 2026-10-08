@@ -38,10 +38,10 @@ function modelAlias(target: UsagePriceTarget, model: string) {
 /** The "Map to" cell across the selected environments, read like a price cell. */
 export function usageAliasCell(targets: readonly UsagePriceTarget[], model: string) {
   if (targets.some((target) => target.aliases === null))
-    return { value: "", placeholder: "Unavailable" };
+    return { value: "", placeholder: "不可用" };
   const values = targets.map((target) => modelAlias(target, model) ?? "");
-  if (values.some((value) => value !== values[0])) return { value: "", placeholder: "Mixed" };
-  return { value: values[0] ?? "", placeholder: "None" };
+  if (values.some((value) => value !== values[0])) return { value: "", placeholder: "混合" };
+  return { value: values[0] ?? "", placeholder: "无" };
 }
 
 export function usagePriceCell(
@@ -53,12 +53,11 @@ export function usagePriceCell(
   const values = targets.map((target) =>
     modelPrice(target, model) ? usagePriceForm(model, modelPrice(target, model))[field] : null,
   );
-  if (targets.some((target) => target.prices === null))
-    return { value: "", placeholder: "Unavailable" };
-  if (values.some((value) => value !== values[0])) return { value: "", placeholder: "Mixed" };
+  if (targets.some((target) => target.prices === null)) return { value: "", placeholder: "不可用" };
+  if (values.some((value) => value !== values[0])) return { value: "", placeholder: "混合" };
   return {
     value: values[0] ?? "",
-    placeholder: values[0] === null ? "Automatic" : optional ? "Input rate" : "0.00",
+    placeholder: values[0] === null ? "自动" : optional ? "输入费率" : "0.00",
   };
 }
 

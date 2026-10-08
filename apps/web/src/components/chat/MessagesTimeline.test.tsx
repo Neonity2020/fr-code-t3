@@ -816,8 +816,8 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain('aria-label="Load earlier turns"');
-    expect(markup).toContain("Load earlier turns");
+    expect(markup).toContain('aria-label="加载更早轮次"');
+    expect(markup).toContain("加载更早轮次");
     expect(markup).toContain("Earlier activity could not be loaded.");
     expect(markup.indexOf("Load earlier turns")).toBeLessThan(markup.indexOf("Recent activity"));
   });
@@ -836,9 +836,9 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Loading earlier turns…");
+    expect(markup).toContain("正在加载更早轮次…");
     expect(markup).toContain("disabled");
-    expect(markup).not.toContain("Send a message to start the conversation.");
+    expect(markup).not.toContain("发送消息以开始对话。");
   });
 
   it("uses the larger leading inset only when the top fade is enabled", () => {
@@ -903,9 +903,9 @@ describe("MessagesTimeline", () => {
     expect(markup).not.toContain("self-start");
     expect(markup).toContain("whitespace-nowrap");
     expect(markup).toContain("size-3");
-    expect(markup).not.toContain('aria-label="Collapse all folders"');
-    expect(markup).toContain('aria-label="Open diff"');
-    expect(markup).toContain("1 changed file");
+    expect(markup).not.toContain('aria-label="折叠所有文件夹"');
+    expect(markup).toContain('aria-label="查看差异"');
+    expect(markup).toContain("1 个更改文件");
   });
 
   it("treats the follow re-arm band above the content bottom as the live edge", async () => {
@@ -1145,8 +1145,8 @@ describe("MessagesTimeline", () => {
       <MessagesTimeline {...buildProps()} timelineEntries={[entry]} />,
     );
 
-    expect(markup).toContain('aria-label="Preview report.pdf"');
-    expect(markup).toContain('aria-label="Download report.pdf"');
+    expect(markup).toContain('aria-label="预览 report.pdf"');
+    expect(markup).toContain('aria-label="下载 report.pdf"');
     expect(markup).not.toContain('alt="report.pdf"');
   });
 
@@ -1171,8 +1171,8 @@ describe("MessagesTimeline", () => {
       <MessagesTimeline {...buildProps()} timelineEntries={[entry]} />,
     );
 
-    expect(markup).toContain('aria-label="Preview report.pdf"');
-    expect(markup).toContain('aria-label="Download report.pdf"');
+    expect(markup).toContain('aria-label="预览 report.pdf"');
+    expect(markup).toContain('aria-label="下载 report.pdf"');
     expect(markup).not.toContain("<a ");
   });
 
@@ -1199,7 +1199,7 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).toContain("report.pdf");
-    expect(markup).not.toContain('aria-label="Download report.pdf"');
+    expect(markup).not.toContain('aria-label="下载 report.pdf"');
   });
 
   it("renders unknown attachment types as inert rows instead of crashing", () => {
@@ -1226,7 +1226,7 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).toContain("voice-memo.ogg");
-    expect(markup).not.toContain('aria-label="Download voice-memo.ogg"');
+    expect(markup).not.toContain('aria-label="下载 voice-memo.ogg"');
     expect(markup).not.toContain('alt="voice-memo.ogg"');
     expect(markup).not.toContain("<a ");
   });
@@ -1330,7 +1330,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Show full message");
+    expect(markup).toContain("显示完整消息");
     // LegendList owns ordinary end-follow (#5449): with live follow on and no
     // anchored end space, its maintainScrollAtEnd is enabled.
     expect(markup).toContain('data-maintain-scroll-at-end="enabled"');
@@ -1351,7 +1351,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).not.toContain("Show full message");
+    expect(markup).not.toContain("显示完整消息");
     expect(markup).toContain('data-user-message-collapsible="false"');
     expect(markup).toContain("rounded-2xl bg-message p-3");
   });
@@ -1375,8 +1375,8 @@ describe("MessagesTimeline", () => {
     );
 
     expect(agentMarkup).toContain('data-user-message-attribution="agent"');
-    expect(agentMarkup).toContain("Sent by another agent");
-    expect(userMarkup).not.toContain("Sent by another agent");
+    expect(agentMarkup).toContain("由其他智能体发送");
+    expect(userMarkup).not.toContain("由其他智能体发送");
   });
 
   it("keeps a subagent parent-thread link at the top of an empty timeline", async () => {
@@ -1392,8 +1392,8 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain('aria-label="Open parent thread"');
-    expect(markup).toContain("Subagent of");
+    expect(markup).toContain('aria-label="打开父会话"');
+    expect(markup).toContain("子智能体，所属");
     expect(markup).toContain("Architecture audit");
     expect(markup).not.toContain("Send a message to start the conversation");
   });
@@ -1524,8 +1524,8 @@ describe("MessagesTimeline", () => {
 
     expect(markup).toContain('data-superseded-attempt-id="attempt-1"');
     expect(markup).toContain('aria-expanded="false"');
-    expect(markup).toContain("Superseded attempt");
-    expect(markup).toContain("Partial output retained");
+    expect(markup).toContain("已被替代的尝试");
+    expect(markup).toContain("已保留部分输出");
     expect(markup).toContain("Current response remains visible");
     expect(markup).not.toContain("Partial response from the old attempt");
   });
@@ -1581,7 +1581,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain('aria-label="Fork from this response"');
+    expect(markup).toContain('aria-label="从此回复创建分支会话"');
   });
 
   it("renders inline terminal labels with the composer chip UI", async () => {
@@ -1609,7 +1609,7 @@ describe("MessagesTimeline", () => {
     expect(markup).toContain("lucide-terminal");
     expect(markup).toContain("yoo what&#x27;s");
     expect(markup).not.toContain("terminal_context");
-    expect(markup).toContain("Show full message");
+    expect(markup).toContain("显示完整消息");
   }, 20_000);
 
   it("renders chips for standalone element-pick context messages", () => {
@@ -1646,7 +1646,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain('aria-label="Copy message"');
+    expect(markup).toContain('aria-label="复制消息"');
     expect(markup).toContain('data-user-message-collapsed="true"');
     expect(markup).toContain('data-user-message-footer="true"');
   });
@@ -1714,7 +1714,7 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).not.toContain('data-v2-item-type="run_interrupt_request"');
-    expect(markup).not.toContain("Interrupt requested");
+    expect(markup).not.toContain("已请求中断");
     expect(markup).not.toContain("Waiting for the provider to stop.");
     expect(markup).not.toContain("Structured details");
   });
@@ -1801,7 +1801,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Context handoff");
+    expect(markup).toContain("上下文交接");
     expect(markup).toContain("GPT 5.6 Sol");
     expect(markup).toContain("Claude Fable 5");
     expect(markup).not.toContain("Full conversation context");
@@ -1904,9 +1904,9 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).toContain('data-v2-item-type="thread_created"');
-    expect(markup).toContain('aria-label="Open Claude research thread"');
+    expect(markup).toContain('aria-label="打开 Claude research thread"');
     expect(markup).toContain("Claude research thread");
-    expect(markup).toContain("Open chat");
+    expect(markup).toContain("打开对话");
     expect(markup).not.toContain("Work Log");
   });
 
@@ -1945,12 +1945,12 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Ran 2 commands");
+    expect(markup).toContain("已运行 2 条命令");
     expect(markup).toContain("lucide-terminal");
     expect(markup).not.toContain("lucide-x");
     expect(markup).not.toContain("text-destructive");
     // The failure stays discoverable for screen readers.
-    expect(markup).toContain("tool call failed");
+    expect(markup).toContain("工具调用失败");
   });
 
   it("keeps mixed work logs neutral after a later tool call succeeds", () => {
@@ -1999,7 +1999,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Ran 2 commands and received 1 update");
+    expect(markup).toContain("已运行 2 条命令；已收到 1 条更新");
     expect(markup).not.toContain('aria-label="Hidden work includes a failure"');
   });
 
@@ -2101,14 +2101,14 @@ describe("MessagesTimeline", () => {
             />,
           );
         });
-        const groupLabel = `${count} subagents`;
+        const groupLabel = `${count} 个子智能体`;
         const group = () =>
           renderer!.root.findAll(
             (node) => node.type === "button" && node.props["aria-label"] === groupLabel,
           )[0]!;
         const child = () =>
           renderer!.root.findAll(
-            (node) => node.type === "button" && node.props["aria-label"] === "Open Package audit",
+            (node) => node.type === "button" && node.props["aria-label"] === "打开 Package audit",
           );
         if (count > 1) {
           expect(child()).toHaveLength(0);
@@ -2287,7 +2287,7 @@ describe("MessagesTimeline", () => {
 
     expect(markup).toContain('data-v2-item-type="command_execution"');
     expect(markup).toContain('data-v2-item-visibility="inherited"');
-    expect(markup).toContain("Received 1 update and ran 1 command");
+    expect(markup).toContain("已收到 1 条更新；已运行 1 条命令");
   });
 
   it("renders T3 MCP dynamic tools with the product logo and pretty name", async () => {
@@ -2360,8 +2360,8 @@ describe("MessagesTimeline", () => {
     );
 
     // The T3 wordmark replaces the generic tool icon for T3 MCP calls.
-    expect(markup).toContain('viewBox="15.5309 37 94.3941 56.96"');
-    expect(markup).toContain("Read a T3 thread");
+    expect(markup).toContain('viewBox="0 0 24 24"');
+    expect(markup).toContain("读取 T3 会话");
     expect(markup).not.toContain("mcp__t3-code__t3_thread_read");
   });
 
@@ -2518,7 +2518,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Ran 2 commands");
+    expect(markup).toContain("已运行 2 条命令");
     expect(markup).toContain('aria-expanded="false"');
     // Entries stay hidden until the toggle expands the group.
     expect(markup).not.toContain("vp lint");
@@ -2559,7 +2559,7 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).toContain("lucide-zap");
-    expect(markup).toContain('aria-label="Tool call failed"');
+    expect(markup).toContain('aria-label="工具调用失败"');
     // Ordinary tool failures render muted, not red.
     expect(markup).not.toContain("text-destructive");
   });
@@ -2611,8 +2611,8 @@ describe("MessagesTimeline", () => {
     ["- first\n- second", "first second", 0],
     ["first  \nsecond", "first second", 0],
     ["![image description](image.png)", "image description", 0],
-    ["![](image.png)", "Thought", 0],
-    ["---", "Thought", 0],
+    ["![](image.png)", "思考过程", 0],
+    ["---", "思考过程", 0],
   ] as const)(
     "shows plain text for a V2 reasoning preview: %s",
     async (markdown, expected, strongCount) => {

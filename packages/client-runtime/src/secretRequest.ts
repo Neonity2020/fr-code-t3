@@ -22,22 +22,22 @@ export type SecretRequestDisplay =
 const SAVED_DISPLAY: SecretRequestDisplay = {
   kind: "answered",
   outcome: "saved",
-  label: "Saved securely and kept private",
+  label: "安全保存并保持私密",
 };
 const DECLINED_DISPLAY: SecretRequestDisplay = {
   kind: "answered",
   outcome: "declined",
-  label: "Declined",
+  label: "已拒绝",
 };
 const ENDED_DISPLAY: SecretRequestDisplay = {
   kind: "answered",
   outcome: "ended",
-  label: "Request ended",
+  label: "请求已结束",
 };
 const PENDING_DISPLAY: SecretRequestDisplay = { kind: "pending" };
 const PENDING_ELSEWHERE_DISPLAY: SecretRequestDisplay = {
   kind: "pending-elsewhere",
-  label: "Waiting for an answer in the original thread",
+  label: "等待原会话中的答复",
 };
 
 /**
@@ -97,5 +97,5 @@ export function secretRequestFailureMessage(failure: unknown): string {
   ) {
     return failure.message;
   }
-  return "Could not answer the request. Try again.";
+  return "无法回答请求。请重试。";
 }

@@ -85,7 +85,7 @@ export function resolveVersionMismatch(
   return {
     clientVersion: normalizedClientVersion,
     serverVersion: normalizedServerVersion,
-    hint: "Version mismatch. Try syncing the client and server to the same FR Code version.",
+    hint: "版本不匹配。请将客户端与服务器同步到同一 FR Code 版本。",
   };
 }
 
@@ -201,5 +201,5 @@ export function appendVersionMismatchHint(
   if (!mismatch) {
     return normalizedMessage;
   }
-  return `${normalizedMessage} Hint: ${mismatch.hint}`;
+  return `${normalizedMessage} 提示：${mismatch.hint}`;
 }

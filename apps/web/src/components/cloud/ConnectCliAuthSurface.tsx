@@ -33,9 +33,8 @@ function ConnectCliAuthMessage({
 
 const invalidLinkMessage = {
   eyebrow: "Authorization request",
-  title: "This connect link is incomplete",
-  description:
-    "The link is missing its authorization request. Re-run `t3 connect` in your terminal and open the freshly printed URL.",
+  title: "此连接链接不完整",
+  description: "链接缺少授权请求。请在终端重新运行 `t3 connect`，并打开新输出的网址。",
 } as const;
 
 /**
@@ -94,17 +93,15 @@ export function ConnectCliAuthorizeSurface() {
     <AuthSurfaceShell>
       <ConnectCliAuthMessage
         eyebrow="Browser authorization"
-        title="Connecting your terminal"
+        title="正在连接您的终端"
         description={
-          isSignedIn
-            ? "Redirecting to authorize T3 Connect for your CLI…"
-            : "Sign in to continue authorizing T3 Connect for your CLI."
+          isSignedIn ? "正在跳转以为 CLI 授权 T3 Connect…" : "请登录以继续为 CLI 授权 T3 Connect。"
         }
       />
       {isLoaded && !isSignedIn ? (
         <div className="mt-6">
           <Button type="button" onClick={openSignIn}>
-            Sign in
+            登录
           </Button>
         </div>
       ) : null}

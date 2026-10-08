@@ -213,13 +213,13 @@ describe("formatSkippedDomains", () => {
   it("joins a short list naturally", () => {
     expect(formatSkippedDomains([])).toBe("");
     expect(formatSkippedDomains(["a.com"])).toBe("a.com");
-    expect(formatSkippedDomains(["a.com", "b.com"])).toBe("a.com and b.com");
-    expect(formatSkippedDomains(["a.com", "b.com", "c.com"])).toBe("a.com, b.com and c.com");
+    expect(formatSkippedDomains(["a.com", "b.com"])).toBe("a.com 和 b.com");
+    expect(formatSkippedDomains(["a.com", "b.com", "c.com"])).toBe("a.com, b.com 和 c.com");
   });
 
   it("summarizes a long list", () => {
     expect(formatSkippedDomains(["a.com", "b.com", "c.com", "d.com", "e.com"])).toBe(
-      "a.com, b.com, c.com and 2 more",
+      "a.com, b.com, c.com，另有 2 项",
     );
   });
 });

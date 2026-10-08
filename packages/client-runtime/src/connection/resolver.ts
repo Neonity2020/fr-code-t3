@@ -131,7 +131,7 @@ const makeBearerBroker = Effect.fn("clientRuntime.connection.broker.makeBearer")
     if (!isBearerProfile(profile)) {
       return yield* new ConnectionBlockedError({
         reason: "configuration",
-        detail: `Connection profile ${target.connectionId} is not a bearer connection.`,
+        detail: `连接配置 ${target.connectionId} 不是 bearer 连接。`,
       });
     }
     if (profile.environmentId !== target.environmentId) {
@@ -214,7 +214,7 @@ const makeSshBroker = Effect.fn("clientRuntime.connection.broker.makeSsh")(funct
     if (!isSshProfile(profile)) {
       return yield* new ConnectionBlockedError({
         reason: "configuration",
-        detail: `Connection profile ${target.connectionId} is not an SSH connection.`,
+        detail: `连接配置 ${target.connectionId} 不是 SSH 连接。`,
       });
     }
     if (profile.environmentId !== target.environmentId) {

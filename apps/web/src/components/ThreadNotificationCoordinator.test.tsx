@@ -194,7 +194,7 @@ describe("thread notifications", () => {
     await render();
     expect(state.add).toHaveBeenCalledTimes(1);
     const toast = state.add.mock.calls[0]?.[0];
-    expect(toast?.title).toBe("Thread completed");
+    expect(toast?.title).toBe("会话已完成");
     expect(toast?.description).toBe("Fix the login form");
     toast?.actionProps.onClick();
     expect(state.close).toHaveBeenCalledWith("toast-1");
@@ -220,11 +220,11 @@ describe("thread notifications", () => {
   );
 
   it.each([
-    ["input", "Input needed"],
-    ["approval", "Approval needed"],
-    ["sessionError", "Thread failed"],
-    ["turnError", "Thread failed"],
-    ["limited", "Usage limit reached"],
+    ["input", "需要输入"],
+    ["approval", "需要审批"],
+    ["sessionError", "会话失败"],
+    ["turnError", "会话失败"],
+    ["limited", "已达到用量限制"],
   ] as const)("uses the same %s event for in-app and desktop alerts", async (event, title) => {
     state.mode = "notifications-and-sound";
     await render();
@@ -259,9 +259,7 @@ describe("thread notifications", () => {
     state.background = [{ taskId: "dev", kind: "command" }];
     await render();
     expect(state.add).toHaveBeenCalledTimes(1);
-    expect(state.add).toHaveBeenLastCalledWith(
-      expect.objectContaining({ title: "Thread completed" }),
-    );
+    expect(state.add).toHaveBeenLastCalledWith(expect.objectContaining({ title: "会话已完成" }));
   });
 
   it("keeps background desktop alerts when in-app notifications are disabled", async () => {
@@ -317,7 +315,7 @@ describe("thread notifications", () => {
     await render();
     await complete();
     expect(state.add).not.toHaveBeenCalled();
-    expect(state.notification).toHaveBeenCalledWith("Thread completed", {
+    expect(state.notification).toHaveBeenCalledWith("会话已完成", {
       body: "Fix the login form",
       tag: "env-1:thread-1",
       silent: true,

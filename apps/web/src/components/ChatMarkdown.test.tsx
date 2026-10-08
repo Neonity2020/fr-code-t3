@@ -199,14 +199,14 @@ describe("ChatMarkdown streaming", () => {
       expect(
         mounted.root
           .findAllByType(Button)
-          .some((button) => button.props["aria-label"] === "Run in terminal"),
+          .some((button) => button.props["aria-label"] === "在终端运行"),
       ).toBe(false);
 
       await act(async () => {
         mounted.update(message("```bash\necho hello\n```"));
       });
       await act(async () => {
-        codeButton(mounted, "Run in terminal").onClick?.({} as never);
+        codeButton(mounted, "在终端运行").onClick?.({} as never);
       });
       expect(onRunShellCommand).toHaveBeenCalledExactlyOnceWith("echo hello");
 
@@ -218,7 +218,7 @@ describe("ChatMarkdown streaming", () => {
         await act(async () => {
           mounted.update(message(text));
         });
-        expect(codeButton(mounted, "Run in terminal")).toBeDefined();
+        expect(codeButton(mounted, "在终端运行")).toBeDefined();
       }
 
       for (const text of [
@@ -239,7 +239,7 @@ describe("ChatMarkdown streaming", () => {
         expect(
           mounted.root
             .findAllByType(Button)
-            .some((button) => button.props["aria-label"] === "Run in terminal"),
+            .some((button) => button.props["aria-label"] === "在终端运行"),
         ).toBe(false);
       }
     } finally {
@@ -293,7 +293,7 @@ describe("ChatMarkdown streaming", () => {
       const mounted = renderer!;
       const codeBlock = mounted.root.findByProps({ "data-language": "text" });
       const initialWrap = codeBlock.props["data-wrap"] === "true";
-      const wrap = codeButton(mounted, initialWrap ? "Disable line wrap" : "Wrap lines");
+      const wrap = codeButton(mounted, initialWrap ? "关闭自动换行" : "自动换行");
       await act(async () => {
         wrap.onClick?.({} as Parameters<NonNullable<typeof wrap.onClick>>[0]);
       });
@@ -344,8 +344,8 @@ describe("ChatMarkdown streaming", () => {
       const mounted = renderer!;
       const codeBlock = mounted.root.findByProps({ "data-language": "text" });
       const initialWrap = codeBlock.props["data-wrap"] === "true";
-      const wrap = codeButton(mounted, initialWrap ? "Disable line wrap" : "Wrap lines");
-      const copy = codeButton(mounted, "Copy code");
+      const wrap = codeButton(mounted, initialWrap ? "关闭自动换行" : "自动换行");
+      const copy = codeButton(mounted, "复制配对码");
       await act(async () => {
         wrap.onClick?.({} as Parameters<NonNullable<typeof wrap.onClick>>[0]);
         copy.onClick?.({} as Parameters<NonNullable<typeof copy.onClick>>[0]);
@@ -383,7 +383,7 @@ describe("ChatMarkdown streaming", () => {
           />,
         );
       });
-      const copyUpdated = codeButton(mounted, "Copied");
+      const copyUpdated = codeButton(mounted, "已复制");
       await act(async () => {
         copyUpdated.onClick?.({} as Parameters<NonNullable<typeof copyUpdated.onClick>>[0]);
       });
@@ -714,7 +714,7 @@ describe("ChatMarkdown artifact-template cards", () => {
     expect(html).toContain('data-skill-name="artifact-template-hello-world"');
     expect(html).toContain("Hello World");
     expect(html).toContain("Document template");
-    expect(html).toContain("Use template");
+    expect(html).toContain("使用模板");
     expect(html).not.toContain("<p><div");
   });
 
@@ -724,7 +724,7 @@ describe("ChatMarkdown artifact-template cards", () => {
     );
 
     expect(html).toContain("data-chat-markdown-artifact-template");
-    expect(html).not.toContain("Use template");
+    expect(html).not.toContain("使用模板");
   });
 
   it("leaves malformed and unfinished artifact-template directives literal", () => {

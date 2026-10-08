@@ -36,52 +36,50 @@ export type ProviderStatusKey = keyof typeof PROVIDER_STATUS_STYLES;
 export function getProviderSummary(provider: ServerProvider | undefined) {
   if (!provider) {
     return {
-      headline: "Checking provider status",
-      detail: "Waiting for the server to report installation and authentication details.",
+      headline: "正在检查提供方状态",
+      detail: "正在等待服务器报告安装和身份验证详情。",
     };
   }
   if (!provider.enabled || provider.status === "disabled") {
     return {
-      headline: "Disabled",
-      detail:
-        provider.message ?? "This provider is installed but disabled for new sessions in FR Code.",
+      headline: "已禁用",
+      detail: provider.message ?? "此提供方已安装，但在 FR Code 中已禁止新建会话。",
     };
   }
   if (!provider.installed) {
     return {
-      headline: "Not found",
-      detail: provider.message ?? "CLI not detected on PATH.",
+      headline: "未找到",
+      detail: provider.message ?? "未在 PATH 中检测到 CLI。",
     };
   }
   if (provider.auth.status === "unauthenticated") {
     const authLabel = provider.auth.label ?? provider.auth.type;
     return {
-      headline: authLabel ? `Not authenticated · ${authLabel}` : "Not authenticated",
+      headline: authLabel ? `未验证身份 · ${authLabel}` : "未验证身份",
       detail: provider.message ?? null,
     };
   }
   if (provider.status === "warning") {
     return {
-      headline: "Needs attention",
-      detail:
-        provider.message ?? "The provider is installed, but the server could not fully verify it.",
+      headline: "需要处理",
+      detail: provider.message ?? "提供方已安装，但服务器无法完全验证。",
     };
   }
   if (provider.status === "error") {
     return {
-      headline: "Unavailable",
-      detail: provider.message ?? "The provider failed its startup checks.",
+      headline: "不可用",
+      detail: provider.message ?? "提供方启动检查失败。",
     };
   }
   if (provider.auth.status === "authenticated") {
     const authLabel = provider.auth.label ?? provider.auth.type;
     return {
-      headline: authLabel ? `Authenticated · ${authLabel}` : "Authenticated",
+      headline: authLabel ? `已验证身份 · ${authLabel}` : "已验证身份",
       detail: provider.message ?? null,
     };
   }
   return {
-    headline: "Available",
+    headline: "可用",
     detail: provider.message ?? null,
   };
 }
@@ -105,9 +103,9 @@ export function getProviderVersionLabel(version: string | null | undefined) {
 }
 
 const COMPATIBILITY_TITLES = {
-  graceful: "Limited support",
-  unsupported: "Unsupported version",
-  broken: "Known broken version",
+  graceful: "支持受限",
+  unsupported: "不支持的版本",
+  broken: "已知有问题的版本",
 } as const;
 
 /** Compatibility guidance shares the version popover, with safe install actions. */
@@ -138,7 +136,7 @@ export function getProviderVersionAdvisoryPresentation(
       title: COMPATIBILITY_TITLES[compatibility.status],
       detail:
         compatibility.message ??
-        (recommendation ? `Use ${recommendation} for full support.` : "Update for full support."),
+        (recommendation ? `使用 ${recommendation} 以获得完整支持。` : "更新以获得完整支持。"),
       updateCommand:
         targetVersion || latestIsIncompatible ? null : (advisory?.updateCommand ?? null),
       emphasis: compatibility.status === "graceful" ? "normal" : "strong",
@@ -154,7 +152,7 @@ export function getProviderVersionAdvisoryPresentation(
     return null;
   }
 
-  const label = "Update available";
+  const label = "有可用更新";
   const version = advisory.latestVersion;
   const versionLabel = getProviderVersionLabel(version);
 
@@ -162,9 +160,7 @@ export function getProviderVersionAdvisoryPresentation(
     title: label,
     detail:
       advisory.message ??
-      (versionLabel
-        ? `${label}: install ${versionLabel}.`
-        : `${label}: install the latest provider version.`),
+      (versionLabel ? `${label}：安装 ${versionLabel}。` : `${label}：安装最新提供方版本。`),
     updateCommand: advisory.updateCommand,
     emphasis: "normal" as const,
     targetVersion: null,

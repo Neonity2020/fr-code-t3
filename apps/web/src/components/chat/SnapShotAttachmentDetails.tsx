@@ -83,7 +83,7 @@ export function SnapShotContentsButton({
   const includesAccessibility = snapShotIncludesAccessibility(source);
   const ContentsIcon = includesAccessibility ? TextIcon : ImageIcon;
   const accessibilityDetails = snapShotAccessibilityDetails(source);
-  const tooltip = includesAccessibility ? "Accessibility data" : "No accessibility data";
+  const tooltip = includesAccessibility ? "辅助功能数据" : "没有辅助功能数据";
 
   return (
     <Popover>
@@ -93,9 +93,7 @@ export function SnapShotContentsButton({
             <PopoverTrigger
               render={
                 <Button
-                  aria-label={
-                    includesAccessibility ? "View accessibility data" : "No accessibility data"
-                  }
+                  aria-label={includesAccessibility ? "查看辅助功能数据" : "没有辅助功能数据"}
                   className={className}
                   onClick={(event) => event.stopPropagation()}
                   size="icon-micro"
@@ -111,7 +109,7 @@ export function SnapShotContentsButton({
       </Tooltip>
       <PopoverPopup side={side} align="center" width="md">
         <div className="max-h-[min(28rem,70vh)] space-y-2 overflow-y-auto">
-          <PopoverTitle>Accessibility data</PopoverTitle>
+          <PopoverTitle>辅助功能数据</PopoverTitle>
           {accessibilityDetails ? (
             <SnapShotAccessibilityData
               details={accessibilityDetails}
@@ -119,12 +117,11 @@ export function SnapShotContentsButton({
             />
           ) : includesAccessibility ? (
             <div className="rounded-md border border-border/70 bg-muted/45 p-2.5 text-muted-foreground text-xs leading-4">
-              Structured accessibility elements were included, but they have no readable names or
-              values.
+              已包含结构化的辅助功能元素，但没有可读的名称或值。
             </div>
           ) : (
             <div className="rounded-md border border-border/70 bg-muted/45 p-2.5 text-muted-foreground text-xs leading-4">
-              The app or capture backend did not provide verified accessibility data.
+              应用或截图后端未提供经验证的辅助功能数据。
             </div>
           )}
         </div>
@@ -160,7 +157,7 @@ export function SnapShotAttachmentDetails({
           <SnapShotContentsButton source={source} className="pointer-events-auto" />
         </div>
         <div className="truncate text-3xs leading-3.5 text-white/70">
-          {source.windowTitle || "Captured window"}
+          {source.windowTitle || "已截取的窗口"}
         </div>
       </div>
     </div>

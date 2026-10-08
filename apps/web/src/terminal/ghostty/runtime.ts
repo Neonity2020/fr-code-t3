@@ -46,7 +46,7 @@ export class GhosttyRuntime {
   static async load(): Promise<GhosttyRuntime> {
     const response = await fetch(ghosttyWasmUrl);
     if (!response.ok) {
-      throw new Error(`Unable to load libghostty-vt (${response.status})`);
+      throw new Error(`无法加载 libghostty-vt（${response.status}）`);
     }
     let instance: WebAssembly.Instance | undefined;
     const imports = {
@@ -196,7 +196,7 @@ export class GhosttyRuntime {
   private async installWritePtyTrampoline(): Promise<void> {
     const response = await fetch(ghosttyWritePtyWasmUrl);
     if (!response.ok) {
-      throw new Error(`Unable to load the libghostty-vt PTY trampoline (${response.status})`);
+      throw new Error(`无法加载 libghostty-vt 的 PTY 桥接模块（${response.status}）`);
     }
     const result = await WebAssembly.instantiate(await response.arrayBuffer(), {
       env: {

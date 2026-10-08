@@ -31,7 +31,7 @@ export class BrowserRecordingConflictError extends Schema.TaggedError<BrowserRec
   },
 ) {
   override get message(): string {
-    return `Cannot record tab ${this.requestedTabId} while tab ${this.activeTabId} is already being recorded.`;
+    return `标签页 ${this.activeTabId} 正在录制，无法录制标签页 ${this.requestedTabId}。`;
   }
 }
 

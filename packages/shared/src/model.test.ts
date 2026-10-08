@@ -318,7 +318,7 @@ describe("provider-reported option display", () => {
   };
 
   it("shows explicit reports without adding a choice or a dispatch option", () => {
-    expect(getProviderOptionCurrentLabel(descriptor, selection, reported)).toBe("Default");
+    expect(getProviderOptionCurrentLabel(descriptor, selection, reported)).toBe("默认");
     expect(
       getProviderOptionCurrentLabel(descriptor, selection, {
         ...reported,
@@ -334,7 +334,7 @@ describe("provider-reported option display", () => {
     ).toBe("None");
     expect(descriptor.options.map((option) => option.id)).toEqual(["none", "thinking"]);
     expect(buildProviderOptionSelectionsFromDescriptors([descriptor])).toBeUndefined();
-    expect(getProviderOptionCurrentLabel(descriptor, selection)).toBe("Unknown");
+    expect(getProviderOptionCurrentLabel(descriptor, selection)).toBe("未知");
     const effortDescriptor = { ...descriptor, id: "effort", currentValue: "default" };
     expect(getProviderOptionCurrentLabel(effortDescriptor, selection)).toBeUndefined();
     expect(
@@ -349,10 +349,10 @@ describe("provider-reported option display", () => {
         ...reported,
         options: [{ id: "effort", value: "default" }],
       }),
-    ).toBe("Default");
+    ).toBe("默认");
     expect(
       getProviderOptionCurrentLabel({ ...descriptor, currentValue: "thinking" }, selection),
-    ).toBe("Unknown");
+    ).toBe("未知");
   });
 
   it.each([
@@ -360,6 +360,6 @@ describe("provider-reported option display", () => {
     { ...selection, instanceId: ProviderInstanceId.make("other") },
     { ...selection, options: [{ id: "variant", value: "none" }] },
   ])("ignores reports after changing the model, instance, or option: %j", (selected) => {
-    expect(getProviderOptionCurrentLabel(descriptor, selected, reported)).toBe("Unknown");
+    expect(getProviderOptionCurrentLabel(descriptor, selected, reported)).toBe("未知");
   });
 });

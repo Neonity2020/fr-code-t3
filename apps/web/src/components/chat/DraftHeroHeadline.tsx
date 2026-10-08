@@ -242,7 +242,7 @@ export function DraftHeroHeadline({
           }
         >
           <span className="min-w-0 truncate">
-            {isScratchDraft ? "No project" : (activeProjectDisplayName ?? "Choose a project")}
+            {isScratchDraft ? "无项目" : (activeProjectDisplayName ?? "选择项目")}
           </span>
         </TooltipTrigger>
         {activeProjectDisplayName && !isScratchDraft ? (
@@ -274,7 +274,7 @@ export function DraftHeroHeadline({
                 >
                   <MessageSquareDashedIcon className="size-full" />
                 </span>
-                No project
+                无项目
               </span>
             </MenuRadioItem>
           )}
@@ -304,7 +304,7 @@ export function DraftHeroHeadline({
         {projectPickerEntries.length > 0 ? <MenuSeparator /> : null}
         <MenuItem onClick={openAddProject}>
           <FolderPlusIcon />
-          Add project
+          添加项目
         </MenuItem>
       </MenuPopup>
     </Menu>
@@ -314,7 +314,7 @@ export function DraftHeroHeadline({
       onClick={openAddProject}
       className="pointer-events-auto inline cursor-pointer border-muted-foreground/35 border-b border-dotted text-muted-foreground/60 transition-colors hover:border-muted-foreground/60 hover:text-muted-foreground/80 focus-visible:rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
     >
-      {activeProjectTitle ?? "Add a project"}
+      {activeProjectTitle ?? "添加项目"}
     </button>
   );
 
@@ -323,12 +323,12 @@ export function DraftHeroHeadline({
   // in the h1; without an explicit label its widget state bleeds into the
   // announced phrase.
   const headingLabel = isScratchDraft
-    ? "What should we work on?"
+    ? "我们要做些什么？"
     : hasResolvedProject
-      ? `What should we build in ${activeProjectDisplayName}?`
+      ? `我们要在 ${activeProjectDisplayName} 中构建什么？`
       : canChooseProject
-        ? `${activeProjectDisplayName ?? "Choose a project"} to start`
-        : "Add a project to start";
+        ? `${activeProjectDisplayName ?? "选择项目"} 以开始`
+        : "添加项目以开始";
 
   // One click out of the project, phrased as the alternative to the question
   // above it. Focus moves to the project picker once this line has gone.
@@ -351,7 +351,7 @@ export function DraftHeroHeadline({
             />
           }
         >
-          or start without a project
+          或不选择项目直接开始
         </TooltipTrigger>
         {noProjectShortcut ? <TooltipPopup side="bottom">{noProjectShortcut}</TooltipPopup> : null}
       </Tooltip>
@@ -364,13 +364,13 @@ export function DraftHeroHeadline({
         className="w-full text-center font-normal text-2xl text-foreground tracking-tight sm:text-3xl"
       >
         {isScratchDraft ? (
-          <>What should we work on?</>
+          <>我们要做些什么？</>
         ) : hasResolvedProject ? (
-          <>What should we build in {projectSelector}?</>
+          <>我们要在以下项目中构建什么？ {projectSelector}?</>
         ) : canChooseProject ? (
-          <>{projectSelector} to start</>
+          <>{projectSelector} 以开始</>
         ) : (
-          <>Add a project to start</>
+          <>添加项目以开始</>
         )}
       </h1>
       {/* Reserved whenever threads can skip a project, so the heading does not

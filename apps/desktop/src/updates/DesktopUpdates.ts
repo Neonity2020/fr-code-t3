@@ -85,7 +85,7 @@ export class DesktopUpdateActionInProgressError extends Schema.TaggedError<Deskt
   },
 ) {
   override get message(): string {
-    return `Cannot change the desktop update channel to ${this.requestedChannel} while an update ${this.action} action is in progress.`;
+    return `更新操作 ${this.action} 正在进行，无法将桌面端更新渠道改为 ${this.requestedChannel}。`;
   }
 }
 
@@ -97,7 +97,7 @@ export class DesktopUpdateChannelPersistenceError extends Schema.TaggedError<Des
   },
 ) {
   override get message(): string {
-    return `Failed to persist the ${this.channel} desktop update channel.`;
+    return `无法保存桌面端更新渠道 ${this.channel}。`;
   }
 }
 
@@ -121,7 +121,7 @@ export class DesktopUpdateEventHandlingError extends Schema.TaggedError<DesktopU
   },
 ) {
   override get message(): string {
-    return `Failed to handle desktop update ${this.event} event.`;
+    return `无法处理桌面端更新事件 ${this.event}。`;
   }
 }
 

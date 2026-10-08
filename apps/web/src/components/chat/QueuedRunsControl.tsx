@@ -247,14 +247,14 @@ export function QueuedRunsControl({
     <ComposerBanner.Attachment>
       <ComposerBanner.Root
         role="region"
-        aria-label={`${items.length} queued message${items.length === 1 ? "" : "s"}`}
+        aria-label={`${items.length} 条排队消息`}
         aria-live="polite"
         data-chat-composer-collapsed-controls="true"
         className="relative z-0"
       >
         <ComposerBanner.Row
           render={<button type="button" />}
-          aria-label={expanded ? "Collapse queued messages" : "Expand queued messages"}
+          aria-label={expanded ? "折叠排队消息" : "展开排队消息"}
           aria-expanded={expanded}
           aria-controls={queueListId}
           onPointerDown={(event) => event.preventDefault()}
@@ -263,7 +263,7 @@ export function QueuedRunsControl({
           <ComposerBanner.Icon>
             <ListOrderedIcon />
           </ComposerBanner.Icon>
-          <ComposerBanner.Content className="text-muted-foreground">Queued</ComposerBanner.Content>
+          <ComposerBanner.Content className="text-muted-foreground">已排队</ComposerBanner.Content>
           <ComposerBanner.Actions>
             <ComposerBanner.Count>{items.length}</ComposerBanner.Count>
             <ComposerBanner.ToggleIcon expanded={expanded} />
@@ -341,7 +341,7 @@ export function QueuedRunsControl({
                       <Button
                         size="icon-xs"
                         variant="ghost-muted"
-                        aria-label="Reorder queued message (drag, or press the arrow keys)"
+                        aria-label="调整排队消息顺序（拖动或按方向键）"
                         className="cursor-grab active:cursor-grabbing disabled:cursor-default"
                         disabled={busyRunId !== null}
                         onPointerDown={() => {
@@ -364,10 +364,10 @@ export function QueuedRunsControl({
                     ) : null}
                   </ComposerBanner.Icon>
                   <ComposerBanner.Content className="text-foreground/80">
-                    {isEditing ? <span className="sr-only">Editing queued message: </span> : null}
+                    {isEditing ? <span className="sr-only">正在编辑排队消息： </span> : null}
                     {item.pending ? (
                       <Clock3Icon
-                        aria-label="Saving queued message"
+                        aria-label="正在保存排队消息"
                         className="size-3 shrink-0 text-muted-foreground/60"
                       />
                     ) : null}
@@ -408,10 +408,10 @@ export function QueuedRunsControl({
                       <Button
                         size="xs"
                         variant="ghost"
-                        aria-label="Cancel editing queued message"
+                        aria-label="取消编辑排队消息"
                         onClick={props.onCancelEdit}
                       >
-                        Cancel
+                        取消
                       </Button>
                     ) : (
                       <>
@@ -421,7 +421,7 @@ export function QueuedRunsControl({
                               <Button
                                 size="icon-xs"
                                 variant="ghost-muted"
-                                aria-label="Edit queued message"
+                                aria-label="编辑排队消息"
                                 disabled={item.runId === null || busyRunId !== null}
                                 onClick={() => {
                                   if (item.runId !== null && item.messageId !== null) {
@@ -439,7 +439,7 @@ export function QueuedRunsControl({
                             <PencilIcon />
                           </TooltipTrigger>
                           <TooltipPopup>
-                            {`Edit in the composer${item.serverIndex === queued.length - 1 && props.editShortcutLabel ? ` (${props.editShortcutLabel})` : ""}`}
+                            {`在输入框中编辑${item.serverIndex === queued.length - 1 && props.editShortcutLabel ? ` (${props.editShortcutLabel})` : ""}`}
                           </TooltipPopup>
                         </Tooltip>
                         <Tooltip>
@@ -459,20 +459,20 @@ export function QueuedRunsControl({
                               }}
                             >
                               <CornerUpRightIcon />
-                              Steer
+                              引导
                             </Button>
                           </TooltipTrigger>
                           <TooltipPopup>
                             {activeRun === null
-                              ? "There is no active run to steer"
-                              : `Send as a steer instead${item.serverIndex === 0 && props.steerShortcutLabel ? ` (${props.steerShortcutLabel})` : ""}`}
+                              ? "没有可引导的活动运行"
+                              : `改为发送引导消息${item.serverIndex === 0 && props.steerShortcutLabel ? ` (${props.steerShortcutLabel})` : ""}`}
                           </TooltipPopup>
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger
                             render={
                               <ComposerBanner.Dismiss
-                                aria-label="Remove queued message"
+                                aria-label="移除排队消息"
                                 disabled={item.runId === null || busyRunId !== null}
                                 onClick={() => {
                                   if (item.runId !== null) void remove(item.runId);
@@ -480,7 +480,7 @@ export function QueuedRunsControl({
                               />
                             }
                           />
-                          <TooltipPopup>Remove from queue</TooltipPopup>
+                          <TooltipPopup>从队列移除</TooltipPopup>
                         </Tooltip>
                       </>
                     )}

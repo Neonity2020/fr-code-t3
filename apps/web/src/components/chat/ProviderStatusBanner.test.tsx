@@ -77,7 +77,7 @@ describe("ProviderStatusBanner", () => {
     );
 
     expect(markup).toContain('role="alert"');
-    expect(markup).toContain('aria-label="Dismiss Codex provider warning"');
+    expect(markup).toContain('aria-label="关闭 Codex 提供方警告"');
   });
 
   it("labels error dismiss controls with the correct severity", () => {
@@ -88,7 +88,7 @@ describe("ProviderStatusBanner", () => {
       />,
     );
 
-    expect(markup).toContain('aria-label="Dismiss Codex provider error"');
+    expect(markup).toContain('aria-label="关闭 Codex 提供方错误"');
   });
 });
 
@@ -129,7 +129,7 @@ describe("getProviderStatusMessage", () => {
         auth: { status: "unauthenticated" },
         message: "",
       }),
-    ).toBe("Open provider setup to install Antigravity on this environment.");
+    ).toBe("请打开提供方设置，在此环境安装 Antigravity。");
   });
 
   it("keeps CLI sign-in advice for a provider without integrated setup", () => {
@@ -140,6 +140,6 @@ describe("getProviderStatusMessage", () => {
         auth: { status: "unauthenticated" },
         message: "",
       }),
-    ).toBe("Sign in via the CLI to authenticate again.");
+    ).toBe("请通过 CLI 登录以重新认证。");
   });
 });

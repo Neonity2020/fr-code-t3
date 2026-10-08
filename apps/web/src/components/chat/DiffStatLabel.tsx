@@ -32,7 +32,7 @@ export const DiffStatLabel = memo(function DiffStatLabel(props: {
       {showParentheses && <span className="text-muted-foreground/70">(</span>}
       <span
         role="group"
-        aria-label={`${additions} additions, ${deletions} deletions`}
+        aria-label={`新增 ${additions} 行，删除 ${deletions} 行`}
         className={cn(
           layout === "inline"
             ? "inline-flex items-center gap-1 tabular-nums align-middle"

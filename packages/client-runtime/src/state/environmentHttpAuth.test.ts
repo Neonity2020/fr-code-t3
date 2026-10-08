@@ -515,7 +515,7 @@ describe("authenticated environment HTTP requests", () => {
 
       expect(error).toMatchObject({
         _tag: "RemoteEnvironmentAuthFetchError",
-        message: "The environment rejected the renewed session authorization.",
+        message: "环境拒绝了续期后的会话授权。",
       });
       expect(harness.calls).toHaveLength(2);
     }),
@@ -630,7 +630,7 @@ describe("authenticated environment HTTP requests", () => {
 
       expect(error).toMatchObject({
         _tag: "RemoteEnvironmentAuthFetchError",
-        message: "Could not authorize the environment request.",
+        message: "无法授权环境请求。",
         cause: failure,
       });
       expect(harness.calls).toEqual([]);
@@ -648,7 +648,7 @@ describe("authenticated environment HTTP requests", () => {
 
       expect(error).toMatchObject({
         _tag: "RemoteEnvironmentAuthFetchError",
-        message: "No relay authorization service is available for the environment request.",
+        message: "没有可用的中继授权服务来处理环境请求。",
       });
       expect(harness.calls).toEqual([]);
     }),

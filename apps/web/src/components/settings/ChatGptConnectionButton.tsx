@@ -6,7 +6,7 @@ export function ChatGptConnectionButton({ children, ...props }: ComponentProps<t
   return (
     <Button {...props}>
       <OpenAI className="size-4 shrink-0" aria-hidden="true" />
-      {children ?? "Continue with ChatGPT"}
+      {children ?? "使用 ChatGPT 继续"}
     </Button>
   );
 }

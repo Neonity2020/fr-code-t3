@@ -74,18 +74,18 @@ afterEach(() => {
 
 describe("ComposerPrimaryActions", () => {
   it("disables and labels the send button while feedback is uploading", () => {
-    const markup = renderSendButton("Sending feedback");
+    const markup = renderSendButton("正在发送反馈");
 
     expect(markup).toContain("disabled");
-    expect(markup).toContain('aria-label="Sending feedback"');
+    expect(markup).toContain('aria-label="正在发送反馈"');
   });
 
   it("offers Stop generation while a running turn is waiting for user input", () => {
-    expect(renderPendingActions(true)).toContain('aria-label="Stop generation"');
+    expect(renderPendingActions(true)).toContain('aria-label="停止生成"');
   });
 
   it("does not offer Stop generation for a pending request without a running turn", () => {
-    expect(renderPendingActions(false)).not.toContain('aria-label="Stop generation"');
+    expect(renderPendingActions(false)).not.toContain('aria-label="停止生成"');
   });
 
   it("renders stage artwork inside the send button when artwork identification is active", () => {

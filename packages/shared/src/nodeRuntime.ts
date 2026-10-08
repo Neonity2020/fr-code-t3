@@ -21,7 +21,7 @@ const NodeRuntimeFeature = Schema.Literals([
 ]);
 
 export const nodeRuntimeUnavailableMessage = (feature: typeof NodeRuntimeFeature.Type): string =>
-  `${feature} requires Node.js. Install Node.js and make sure node is on PATH, then retry.`;
+  `${feature} 需要 Node.js。请安装 Node.js 并确保 node 位于 PATH 中，然后重试。`;
 
 export class NodeRuntimeUnavailableError extends Schema.TaggedError<NodeRuntimeUnavailableError>()(
   "NodeRuntimeUnavailableError",

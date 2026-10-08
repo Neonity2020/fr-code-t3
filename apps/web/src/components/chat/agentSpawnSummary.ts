@@ -26,38 +26,36 @@ export function deriveAgentSpawnSummary({
   const live =
     coordinatorStatus !== undefined ? !isTerminalSubagentStatus(coordinatorStatus) : working > 0;
   const subjects = [
-    individuals > 0 ? `${individuals} subagent${individuals === 1 ? "" : "s"}` : null,
-    batches > 0
-      ? `${batches} ${individuals > 0 ? "" : "subagent "}batch${batches === 1 ? "" : "es"}`
-      : null,
+    individuals > 0 ? `${individuals} 个子智能体` : null,
+    batches > 0 ? `${batches} 批子智能体` : null,
   ]
     .filter(Boolean)
-    .join(" and ");
-  const lead = `${batches > 0 ? "Launched" : live ? "Kicked off" : "Ran"} ${subjects || "subagents"}`;
+    .join(" 和 ");
+  const lead = `${batches > 0 ? "已启动" : live ? "已发起" : "已运行"} ${subjects || "子智能体"}`;
 
   const status = live
     ? working > 0
-      ? `${working} working`
-      : "working"
+      ? `${working} 个正在工作`
+      : "正在工作"
     : coordinatorStatus === "failed"
-      ? "Workflow failed"
+      ? "工作流失败"
       : coordinatorStatus === "cancelled" || coordinatorStatus === "interrupted"
-        ? "Workflow stopped"
+        ? "工作流已停止"
         : failed > 0
-          ? `${failed} failed`
+          ? `${failed} 个失败`
           : stopped > 0
-            ? `${stopped} stopped`
+            ? `${stopped} 个已停止`
             : idle > 0
-              ? `${idle} idle`
+              ? `${idle} 个空闲`
               : coordinatorStatus !== "completed" &&
                   (agents.length === 0 || agents.length < agentCount)
-                ? "Status unavailable"
-                : "✓ completed";
+                ? "状态不可用"
+                : "✓ 已完成";
   const tone = live
     ? "working"
     : failed > 0 || coordinatorStatus === "failed"
       ? "failed"
-      : status === "✓ completed"
+      : status === "✓ 已完成"
         ? "completed"
         : "inactive";
   return { live, lead, status, tone };

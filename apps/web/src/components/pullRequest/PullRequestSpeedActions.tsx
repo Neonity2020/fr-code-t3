@@ -72,7 +72,7 @@ export function PullRequestSpeedActions({
       className="shrink-0 items-center gap-1 pr-3"
       style={{ display: visible || busy ? "flex" : "none" }}
       role="group"
-      aria-label={`Quick actions for pull request #${entry.number}`}
+      aria-label={`拉取请求 #${entry.number} 的快捷操作`}
       data-pull-request-action-pending={actionPending || closing}
     >
       {actions.map((action) => {
@@ -101,10 +101,10 @@ export function PullRequestSpeedActions({
             </TooltipTrigger>
             <TooltipPopup>
               {action === "merge" && entry.stack
-                ? "Open this pull request to merge its stack"
+                ? "打开此拉取请求以合并其堆叠"
                 : action === "close"
-                  ? "Close immediately, or drag across rows to close several"
-                  : `${label} immediately`}
+                  ? "立即关闭，或拖过多行批量关闭"
+                  : `立即${label}`}
             </TooltipPopup>
           </Tooltip>
         );
@@ -114,8 +114,8 @@ export function PullRequestSpeedActions({
 }
 
 const ACTIONS = {
-  close: { label: "Close", Icon: PullRequestGlyph.closed },
-  merge: { label: "Merge", Icon: PullRequestGlyph.merged },
-  ready: { label: "Ready for review", Icon: PullRequestGlyph.pullRequest },
-  reopen: { label: "Reopen", Icon: PullRequestGlyph.reopen },
+  close: { label: "关闭", Icon: PullRequestGlyph.closed },
+  merge: { label: "合并", Icon: PullRequestGlyph.merged },
+  ready: { label: "可以开始评审", Icon: PullRequestGlyph.pullRequest },
+  reopen: { label: "重新打开", Icon: PullRequestGlyph.reopen },
 } as const;

@@ -648,8 +648,8 @@ describe("threadChangeRequestSnapshotsAtom", () => {
 describe("prStatusIndicator", () => {
   it("formats PR tooltips with number, uppercase status, and title", () => {
     expect(prStatusIndicator(status().pr, undefined)).toMatchObject({
-      tooltip: "PR #42 - Open: PR branch",
-      tooltipLead: "PR #42 - Open",
+      tooltip: "PR #42 - 打开: PR branch",
+      tooltipLead: "PR #42 - 打开",
       tooltipTitle: "PR branch",
     });
   });
@@ -668,9 +668,9 @@ describe("prStatusIndicator", () => {
     if (!draftPr) throw new Error("Expected pull request fixture");
 
     expect(prStatusIndicator({ ...draftPr, isDraft: true }, undefined)).toMatchObject({
-      label: "PR draft",
+      label: "PR 草稿",
       colorClass: "text-zinc-500 dark:text-zinc-400/80",
-      tooltipLead: "PR #42 - Draft",
+      tooltipLead: "PR #42 - 草稿",
     });
   });
 });
@@ -689,7 +689,7 @@ describe("resolveThreadPullRequestBadgePresentation", () => {
     ).toEqual({
       Icon: PullRequestGlyph.pullRequest,
       toneClassName: "text-muted-foreground",
-      label: "PR #42, status pending",
+      label: "PR #42，状态待定",
       text: 42,
     });
   });
@@ -700,28 +700,28 @@ describe("resolveThreadPullRequestBadgePresentation", () => {
       { state: "open", isDraft: false },
       PullRequestGlyph.pullRequest,
       "text-emerald-600 dark:text-emerald-300/90",
-      "PR #42 - Open: PR branch",
+      "PR #42 - 打开: PR branch",
     ],
     [
       "draft",
       { state: "open", isDraft: true },
       PullRequestGlyph.draft,
       "text-zinc-500 dark:text-zinc-400/80",
-      "PR #42 - Draft: PR branch",
+      "PR #42 - 草稿: PR branch",
     ],
     [
       "closed",
       { state: "closed", isDraft: false },
       PullRequestGlyph.closed,
       "text-red-600 dark:text-red-300/90",
-      "PR #42 - Closed: PR branch",
+      "PR #42 - 已关闭: PR branch",
     ],
     [
       "merged",
       { state: "merged", isDraft: false },
       PullRequestGlyph.merged,
       "text-violet-600 dark:text-violet-300/90",
-      "PR #42 - Merged: PR branch",
+      "PR #42 - 已合并: PR branch",
     ],
   ] as const)(
     "keeps the %s state for one linked pull request",
@@ -762,7 +762,7 @@ describe("resolveThreadPullRequestBadgePresentation", () => {
       ).toEqual({
         Icon: PullRequestGlyph.stack,
         toneClassName: expectedToneClassName,
-        label: `Stack of 3 pull requests, ${state}`,
+        label: `3 个拉取请求的堆栈，${{ open: "打开", draft: "草稿", merged: "已合并" }[state]}`,
         text: 3,
       });
     },
@@ -793,7 +793,7 @@ describe("resolveThreadPullRequestBadgePresentation", () => {
       ).toEqual({
         Icon: expectedIcon,
         toneClassName: expectedToneClassName,
-        label: `PR #42 - Closed: PR branch, and 2 more linked; overall ${state}`,
+        label: `PR #42 - 已关闭: PR branch，另有 2 个关联项；整体状态 ${{ open: "打开", draft: "草稿", merged: "已合并" }[state]}`,
         text: "+3",
       });
     },

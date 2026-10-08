@@ -168,7 +168,7 @@ export function usePaginatedBranches(target: VcsRefTarget) {
           const cause = Cause.squash(failed.cause);
           return cause instanceof Error && cause.message.trim().length > 0
             ? cause.message
-            : "Failed to load refs.";
+            : "加载 Git 引用失败。";
         })()
       : null;
   const refresh = useCallback(() => {

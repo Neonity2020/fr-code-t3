@@ -21,7 +21,7 @@ describe("navigateAfterThreadDeletion", () => {
     expect(addToast).toHaveBeenCalledOnce();
     expect(addToast).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "Thread deleted, but navigation failed",
+        title: "会话已删除，但导航失败",
         description: "route unavailable",
       }),
     );
@@ -47,7 +47,7 @@ describe("ThreadArchiveBlockedError", () => {
       environmentId: "environment-1",
       threadId: "thread-1",
     });
-    expect(error.message).toBe("Cannot archive while the provider is active.");
+    expect(error.message).toBe("提供商正在运行，无法归档。");
   });
 });
 
@@ -88,9 +88,7 @@ describe("requestThreadUnpinConfirmation", () => {
       },
     });
 
-    expect(message).toBe(
-      'Unpin thread "Release prep"?\nThis will move the thread out of your pinned section.',
-    );
+    expect(message).toBe("取消会话“Release prep”的置顶？\n会话将从置顶分区移出。");
     expect(result).toMatchObject({ _tag: "Success", value: false });
   });
 

@@ -68,7 +68,7 @@ describe("third-party license manifests", () => {
   it("formats platform bundle names for display", () => {
     expect(
       formatLicenseBundles(["android", "assets", "ios", "mobile", "plugin", "constructor"]),
-    ).toBe("Android, Assets, iOS, Mobile, plugin, constructor");
+    ).toBe("Android, 资源, iOS, 移动端, plugin, constructor");
   });
 
   it("finds an entry by its stable navigation key", () => {

@@ -24,9 +24,7 @@ import { ProviderDriverKind } from "@t3tools/contracts";
 import { ProviderInstanceIcon } from "../chat/ProviderInstanceIcon";
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error && error.message.trim()
-    ? error.message
-    : "The ACP could not be prepared.";
+  return error instanceof Error && error.message.trim() ? error.message : "无法准备 ACP。";
 }
 
 interface AcpRegistrySearchStepProps {
@@ -135,7 +133,7 @@ export function AcpRegistrySearchStep({
   return (
     <section className="grid gap-3" aria-labelledby="acp-registry-search-heading">
       <h3 className="sr-only" id="acp-registry-search-heading">
-        Choose an agent
+        选择智能体
       </h3>
 
       <form className="flex flex-wrap items-center gap-2" onSubmit={handleSearch}>
@@ -144,7 +142,7 @@ export function AcpRegistrySearchStep({
             <SearchIcon />
           </InputGroupAddon>
           <InputGroupInput
-            aria-label="Search ACP Registry"
+            aria-label="搜索 ACP 注册表"
             disabled={preparingId !== null}
             onChange={(event) => {
               const nextQuery = event.currentTarget.value;
@@ -156,7 +154,7 @@ export function AcpRegistrySearchStep({
                 setSubmittedQuery(nextQuery.trim());
               }, 300);
             }}
-            placeholder="Search agents…"
+            placeholder="搜索智能体…"
             size="sm"
             type="search"
             value={query}
@@ -169,7 +167,7 @@ export function AcpRegistrySearchStep({
           type="button"
           variant="ghost-muted"
         >
-          Enter manually
+          手动输入
         </Button>
         {onLocalConfiguration ? (
           <Button
@@ -179,18 +177,18 @@ export function AcpRegistrySearchStep({
             type="button"
             variant="outline"
           >
-            Local ACP command
+            本地 ACP 命令
           </Button>
         ) : null}
       </form>
 
       <div className="sr-only" role="status">
         {isInitialSearch
-          ? "Searching the ACP Registry."
+          ? "正在搜索 ACP 注册表。"
           : isRefreshing
-            ? "Refreshing ACP Registry results."
+            ? "正在刷新 ACP 注册表结果。"
             : results
-              ? `${resultCount} compatible ${resultCount === 1 ? "agent" : "agents"} found.`
+              ? `找到 ${resultCount} 个兼容的${"个智能体"}。`
               : ""}
       </div>
 
@@ -202,15 +200,15 @@ export function AcpRegistrySearchStep({
 
       {isInitialSearch ? (
         <div className="flex min-h-20 items-center justify-center text-sm text-muted-foreground">
-          Searching the registry...
+          正在搜索注册表…
         </div>
       ) : null}
 
       {results ? (
         results.length === 0 ? (
           <div className="flex min-h-28 flex-col items-center justify-center rounded-2xl border border-dashed px-4 text-center">
-            <p className="text-sm font-medium">No compatible agents found</p>
-            <p className="mt-1 text-xs text-muted-foreground">Try a broader search.</p>
+            <p className="text-sm font-medium">未找到兼容的智能体</p>
+            <p className="mt-1 text-xs text-muted-foreground">请尝试扩大搜索范围。</p>
           </div>
         ) : (
           <ScrollArea scrollFade className="max-h-64">
@@ -220,7 +218,7 @@ export function AcpRegistrySearchStep({
               {results.map((agent) => {
                 const alreadyAdded = isConfiguredAcpRegistryAgent(providerInstances, agent.id);
                 const isPreparing = preparingId === agent.id;
-                const progressLabel = agent.distribution === "binary" ? "Downloading" : "Preparing";
+                const progressLabel = agent.distribution === "binary" ? "正在下载" : "正在准备";
                 return (
                   <article className="min-w-0 py-2.5" key={agent.id}>
                     <div className="flex min-w-0 items-center justify-between gap-3">
@@ -253,7 +251,7 @@ export function AcpRegistrySearchStep({
                                 <Button
                                   size="icon-xs"
                                   variant="ghost-muted"
-                                  aria-label={`About ${agent.name}`}
+                                  aria-label={`关于 ${agent.name}`}
                                   render={
                                     <a
                                       href={agent.website || agent.repository || undefined}
@@ -266,17 +264,17 @@ export function AcpRegistrySearchStep({
                                 </Button>
                               }
                             />
-                            <TooltipPopup>About {agent.name}</TooltipPopup>
+                            <TooltipPopup>关于 {agent.name}</TooltipPopup>
                           </Tooltip>
                         ) : null}
                         <Button
-                          aria-label={`${alreadyAdded ? "Already added" : isPreparing ? progressLabel : "Add"} ${agent.name}`}
+                          aria-label={`${alreadyAdded ? "已添加" : isPreparing ? progressLabel : "添加"} ${agent.name}`}
                           disabled={alreadyAdded || preparingId !== null}
                           onClick={() => void handlePrepare(agent)}
                           size="xs"
                           variant={isPreparing ? "secondary" : "outline"}
                         >
-                          {alreadyAdded ? "Added" : isPreparing ? progressLabel : "Add"}
+                          {alreadyAdded ? "已添加" : isPreparing ? progressLabel : "添加"}
                         </Button>
                       </div>
                     </div>

@@ -93,7 +93,7 @@ export function ProviderUpdatesAction() {
             disabled={isPending}
             onClick={() => void handleUpdate()}
           >
-            {isPending ? "Updating…" : "Update all"}
+            {isPending ? "正在更新…" : "全部更新"}
           </Button>
         }
       />

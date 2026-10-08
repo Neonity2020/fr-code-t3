@@ -24,7 +24,7 @@ export function ThreadContextChip(props: {
           <ContextChip
             kind="thread"
             render={<Link to="/$environmentId/$threadId" params={{ environmentId, threadId }} />}
-            aria-label={`Thread, ${title}`}
+            aria-label={`会话，${title}`}
             data-markdown-copy={props.copyMarkdown}
             className="no-underline"
           >
@@ -33,7 +33,7 @@ export function ThreadContextChip(props: {
           </ContextChip>
         }
       />
-      <TooltipPopup side="top">{shell ? "Open thread" : "Thread no longer available"}</TooltipPopup>
+      <TooltipPopup side="top">{shell ? "打开会话" : "会话已不可用"}</TooltipPopup>
     </Tooltip>
   );
 }

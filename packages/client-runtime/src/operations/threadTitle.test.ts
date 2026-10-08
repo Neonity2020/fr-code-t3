@@ -19,7 +19,7 @@ describe("deriveThreadTitleSeed", () => {
         text: " \n ",
         attachments: [{ name: "login-error.png" }, { name: "other.png" }],
       }),
-    ).toBe("Image: login-error.png");
+    ).toBe("图片：login-error.png");
   });
 
   it("uses the first non-empty fallback label after text and attachments", () => {
@@ -33,7 +33,7 @@ describe("deriveThreadTitleSeed", () => {
   });
 
   it("falls back to New thread", () => {
-    expect(deriveThreadTitleSeed({ text: "", attachments: [] })).toBe("New thread");
+    expect(deriveThreadTitleSeed({ text: "", attachments: [] })).toBe("新建会话");
   });
 
   it("applies the shared title truncation", () => {

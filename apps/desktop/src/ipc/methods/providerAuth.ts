@@ -27,8 +27,7 @@ export const receiveProviderAuthCallback = DesktopIpc.makeIpcMethod({
         receiveCodexAuthCallback(authorizationUrl, (url) => runPromise(shell.openExternal(url))),
       catch: () =>
         new CodexAuthCallbackError({
-          detail:
-            "Could not receive ChatGPT sign-in on this computer. Try again or paste the redirect URL.",
+          detail: "无法在此计算机接收 ChatGPT 登录结果。请重试或粘贴重定向网址。",
         }),
     });
     const window = yield* windows.currentMainOrFirst;
@@ -44,6 +43,6 @@ export const cancelProviderAuthCallback = DesktopIpc.makeIpcMethod({
   handler: (authorizationUrl) =>
     Effect.try({
       try: () => cancelCodexAuthCallback(authorizationUrl),
-      catch: () => new CodexAuthCallbackError({ detail: "Invalid ChatGPT sign-in request." }),
+      catch: () => new CodexAuthCallbackError({ detail: "ChatGPT 登录请求无效。" }),
     }),
 });

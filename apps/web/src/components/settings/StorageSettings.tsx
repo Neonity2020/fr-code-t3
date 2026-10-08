@@ -48,14 +48,14 @@ function WorktreesDirectoryRow() {
     <SettingsRow
       {...searchableSetting("storage-worktrees-location")}
       description={
-        "Folder where new worktrees are created, on any drive, such as D:\\worktrees or ~/worktrees. Existing worktrees stay where they are. Leave empty to use the T3 home folder."
+        "创建新工作树的文件夹，可在任意磁盘上，例如 D:\\\\worktrees 或 ~/worktrees。已有工作树保留原位置。留空则使用 T3 主目录。"
       }
       serverScoped
       settingKeys={["worktreesDirectory"]}
       resetAction={
         mixed || settings.worktreesDirectory !== "" ? (
           <SettingResetButton
-            label="worktree location"
+            label={"工作树位置"}
             onClick={() => updateSettings({ worktreesDirectory: "" })}
           />
         ) : null
@@ -63,10 +63,10 @@ function WorktreesDirectoryRow() {
       control={
         <Input
           key={`${scopeKey}:${mixed}:${settings.worktreesDirectory}`}
-          aria-label="Worktree location"
+          aria-label="工作树位置"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder={mixed ? "Mixed" : "Default"}
+          placeholder={mixed ? "混合" : "默认"}
           defaultValue={mixed ? "" : settings.worktreesDirectory}
           onChange={() => {
             edited.current = true;
@@ -120,20 +120,20 @@ function RetentionControl({
           }}
         >
           <NumberFieldGroup>
-            <NumberFieldDecrement aria-label={`Decrease ${label}`} />
+            <NumberFieldDecrement aria-label={`减少${label}`} />
             <NumberFieldInput
-              aria-label={`${label} in days`}
+              aria-label={`${label}（天）`}
               size={new Intl.NumberFormat().format(draft ?? value).length}
               className="field-sizing-content w-auto min-w-[1ch] grow-0 text-right"
             />
             <span aria-hidden="true" className="self-center pr-2 text-xs">
-              days
+              天
             </span>
-            <NumberFieldIncrement aria-label={`Increase ${label}`} />
+            <NumberFieldIncrement aria-label={`增加${label}`} />
           </NumberFieldGroup>
         </NumberField>
       ) : (
-        <span className="text-xs text-muted-foreground">Off</span>
+        <span className="text-xs text-muted-foreground">关闭</span>
       )}
       <Switch
         aria-label={label}
@@ -184,9 +184,7 @@ export function StorageSettingsPanel() {
     )
   ) {
     return (
-      <SettingsScopeNotice target="all">
-        Update the selected machines to configure project worktree cleanup.
-      </SettingsScopeNotice>
+      <SettingsScopeNotice target="all">请更新所选机器以配置项目工作树清理。</SettingsScopeNotice>
     );
   }
 
@@ -205,25 +203,24 @@ export function StorageSettingsPanel() {
           )
           .map((environment) => environment.environmentId)}
       >
-        Update the selected environments to use storage cleanup, or choose a machine that supports
-        it.
+        请更新所选环境以使用存储清理，或选择支持此功能的机器。
       </SettingsScopeNotice>
     );
   }
 
   return (
     <SettingsPageContainer>
-      <SettingsSection id="storage-worktrees" title="Worktrees">
+      <SettingsSection id="storage-worktrees" title="工作树">
         {!isProjectScope && <WorktreesDirectoryRow />}
         {isProjectScope && (
           <SettingsRow
-            title="Automatic worktree cleanup"
+            title="自动清理工作树"
             description={
               mode === "off"
-                ? "Keep this project's worktrees until you delete them manually."
+                ? "保留此项目的工作树，直到手动删除。"
                 : mode === "custom"
-                  ? "Use these rules for this project."
-                  : "Use each machine's worktree cleanup settings."
+                  ? "将这些规则用于此项目。"
+                  : "使用各计算机的工作树清理设置。"
             }
             serverScoped
             settingKeys={["worktreeCleanup"]}
@@ -238,21 +235,21 @@ export function StorageSettingsPanel() {
                     updateSettings({ worktreeCleanup: { mode: "custom", rules: {} } });
                 }}
               >
-                <SelectTrigger size="sm" aria-label="Automatic worktree cleanup">
+                <SelectTrigger size="sm" aria-label="自动清理工作树">
                   <SelectValue>
                     {mixedModes
-                      ? "Mixed"
+                      ? "混合"
                       : mode === "inherit"
-                        ? "Inherit"
+                        ? "继承"
                         : mode === "off"
-                          ? "Off"
-                          : "Custom"}
+                          ? "关闭"
+                          : "自定义"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectPopup align="end" alignItemWithTrigger={false}>
-                  <SelectItem value="inherit">Inherit</SelectItem>
-                  <SelectItem value="off">Off</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
+                  <SelectItem value="inherit">继承</SelectItem>
+                  <SelectItem value="off">关闭</SelectItem>
+                  <SelectItem value="custom">自定义</SelectItem>
                 </SelectPopup>
               </Select>
             }
@@ -261,52 +258,52 @@ export function StorageSettingsPanel() {
         {(!isProjectScope || (!mixedModes && mode === "custom")) && (
           <>
             <SettingsRow
-              title="Delete worktrees with deleted threads"
+              title="随会话删除工作树"
               status={ruleStatus("worktreeOnDelete")}
-              description="Remove unused worktrees when active or archived threads are deleted. Worktrees with local changes are kept."
+              description="删除活跃或已归档会话时移除未使用的工作树。有本地改动的工作树会保留。"
               serverScoped={!isProjectScope}
               control={
                 <Switch
-                  aria-label="Delete worktrees with deleted threads"
+                  aria-label="随会话删除工作树"
                   checked={settings.worktreeOnDelete}
                   onCheckedChange={(worktreeOnDelete) => updateWorktree({ worktreeOnDelete })}
                 />
               }
             />
             <SettingsRow
-              title="Delete inactive worktrees"
+              title="删除无活动工作树"
               status={ruleStatus("worktreeAfterDays")}
-              description="Remove worktrees after their threads have been inactive for this many days. Branches and thread history are kept."
+              description="会话超过此天数无活动后移除工作树。分支和会话历史会保留。"
               serverScoped={!isProjectScope}
               control={
                 <RetentionControl
-                  label="Delete inactive worktrees"
+                  label="删除无活动工作树"
                   value={settings.worktreeAfterDays}
                   onChange={(worktreeAfterDays) => updateWorktree({ worktreeAfterDays })}
                 />
               }
             />
             <SettingsRow
-              title="Delete merged worktrees"
+              title="删除已合并工作树"
               status={ruleStatus("worktreeOnMerge")}
-              description="Remove worktrees whose pull request is merged and whose commits are included in the default branch."
+              description="移除拉取请求已合并且提交已包含在默认分支中的工作树。"
               serverScoped={!isProjectScope}
               control={
                 <Switch
-                  aria-label="Delete merged worktrees"
+                  aria-label="删除已合并工作树"
                   checked={settings.worktreeOnMerge}
                   onCheckedChange={(worktreeOnMerge) => updateWorktree({ worktreeOnMerge })}
                 />
               }
             />
             <SettingsRow
-              title="Delete unchanged worktrees"
+              title="删除无改动工作树"
               status={ruleStatus("worktreeUnchanged")}
-              description="Remove worktrees with no commits beyond the default branch."
+              description="移除没有超出默认分支提交的工作树。"
               serverScoped={!isProjectScope}
               control={
                 <Switch
-                  aria-label="Delete unchanged worktrees"
+                  aria-label="删除无改动工作树"
                   checked={settings.worktreeUnchanged}
                   onCheckedChange={(worktreeUnchanged) => updateWorktree({ worktreeUnchanged })}
                 />
@@ -317,28 +314,28 @@ export function StorageSettingsPanel() {
       </SettingsSection>
 
       {!isProjectScope && (
-        <SettingsSection id="storage-artifacts" title="Artifacts and logs">
+        <SettingsSection id="storage-artifacts" title="产物与日志">
           <SettingsRow
-            title="Delete old browser artifacts"
+            title="删除旧浏览器产物"
             status={ruleStatus("browserArtifactsAfterDays")}
-            description="Delete saved browser captures after this many days. Older capture links will no longer open."
+            description="在此天数后删除已保存的浏览器捕获内容。较旧的捕获链接将无法打开。"
             serverScoped
             control={
               <RetentionControl
-                label="Delete old browser artifacts"
+                label="删除旧浏览器产物"
                 value={settings.browserArtifactsAfterDays}
                 onChange={(browserArtifactsAfterDays) => update({ browserArtifactsAfterDays })}
               />
             }
           />
           <SettingsRow
-            title="Delete old rotated logs"
+            title="删除旧轮转日志"
             status={ruleStatus("logsAfterDays")}
-            description="Delete inactive rotated log files after this many days. Current logs are kept."
+            description="在此天数后删除不活跃的轮转日志文件。当前日志会保留。"
             serverScoped
             control={
               <RetentionControl
-                label="Delete old rotated logs"
+                label="删除旧轮转日志"
                 value={settings.logsAfterDays}
                 onChange={(logsAfterDays) => update({ logsAfterDays })}
               />

@@ -7,10 +7,10 @@ import { getTerminalLabel, nextTerminalId, resolveTerminalSessionLabel } from ".
 
 describe("getTerminalLabel", () => {
   it("uses the numeric suffix for term-* ids", () => {
-    expect(getTerminalLabel(DEFAULT_TERMINAL_ID)).toBe("Terminal 1");
-    expect(getTerminalLabel("term-2")).toBe("Terminal 2");
-    expect(getTerminalLabel("term-12")).toBe("Terminal 12");
-    expect(getTerminalLabel("terminal-3")).toBe("Terminal 3");
+    expect(getTerminalLabel(DEFAULT_TERMINAL_ID)).toBe("终端 1");
+    expect(getTerminalLabel("term-2")).toBe("终端 2");
+    expect(getTerminalLabel("term-12")).toBe("终端 12");
+    expect(getTerminalLabel("terminal-3")).toBe("终端 3");
   });
 
   it("falls back to the raw id for unknown shapes", () => {
@@ -25,9 +25,9 @@ describe("resolveTerminalSessionLabel", () => {
   });
 
   it("falls back to getTerminalLabel when summary is missing or blank", () => {
-    expect(resolveTerminalSessionLabel(DEFAULT_TERMINAL_ID, { label: "   " })).toBe("Terminal 1");
-    expect(resolveTerminalSessionLabel(DEFAULT_TERMINAL_ID, null)).toBe("Terminal 1");
-    expect(resolveTerminalSessionLabel("term-2", undefined)).toBe("Terminal 2");
+    expect(resolveTerminalSessionLabel(DEFAULT_TERMINAL_ID, { label: "   " })).toBe("终端 1");
+    expect(resolveTerminalSessionLabel(DEFAULT_TERMINAL_ID, null)).toBe("终端 1");
+    expect(resolveTerminalSessionLabel("term-2", undefined)).toBe("终端 2");
   });
 });
 

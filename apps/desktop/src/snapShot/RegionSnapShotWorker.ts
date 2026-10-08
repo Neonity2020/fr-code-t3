@@ -24,6 +24,6 @@ async function capture() {
 void capture().catch((error: unknown) =>
   process.send?.({
     type: "error",
-    message: error instanceof Error ? error.message : "Windows window capture failed.",
+    message: error instanceof Error ? error.message : "Windows 窗口截图失败。",
   } satisfies RegionSnapShotResult),
 );

@@ -43,9 +43,9 @@ describe("ProviderSettingsForm helpers", () => {
     expect(cursor?.environmentFields).toEqual([
       {
         name: "CURSOR_API_KEY",
-        label: "Cursor API key",
-        description: "Optional. Overrides browser sign-in for this provider.",
-        placeholder: "Paste API key",
+        label: "Cursor API 密钥",
+        description: "可选。覆盖此提供方的浏览器登录。",
+        placeholder: "粘贴 API 密钥",
         sensitive: true,
       },
     ]);

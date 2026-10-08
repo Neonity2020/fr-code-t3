@@ -23,7 +23,7 @@ class DesktopWslStateLoadError extends Schema.TaggedError<DesktopWslStateLoadErr
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to load WSL state.";
+    return "加载 WSL 状态失败。";
   }
 }
 

@@ -47,7 +47,7 @@ function stringifyYaml(options?: YamlStringifyOptions): SchemaGetter.Getter<stri
   return SchemaGetter.transformEffect((input: unknown) =>
     Effect.try({
       try: () => stringifyYamlValue(input, options),
-      catch: () => new SchemaIssue.InvalidValue({ message: "Failed to stringify YAML." }),
+      catch: () => new SchemaIssue.InvalidValue({ message: "无法序列化为 YAML。" }),
     }),
   );
 }

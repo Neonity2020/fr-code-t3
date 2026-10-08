@@ -295,7 +295,7 @@ function pullRequestWatchTasks(
       : [
           {
             taskId: `pull-request-watch:${threadPullRequestKeyOf(link)}`,
-            description: `Watching pull request #${link.number}`,
+            description: `正在关注拉取请求 #${link.number}`,
             kind: "monitor" as const,
           },
         ],

@@ -38,7 +38,7 @@ export const MessageCopyButton = memo(function MessageCopyButton({
       <TooltipTrigger
         render={
           <Button
-            aria-label="Copy message"
+            aria-label="复制消息"
             disabled={isCopied}
             onClick={() => copyToClipboard(text)}
             ref={ref}
@@ -55,7 +55,7 @@ export const MessageCopyButton = memo(function MessageCopyButton({
         />
       </TooltipTrigger>
       <TooltipPopup>
-        <p>Copy message</p>
+        <p>复制消息</p>
       </TooltipPopup>
     </Tooltip>
   );

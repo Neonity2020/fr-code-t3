@@ -20,44 +20,44 @@ export function presentSavedCloudEnvironmentConnection(
   switch (connection.phase) {
     case "connected":
       return {
-        buttonLabel: "Connected",
+        buttonLabel: "已连接",
         statusText: connectionStatusText(connection),
         tone: "connected",
       };
     case "connecting":
       return {
-        buttonLabel: "Connecting…",
+        buttonLabel: "正在连接…",
         statusText: connectionStatusText(connection),
         tone: "connecting",
       };
     case "reconnecting":
       return {
-        buttonLabel: "Reconnecting…",
+        buttonLabel: "正在重新连接…",
         statusText: connectionStatusText(connection),
         tone: "connecting",
       };
     // Not a failure: the machine is fine, this build just cannot talk to it.
     case "unsupported":
       return {
-        buttonLabel: "Client not supported",
+        buttonLabel: "不支持此客户端",
         statusText: connectionStatusText(connection),
         tone: "idle",
       };
     case "error":
       return {
-        buttonLabel: "Connection failed",
+        buttonLabel: "连接失败",
         statusText: connectionStatusText(connection),
         tone: "error",
       };
     case "offline":
       return {
-        buttonLabel: "Offline",
+        buttonLabel: "离线",
         statusText: connectionStatusText(connection),
         tone: "idle",
       };
     case "available":
       return {
-        buttonLabel: "Not connected",
+        buttonLabel: "未连接",
         statusText: connectionStatusText(connection),
         tone: "idle",
       };

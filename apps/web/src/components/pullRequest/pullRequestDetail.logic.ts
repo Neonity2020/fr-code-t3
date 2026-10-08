@@ -38,9 +38,9 @@ import { reviewCommentContextId } from "~/lib/composerContextRecords";
 import { removeInlineContextReference } from "~/lib/composerContextReferences";
 
 export const PULL_REQUEST_MERGE_METHOD_LABELS: Record<PullRequestMergeMethod, string> = {
-  merge: "Merge",
-  squash: "Squash and merge",
-  rebase: "Rebase and merge",
+  merge: "合并",
+  squash: "压缩并合并",
+  rebase: "变基并合并",
 };
 
 /** Old environments keep their existing actions; new ones must finish stack discovery first. */
@@ -270,14 +270,14 @@ export function threadPullRequestPanelTarget(thread: {
 export function pullRequestHandoffLabels(inThisThread: boolean) {
   return inThisThread
     ? {
-        fixFinding: "Fix in this thread",
-        fixCheck: "Fix in this thread",
-        fixFindings: "Fix findings in this thread",
+        fixFinding: "在此会话中修复",
+        fixCheck: "在此会话中修复",
+        fixFindings: "在此会话中修复审查问题",
       }
     : {
-        fixFinding: "Fix in a thread",
-        fixCheck: "Fix",
-        fixFindings: "Fix findings in a thread",
+        fixFinding: "在会话中修复",
+        fixCheck: "修复",
+        fixFindings: "在会话中修复审查问题",
       };
 }
 
@@ -374,7 +374,7 @@ export function classifyPullRequestChecks(
  * what a reader does next.
  */
 export function describePullRequestChecks(checks: ReadonlyArray<PullRequestCheck>): string {
-  if (checks.length === 0) return "No checks reported";
+  if (checks.length === 0) return "没有检查结果";
   const failed = checks.filter(
     (check) => check.status === "failure" || check.status === "cancelled",
   ).length;
@@ -639,7 +639,7 @@ export function buildPullRequestTimeline(
       id: "created",
       at: detail.createdAt,
       kind: "opened" as const,
-      title: "opened this pull request",
+      title: "打开了此拉取请求",
       body: null,
       markdown: false,
       url: null,
@@ -655,7 +655,7 @@ export function buildPullRequestTimeline(
       id: commit.oid,
       at: commit.committedDate,
       kind: "commit" as const,
-      title: `Commit ${commit.oid.slice(0, 7)}`,
+      title: `提交 ${commit.oid.slice(0, 7)}`,
       body: commit.messageHeadline || null,
       markdown: false,
       url: null,
@@ -689,7 +689,7 @@ export function buildPullRequestTimeline(
             id: "merged",
             at: detail.mergedAt,
             kind: "merged" as const,
-            title: "Pull request merged",
+            title: "拉取请求已合并",
             body: null,
             markdown: false,
             url: null,
@@ -709,7 +709,7 @@ export function buildPullRequestTimeline(
             id: "closed",
             at: detail.closedAt,
             kind: "closed" as const,
-            title: "Pull request closed",
+            title: "拉取请求已关闭",
             body: null,
             markdown: false,
             url: null,
@@ -1086,10 +1086,10 @@ function pullRequestContextComment(
   return {
     id: `pull-request-context:${input.number}`,
     sectionId: `pull-request:${input.number}`,
-    sectionTitle: `PR #${input.number}`,
+    sectionTitle: `拉取请求 #${input.number}`,
     // The chip wears `filePath rangeLabel`, so those two are what it reads as: which pull
     // request, and what it is called.
-    filePath: `PR #${input.number}`,
+    filePath: `拉取请求 #${input.number}`,
     startIndex: 0,
     endIndex: 0,
     rangeLabel: boundedField(input.title),

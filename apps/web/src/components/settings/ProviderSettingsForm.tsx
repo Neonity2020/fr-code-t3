@@ -110,15 +110,15 @@ export function deriveProviderSettingsFields(
           control: formAnnotation.control ?? "text",
           label:
             isLocalAcp && key === "commandPath"
-              ? "Executable"
+              ? "可执行程序"
               : (annotatedTitle ?? titleizeFieldKey(key)),
           ...(isLocalAcp && key === "commandPath"
-            ? { description: "Executable name or path on this environment." }
+            ? { description: "此环境中的可执行程序名称或路径。" }
             : annotatedDescription !== undefined
               ? { description: annotatedDescription }
               : {}),
           ...(isLocalAcp && key === "commandPath"
-            ? { placeholder: "e.g. dsh" }
+            ? { placeholder: "例如：dsh" }
             : formAnnotation.placeholder !== undefined
               ? { placeholder: formAnnotation.placeholder }
               : {}),
@@ -189,8 +189,8 @@ function ProviderCommandArguments({
 
   return (
     <SettingsRow
-      title="Arguments"
-      description="One literal argument per row, in launch order."
+      title="参数"
+      description="每行一个字面量参数，按启动顺序排列。"
       control={
         <Button
           type="button"
@@ -199,7 +199,7 @@ function ProviderCommandArguments({
           onClick={() => updateArguments([...rowsRef.current, makeCommandArgumentDraftRow("")])}
         >
           <PlusIcon />
-          Add argument
+          添加参数
         </Button>
       }
     >
@@ -218,7 +218,7 @@ function ProviderCommandArguments({
                     ),
                   )
                 }
-                aria-label={`Argument ${index + 1}`}
+                aria-label={`参数 ${index + 1}`}
                 spellCheck={false}
               />
               <Button
@@ -228,7 +228,7 @@ function ProviderCommandArguments({
                 onClick={() =>
                   updateArguments(rowsRef.current.filter((current) => current.id !== argument.id))
                 }
-                aria-label={`Remove argument ${index + 1}`}
+                aria-label={`移除参数 ${index + 1}`}
               >
                 <XIcon />
               </Button>

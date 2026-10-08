@@ -20,11 +20,11 @@ import { DesktopSnapShotError } from "./DesktopSnapShot.ts";
 
 describe("window capture errors", () => {
   it.each([
-    ["unsupported", "SnapShots are not supported here."],
-    ["disabled", "Enable SnapShots in Settings first."],
-    ["no-window-selected", "No window was selected."],
-    ["window-unavailable", "The active window is not available for capture."],
-    ["capture", "Could not capture the active window."],
+    ["unsupported", "此处不支持截图。"],
+    ["disabled", "请先在设置中启用截图。"],
+    ["no-window-selected", "未选择窗口。"],
+    ["window-unavailable", "无法截取当前窗口。"],
+    ["capture", "无法截取当前窗口。"],
   ] as const)("keeps %s failures user-facing", (operation, message) => {
     expect(new DesktopSnapShotError({ operation }).message).toBe(message);
   });
@@ -748,19 +748,19 @@ describe("snapShotShortcutRegistrationFailureMessage", () => {
   it("distinguishes a modifier listener failure from a reserved key chord", () => {
     expect(
       snapShotShortcutRegistrationFailureMessage({ kind: "both-shift-keys" }, "darwin"),
-    ).toMatch(/Shift \+ Shift is not available/);
+    ).toMatch(/不支持 Shift \+ Shift/);
     expect(
       snapShotShortcutRegistrationFailureMessage(
         { kind: "modifier-pair", modifier: "meta" },
         "darwin",
       ),
-    ).toMatch(/Command \+ Command is not available/);
+    ).toMatch(/不支持 Command \+ Command/);
     expect(
       snapShotShortcutRegistrationFailureMessage(
         { kind: "modifier-pair", modifier: "meta" },
         "linux",
       ),
-    ).toMatch(/Super \+ Super is not available/);
+    ).toMatch(/不支持 Super \+ Super/);
     expect(
       snapShotShortcutRegistrationFailureMessage(
         {
@@ -773,7 +773,7 @@ describe("snapShotShortcutRegistrationFailureMessage", () => {
         },
         "darwin",
       ),
-    ).toMatch(/already used/);
+    ).toMatch(/已被系统或其他应用占用/);
   });
 });
 

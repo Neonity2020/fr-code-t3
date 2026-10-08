@@ -122,8 +122,8 @@ describe("deriveProviderModelsForDisplay", () => {
       }),
     );
 
-    expect(markup).toContain("Authenticated as");
-    expect(markup).toContain('aria-label="Toggle account email visibility"');
+    expect(markup).toContain("已认证为");
+    expect(markup).toContain('aria-label="切换账号邮箱可见性"');
     expect(markup).toContain("blur-xs");
     expect(markup).not.toContain("developer@example.com");
   });
@@ -162,7 +162,7 @@ describe("deriveProviderModelsForDisplay", () => {
 
     for (const mode of ["list", "editor"] as const) {
       const markup = renderToStaticMarkup(createElement(ProviderInstanceCard, { ...props, mode }));
-      expect(markup).toContain("Unavailable");
+      expect(markup).toContain("不可用");
       expect(markup).toContain("is not a symlink");
     }
   });

@@ -155,7 +155,7 @@ export const make = Effect.gen(function* () {
               catch: () =>
                 new CodexAuthCallbackError({
                   detail:
-                    "Could not receive hosted web ChatGPT sign-in. Retry or use the redirect URL in the web app.",
+                    "无法接收 Web 版 ChatGPT 登录结果。请重试，或在 Web 应用中使用重定向网址。",
                 }),
             });
           }).pipe(

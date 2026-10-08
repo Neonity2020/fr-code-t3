@@ -102,12 +102,12 @@ export function ProjectIconPickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup className="w-full sm:w-[32rem]">
         <DialogHeader>
-          <DialogTitle>Choose project icon</DialogTitle>
-          <DialogDescription>Choose an icon, emoji, or monogram.</DialogDescription>
+          <DialogTitle>选择项目图标</DialogTitle>
+          <DialogDescription>选择图标、表情或字母标记。</DialogDescription>
         </DialogHeader>
         <DialogPanel className="flex min-h-0 flex-col">
           <ToggleGroup
-            aria-label="Icon type"
+            aria-label="图标类型"
             variant="segmented"
             value={[mode]}
             onValueChange={(next) => {
@@ -115,15 +115,15 @@ export function ProjectIconPickerDialog({
               if (value === "lucide" || value === "emoji" || value === "monogram") setMode(value);
             }}
           >
-            <Toggle value="lucide">Icons</Toggle>
-            <Toggle value="emoji">Emoji</Toggle>
-            <Toggle value="monogram">Monogram</Toggle>
+            <Toggle value="lucide">图标</Toggle>
+            <Toggle value="emoji">表情</Toggle>
+            <Toggle value="monogram">字母标记</Toggle>
           </ToggleGroup>
 
           {mode !== "emoji" ? (
             <div>
-              <div className="mb-2 text-xs font-medium text-muted-foreground">Color</div>
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Icon color">
+              <div className="mb-2 text-xs font-medium text-muted-foreground">颜色</div>
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="图标颜色">
                 {PROJECT_ICON_COLORS.map((option) => (
                   <button
                     key={option.value}
@@ -148,8 +148,8 @@ export function ProjectIconPickerDialog({
               <Input
                 type="search"
                 value={query}
-                aria-label="Search Lucide icons"
-                placeholder="Search all Lucide icons"
+                aria-label="搜索 Lucide 图标"
+                placeholder="搜索全部 Lucide 图标"
                 onChange={(event) => setQuery(event.currentTarget.value)}
               />
               <ScrollArea scrollFade className="max-h-64">
@@ -173,7 +173,7 @@ export function ProjectIconPickerDialog({
                 </div>
               </ScrollArea>
               {icons.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">No icons found.</p>
+                <p className="py-8 text-center text-sm text-muted-foreground">未找到图标。</p>
               ) : null}
             </>
           ) : mode === "monogram" ? (
@@ -185,7 +185,7 @@ export function ProjectIconPickerDialog({
               />
               <div className="flex-1 space-y-2">
                 <label htmlFor="project-monogram" className="text-sm font-medium">
-                  Letters
+                  字母
                 </label>
                 <Input
                   id="project-monogram"
@@ -196,7 +196,7 @@ export function ProjectIconPickerDialog({
                   autoComplete="off"
                 />
                 <p id="project-monogram-hint" className="text-xs text-muted-foreground">
-                  One or two letters or numbers.
+                  一到两个字母或数字。
                 </p>
               </div>
             </div>
@@ -222,13 +222,11 @@ export function ProjectIconPickerDialog({
                 </div>
               </ScrollArea>
               <div>
-                <div className="mb-2 text-xs font-medium text-muted-foreground">
-                  Or paste any emoji
-                </div>
+                <div className="mb-2 text-xs font-medium text-muted-foreground">或粘贴任意表情</div>
                 <Input
                   value={customEmoji}
-                  aria-label="Custom emoji"
-                  placeholder="Paste an emoji"
+                  aria-label="自定义表情"
+                  placeholder="粘贴表情"
                   onChange={(event) => {
                     const value = event.currentTarget.value;
                     setCustomEmoji(value);
@@ -242,10 +240,10 @@ export function ProjectIconPickerDialog({
         </DialogPanel>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            取消
           </Button>
           <Button onClick={save} disabled={mode === "monogram" && !validMonogram}>
-            Save icon
+            保存图标
           </Button>
         </DialogFooter>
       </DialogPopup>

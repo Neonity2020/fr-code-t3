@@ -328,7 +328,7 @@ async function runUpload(job: UploadJob): Promise<void> {
       result.step === "mint"
         ? "Upload could not start"
         : result.step === "resolve-url"
-          ? "Not connected"
+          ? "未连接"
           : result.error instanceof Error
             ? result.error.message
             : "Upload failed",

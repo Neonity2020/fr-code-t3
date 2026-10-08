@@ -17,7 +17,7 @@ describe("relayProtectedErrorMessage", () => {
     });
 
     expect(relayProtectedErrorMessage(error)).toBe(
-      `Relay rejected the DPoP proof. ${DPOP_UNKNOWN_HINT}`,
+      `中继服务拒绝了 DPoP 证明。 ${DPOP_UNKNOWN_HINT}`,
     );
   });
 
@@ -40,9 +40,7 @@ describe("relayProtectedErrorMessage", () => {
       traceId: "trace-1",
     });
 
-    expect(relayProtectedErrorMessage(error)).toBe(
-      `Relay rejected the DPoP proof. ${DPOP_RETRY_HINT}`,
-    );
+    expect(relayProtectedErrorMessage(error)).toBe(`中继服务拒绝了 DPoP 证明。 ${DPOP_RETRY_HINT}`);
   });
 
   it("preserves the existing message for other authentication failures", () => {
@@ -52,6 +50,6 @@ describe("relayProtectedErrorMessage", () => {
       traceId: "trace-1",
     });
 
-    expect(relayProtectedErrorMessage(error)).toBe("Relay rejected the cloud session token.");
+    expect(relayProtectedErrorMessage(error)).toBe("中继服务拒绝了云端会话令牌。");
   });
 });

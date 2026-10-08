@@ -21,10 +21,18 @@ describe("claude resume compaction copy", () => {
   it("formats ages above and below one hour", () => {
     expect(
       formatClaudeResumeCompactionQuestion({ ageMinutes: 145, estimatedTokens: 275_123 }),
-    ).toBe("This session is 2h 25m old and uses 275,123 tokens. Compact it before continuing?");
+    ).toBe("此会话已持续 2 小时 25 分钟，使用了 275,123 token。继续前压缩上下文？");
     expect(formatClaudeResumeCompactionQuestion({ ageMinutes: 45, estimatedTokens: 1_000 })).toBe(
-      "This session is 45m old and uses 1,000 tokens. Compact it before continuing?",
+      "此会话已持续 45 分钟，使用了 1,000 token。继续前压缩上下文？",
     );
+  });
+
+  it("recognizes questions stored before localization", () => {
+    expect(
+      isClaudeResumeCompactionQuestion(
+        "This session is 2h 0m old and uses 250,000 tokens. Compact it before continuing?",
+      ),
+    ).toBe(true);
   });
 
   it("does not match unrelated questions", () => {

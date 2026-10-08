@@ -156,14 +156,14 @@ function EnvironmentNotifications({
       if (!kind) continue;
       const title =
         kind === "completion"
-          ? "Thread completed"
+          ? "会话已完成"
           : status === "approval"
-            ? "Approval needed"
+            ? "需要审批"
             : status === "limited"
-              ? "Usage limit reached"
+              ? "已达到用量限制"
               : status === "failed"
-                ? "Thread failed"
-                : "Input needed";
+                ? "会话失败"
+                : "需要输入";
       if (hasNotificationSound(mode)) {
         void playNotificationSound(kind, () =>
           hasNotificationSound(getClientSettings().notificationMode),
@@ -193,7 +193,7 @@ function EnvironmentNotifications({
               ),
           },
           actionProps: {
-            children: "Open thread",
+            children: "打开会话",
             onClick: () => {
               toastManager.close(toastId);
               void navigate({

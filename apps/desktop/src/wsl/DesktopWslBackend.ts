@@ -72,7 +72,7 @@ const isWslInstanceId = (id: DesktopBackendPool.BackendInstanceId): boolean =>
   id.startsWith(WSL_INSTANCE_ID_PREFIX);
 
 const buildLabel = (distro: string | null): string =>
-  distro === null ? "WSL (default distro)" : `WSL (${distro})`;
+  distro === null ? "WSL（默认发行版）" : `WSL (${distro})`;
 
 // Loopback-only port scan starting one above the primary's port. The
 // WSL backend is reachable via 127.0.0.1 from Windows (wslhost
@@ -87,7 +87,7 @@ const scanForWslPort = Effect.fn("desktop.wslBackend.scanForWslPort")(function* 
     }
   }
   return yield* new NetService.NetError({
-    message: `No loopback port available for WSL backend between ${startPort} and ${MAX_TCP_PORT}.`,
+    message: `${startPort} 至 ${MAX_TCP_PORT} 之间没有可用于 WSL 后端的回环端口。`,
   });
 });
 

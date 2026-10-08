@@ -182,7 +182,7 @@ export function DeviceDuoViewport(props: {
         />
         <canvas
           ref={canvasRef}
-          aria-label="Interactive 3D iPhone Duo. Drag the screen to interact. Drag outside it or swipe with two fingers to turn. Pinch over the device to open or close its hinge."
+          aria-label="交互式 3D iPhone Duo。拖动屏幕进行交互，拖动外部或双指滑动旋转，在设备上捏合以开合铰链。"
           className="size-full touch-none"
           onPointerDown={(event) => {
             if (event.button !== 0) return;

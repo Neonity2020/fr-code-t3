@@ -33,7 +33,7 @@ export function AddCodexAccountDialog({
 }) {
   const settings = useEnvironmentSettings(environmentId);
   const providers = useAtomValue(serverEnvironment.providersValueAtom(environmentId));
-  const update = useAtomCommand(serverEnvironment.updateSettings, "Add ChatGPT account");
+  const update = useAtomCommand(serverEnvironment.updateSettings, "添加 ChatGPT 账户");
   const [name, setName] = useState("Personal");
   const displayName = `ChatGPT - ${name.trim()}`;
   const [instanceId, setInstanceId] = useState<ProviderInstanceId | null>(null);
@@ -87,15 +87,15 @@ export function AddCodexAccountDialog({
     >
       <WizardPopup size="wide">
         <WizardHeader
-          title={instanceId ? displayName : "Add ChatGPT account"}
-          description="Each account has its own Codex instance and sign-in. Choose the other account on the sign-in page."
+          title={instanceId ? displayName : "添加 ChatGPT 账户"}
+          description="每个账户都有独立的 Codex 实例和登录状态。请在登录页面选择另一个账户。"
         />
         <WizardPanel>
           {instanceId ? (
             provider?.setup ? (
               renderSetup(instanceId, provider)
             ) : (
-              <SettingsRow title="Codex runtime" description="Preparing managed setup." />
+              <SettingsRow title="Codex 运行时" description="正在准备托管设置。" />
             )
           ) : (
             <form
@@ -106,15 +106,15 @@ export function AddCodexAccountDialog({
               }}
             >
               <SettingsRow
-                title="Account name"
-                description="Shown in the provider list and model picker."
+                title="账户名称"
+                description="显示在提供方列表和模型选择器中。"
                 control={
                   <Input
-                    aria-label="Account name"
+                    aria-label="账户名称"
                     value={name}
                     disabled={pending}
                     onChange={(event) => setName(event.target.value)}
-                    placeholder="e.g. Personal or Work"
+                    placeholder="例如：个人或工作"
                   />
                 }
               />
@@ -124,15 +124,15 @@ export function AddCodexAccountDialog({
         <WizardFooter>
           {instanceId ? (
             <Button variant="outline" onClick={onClose}>
-              Finish later
+              稍后完成
             </Button>
           ) : (
             <>
               <Button variant="outline" disabled={pending} onClick={onClose}>
-                Cancel
+                取消
               </Button>
               <Button type="submit" form="add-codex-account" disabled={pending || !name.trim()}>
-                {pending ? "Adding account…" : "Continue"}
+                {pending ? "正在添加账户…" : "继续"}
               </Button>
             </>
           )}

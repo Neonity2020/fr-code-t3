@@ -195,7 +195,7 @@ export function getRenderablePatch(
     return {
       kind: "raw",
       text: normalizedPatch,
-      reason: "Failed to parse patch. Showing raw patch.",
+      reason: "解析补丁失败，正在显示原始补丁。",
     };
   }
 }

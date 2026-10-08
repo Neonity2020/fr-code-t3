@@ -25,7 +25,7 @@ export const PROVIDER_PRESENTATION = {
     driverKind: ProviderDriverKind.make("claudeAgent"),
   },
   grok: {
-    label: "Grok Build",
+    label: "Grok 构建",
     // Contrast-aware neutral between the Codex series and muted chart chrome.
     color: "color-mix(in oklab, var(--contrast-foreground) 72%, var(--background))",
     driverKind: ProviderDriverKind.make("grok"),

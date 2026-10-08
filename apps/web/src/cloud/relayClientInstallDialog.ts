@@ -15,7 +15,7 @@ export class RelayClientInstallConfirmationConflictError extends Schema.TaggedEr
   },
 ) {
   override get message(): string {
-    return `Cannot confirm relay client installation ${this.requestedVersion}; installation ${this.activeVersion} has dialog status ${this.activeDialogStatus}.`;
+    return `无法确认中继客户端安装 ${this.requestedVersion}；安装 ${this.activeVersion} 的对话框状态为 ${this.activeDialogStatus}。`;
   }
 }
 

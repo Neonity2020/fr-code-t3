@@ -13,10 +13,10 @@ import { FoldedSettingsSection } from "./FoldedSettingsSection";
 import { searchableSetting } from "./settingsSearch";
 
 const preferences = [
-  { value: 100, label: "Prefer" },
-  { value: 50, label: "Normal" },
-  { value: 25, label: "Less often" },
-  { value: 0, label: "Manual only" },
+  { value: 100, label: "优先" },
+  { value: 50, label: "标准" },
+  { value: 25, label: "较少使用" },
+  { value: 0, label: "仅手动" },
 ] as const;
 
 type LoadPreference = (typeof preferences)[number]["value"];
@@ -74,11 +74,11 @@ export function LoadBalancingSettings({
       summary={
         settings.loadBalancingEnabled
           ? summarizeLoadPreferences(environments, settings.loadBalancingWeights)
-          : "Off"
+          : "关闭"
       }
       control={
         <Switch
-          aria-label="Automatically balance load"
+          aria-label="自动平衡负载"
           checked={settings.loadBalancingEnabled}
           disabled={!settingsHydrated}
           onCheckedChange={(loadBalancingEnabled) => updateSettings({ loadBalancingEnabled })}
@@ -86,8 +86,7 @@ export function LoadBalancingSettings({
       }
     >
       <p className="px-3 py-2.5 text-xs text-muted-foreground sm:px-4">
-        New threads in shared projects start on the machine with the most free CPU and memory,
-        weighted by each machine's preference.
+        共享项目中的新会话会根据各机器的偏好权重，选择空闲 CPU 和内存最多的机器运行。
       </p>
       {environments.map((environment) => (
         <EnvironmentRow
@@ -112,11 +111,7 @@ export function LoadBalancingSettings({
               });
             }}
           >
-            <SelectTrigger
-              size="xs"
-              className="w-32"
-              aria-label={`${environment.label} load preference`}
-            >
+            <SelectTrigger size="xs" className="w-32" aria-label={`${environment.label} 负载偏好`}>
               <SelectValue />
             </SelectTrigger>
             <SelectPopup align="end" alignItemWithTrigger={false}>

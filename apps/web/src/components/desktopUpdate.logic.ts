@@ -57,51 +57,51 @@ export function isDesktopUpdateButtonDisabled(state: DesktopUpdateState | null):
 
 export function getArm64IntelBuildWarningDescription(state: DesktopUpdateState): string {
   if (!shouldShowArm64IntelBuildWarning(state)) {
-    return "This install is using the correct architecture.";
+    return "此安装版本使用了正确的架构。";
   }
 
   const action = resolveDesktopUpdateButtonAction(state);
   if (action === "download") {
-    return "This Mac has Apple Silicon, but FR Code is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.";
+    return "此 Mac 使用 Apple 芯片，但 FR Code 仍通过 Rosetta 运行 Intel 版本。请下载可用更新以切换到原生 Apple 芯片版本。";
   }
   if (action === "install") {
-    return "This Mac has Apple Silicon, but FR Code is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.";
+    return "此 Mac 使用 Apple 芯片，但 FR Code 仍通过 Rosetta 运行 Intel 版本。请重启以安装已下载的 Apple 芯片版本。";
   }
-  return "This Mac has Apple Silicon, but FR Code is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.";
+  return "此 Mac 使用 Apple 芯片，但 FR Code 仍通过 Rosetta 运行 Intel 版本。下次应用更新会替换为原生 Apple 芯片版本。";
 }
 
 export function getDesktopUpdateButtonTooltip(state: DesktopUpdateState): string {
   if (state.status === "available") {
-    return `Update ${state.availableVersion ?? "available"} ready to download`;
+    return `更新 ${state.availableVersion ?? "available"} 已可下载`;
   }
   if (state.status === "downloading") {
     const progress =
       typeof state.downloadPercent === "number" ? ` (${Math.floor(state.downloadPercent)}%)` : "";
-    return `Downloading update${progress}`;
+    return `正在下载更新${progress}`;
   }
   if (state.status === "downloaded") {
-    return `Update ${state.downloadedVersion ?? state.availableVersion ?? "ready"} downloaded. Click to restart and install.`;
+    return `更新 ${state.downloadedVersion ?? state.availableVersion ?? "ready"} 已下载，点击重启并安装。`;
   }
   if (state.status === "error") {
     if (state.errorContext === "download" && state.availableVersion) {
-      return `Download failed for ${state.availableVersion}. Click to retry.`;
+      return `下载 ${state.availableVersion} 失败，点击重试。`;
     }
     if (state.errorContext === "install" && state.downloadedVersion) {
-      return `Install failed for ${state.downloadedVersion}. Click to retry.`;
+      return `安装 ${state.downloadedVersion} 失败，点击重试。`;
     }
     if (state.downloadedVersion) {
-      return `Update ${state.downloadedVersion} downloaded. Click to restart and install.`;
+      return `更新 ${state.downloadedVersion} 已下载，点击重启并安装。`;
     }
-    return state.message ?? "Update failed";
+    return state.message ?? "更新失败";
   }
-  return "Up to date";
+  return "已是最新版本";
 }
 
 export function getDesktopUpdateInstallConfirmationMessage(
   state: Pick<DesktopUpdateState, "availableVersion" | "downloadedVersion">,
 ): string {
   const version = state.downloadedVersion ?? state.availableVersion;
-  return `Install update${version ? ` ${version}` : ""} and restart FR Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.`;
+  return `安装更新${version ? ` ${version}` : ""}并重启 FR Code？\n\n运行中的任务将被中断，请确认已准备好再继续。`;
 }
 
 export function getDesktopUpdateActionError(result: DesktopUpdateActionResult): string | null {

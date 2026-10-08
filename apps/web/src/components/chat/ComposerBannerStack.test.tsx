@@ -52,7 +52,7 @@ it("only offers notice details when the description cannot fit", async () => {
     get clientWidth() {
       return (
         availableWidth -
-        (renderer?.root.findAllByProps({ "aria-label": "Show notice details" }).length ? 28 : 0)
+        (renderer?.root.findAllByProps({ "aria-label": "显示提示详情" }).length ? 28 : 0)
       );
     },
     scrollWidth: 80,
@@ -65,7 +65,7 @@ it("only offers notice details when the description cannot fit", async () => {
             id: "usage",
             variant: "info",
             icon: null,
-            title: "Usage limits",
+            title: "用量限制",
             description: "OpenCode",
           },
         ]}
@@ -76,7 +76,7 @@ it("only offers notice details when the description cannot fit", async () => {
       },
     );
   });
-  const details = () => renderer.root.findAllByProps({ "aria-label": "Show notice details" });
+  const details = () => renderer.root.findAllByProps({ "aria-label": "显示提示详情" });
   expect(details()).toHaveLength(0);
   text.scrollWidth = 300;
   await act(() => resize());

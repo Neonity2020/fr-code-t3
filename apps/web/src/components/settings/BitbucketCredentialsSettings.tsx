@@ -22,16 +22,15 @@ const METHODS: Record<
   }
 > = {
   "access-token": {
-    label: "Access token",
-    description:
-      "Scoped to one repository, project, or workspace. Create it in that item's Bitbucket settings.",
+    label: "访问令牌",
+    description: "限定于一个仓库、项目或工作区。在该项目的 Bitbucket 设置中创建。",
     link: "https://support.atlassian.com/bitbucket-cloud/docs/access-tokens/",
     linkLabel: "Learn more",
   },
   "api-token": {
-    label: "API token",
+    label: "API 令牌",
     description:
-      "Uses your Atlassian account, so it reaches every repository you can. Give it read and write access to repositories and pull requests, and read:user:bitbucket.",
+      "使用你的 Atlassian 账户，可访问你有权限的所有仓库。请授予仓库和拉取请求读写权限，以及 read:user:bitbucket 权限。",
     link: "https://id.atlassian.com/manage-profile/security/api-tokens",
     linkLabel: "Create an API token",
   },
@@ -61,7 +60,7 @@ function TokenInput({
       type="password"
       autoComplete="off"
       size="sm"
-      placeholder={isSaved ? "Stored secret, enter a new value to replace" : "Not set"}
+      placeholder={isSaved ? "已保存密钥，输入新值可替换" : "未设置"}
       value={draft}
       onChange={(event) => onDraftChange(event.target.value)}
     />
@@ -140,7 +139,7 @@ export function BitbucketCredentialsSettings({
       {/* Locked while saving: a successful save clears the drafts, which would drop edits made mid-request. */}
       <fieldset disabled={saving} className="contents">
         <ToggleGroup
-          aria-label="Bitbucket sign-in method"
+          aria-label="Bitbucket 登录方式"
           variant="segmented"
           value={[method]}
           onValueChange={(next) => {
@@ -160,7 +159,7 @@ export function BitbucketCredentialsSettings({
         </p>
         {method === "access-token" ? (
           <div className="grid gap-1.5">
-            <Label htmlFor={`bitbucket-access-token-${environmentId}`}>Access token</Label>
+            <Label htmlFor={`bitbucket-access-token-${environmentId}`}>访问令牌</Label>
             <TokenInput
               id={`bitbucket-access-token-${environmentId}`}
               isSaved={methodIsSaved}
@@ -171,7 +170,7 @@ export function BitbucketCredentialsSettings({
         ) : (
           <>
             <div className="grid gap-1.5">
-              <Label htmlFor={`bitbucket-email-${environmentId}`}>Atlassian account email</Label>
+              <Label htmlFor={`bitbucket-email-${environmentId}`}>Atlassian 账号邮箱</Label>
               <Input
                 id={`bitbucket-email-${environmentId}`}
                 type="email"
@@ -183,7 +182,7 @@ export function BitbucketCredentialsSettings({
               />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor={`bitbucket-api-token-${environmentId}`}>API token</Label>
+              <Label htmlFor={`bitbucket-api-token-${environmentId}`}>API 令牌</Label>
               <TokenInput
                 id={`bitbucket-api-token-${environmentId}`}
                 isSaved={methodIsSaved}
@@ -196,10 +195,10 @@ export function BitbucketCredentialsSettings({
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             {current === null
-              ? "Without a saved token, the server falls back to its T3CODE_BITBUCKET_* environment variables."
+              ? "未保存令牌时，服务器会使用 T3CODE_BITBUCKET_* 环境变量。"
               : methodIsSaved
                 ? null
-                : `Saving replaces your ${METHODS[current].label.toLowerCase()}.`}
+                : `保存后将替换你的${METHODS[current].label.toLowerCase()}。`}
           </p>
           <div className="flex shrink-0 gap-2">
             {current !== null ? (
@@ -209,11 +208,11 @@ export function BitbucketCredentialsSettings({
                 disabled={saving}
                 onClick={() => void save({ accessToken: "", email: "", apiToken: "" })}
               >
-                Remove
+                移除
               </Button>
             ) : null}
             <Button type="submit" size="xs" disabled={!canSave || saving}>
-              Save
+              保存
             </Button>
           </div>
         </div>

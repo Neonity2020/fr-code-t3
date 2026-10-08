@@ -32,12 +32,12 @@ it("offers effects only with a capable GNOME extension, explaining how to upgrad
     shortcutMessage: null,
     message: null,
   };
-  expect(snapShotFeedbackUnavailableMessage(state)).toContain("Update");
+  expect(snapShotFeedbackUnavailableMessage(state)).toContain("更新");
   expect(
     snapShotFeedbackUnavailableMessage({ ...state, linuxFeedbackAvailable: true }),
   ).toBeUndefined();
   expect(snapShotFeedbackUnavailableMessage({ ...state, linuxBackend: "picker" })).toContain(
-    "aren't available",
+    "不支持捕获效果",
   );
   expect(snapShotFeedbackUnavailableMessage({ ...state, mode: "direct" })).toBeUndefined();
 });
@@ -57,7 +57,7 @@ it("ignores a stale request after a newer request starts", () => {
 });
 
 it("reports unavailable capture support without browser globals", () => {
-  expect(snapShotUnavailableMessage(false)).toBe("Only available in the desktop app.");
+  expect(snapShotUnavailableMessage(false)).toBe("仅桌面应用可用。");
 });
 
 it("describes Niri setup without claiming a global shortcut is registered", () => {
@@ -69,9 +69,9 @@ it("describes Niri setup without claiming a global shortcut is registered", () =
     shortcutMessage: "Managed by Niri",
     message: null,
   };
-  expect(snapShotStatus(state, true)).toBe("Finish shortcut setup");
+  expect(snapShotStatus(state, true)).toBe("完成快捷键设置");
   expect(snapShotStatus(state, true)).not.toContain("could not be registered");
-  expect(snapShotFeedbackUnavailableMessage(state)).toContain("aren't available on Niri");
+  expect(snapShotFeedbackUnavailableMessage(state)).toContain("Niri 不支持捕获效果");
 });
 
 it("distinguishes Hyprland helper setup, action registration, and verified shortcut delivery", () => {
@@ -85,21 +85,21 @@ it("distinguishes Hyprland helper setup, action registration, and verified short
     message: null,
     hyprlandHelper: { status: "not-installed", message: "Install helper" },
   };
-  expect(snapShotSetupButtonLabel(state)).toBe("Set up Hyprland capture");
+  expect(snapShotSetupButtonLabel(state)).toBe("设置 Hyprland 捕获");
   expect(snapShotStatus(state, false)).toBe("Turn this on to set up snapshots.");
-  expect(snapShotStatus(state, true)).toContain("Install the capture helper");
-  expect(snapShotFeedbackUnavailableMessage(state)).toContain("Install or update");
+  expect(snapShotStatus(state, true)).toContain("安装捕获辅助程序");
+  expect(snapShotFeedbackUnavailableMessage(state)).toContain("安装或更新");
   const ready = {
     ...state,
     hyprlandHelper: { status: "ready" as const, message: "Ready" },
     linuxFeedbackAvailable: true,
   };
-  expect(snapShotSetupButtonLabel(ready)).toBe("Manage capture");
+  expect(snapShotSetupButtonLabel(ready)).toBe("管理捕获");
   expect(snapShotShortcutStatus({ ...ready, shortcutPending: true })).not.toContain("permission");
   expect(snapShotStatus({ ...ready, shortcutActionRegistered: true }, true)).toBe(
-    "Use your shortcut from another app",
+    "在其他应用中使用快捷键",
   );
-  expect(snapShotStatus({ ...ready, shortcutVerified: true }, true)).toBe("Ready to capture");
+  expect(snapShotStatus({ ...ready, shortcutVerified: true }, true)).toBe("已可捕获");
   expect(snapShotFeedbackUnavailableMessage(ready)).toBeUndefined();
   expect(snapShotAccessibilityUnavailableMessage(ready)).toBeUndefined();
 });
@@ -131,7 +131,7 @@ it.each(["gnome-extension", "niri", "screenshot-portal", "picker"] as const)(
 
     expect(DEFAULT_CLIENT_SETTINGS.snapShotEnabled).toBe(false);
     expect(snapShotStatus(state, false)).toBe("Turn this on to set up snapshots.");
-    expect(snapShotStatus(state, true)).toBe("Capture needs attention");
+    expect(snapShotStatus(state, true)).toBe("捕获需要处理");
   },
 );
 
@@ -145,20 +145,18 @@ it("distinguishes saved shortcuts from observed delivery without making users re
     message: null,
     gnomeExtension: { status: "enabled", message: "Running" },
   };
-  expect(snapShotSetupSummary(state, true)).toBe("Shortcut saved");
-  expect(snapShotSetupButtonLabel(state)).toBe("Manage capture");
-  expect(snapShotSetupSummary({ ...state, shortcutVerified: true }, true)).toBe("Ready to capture");
-  expect(snapShotSetupButtonLabel({ ...state, shortcutVerified: true })).toBe("Manage capture");
-  expect(snapShotSetupButtonLabel({ ...state, shortcutRegistered: false })).toBe("Manage capture");
+  expect(snapShotSetupSummary(state, true)).toBe("快捷键已保存");
+  expect(snapShotSetupButtonLabel(state)).toBe("管理捕获");
+  expect(snapShotSetupSummary({ ...state, shortcutVerified: true }, true)).toBe("已可捕获");
+  expect(snapShotSetupButtonLabel({ ...state, shortcutVerified: true })).toBe("管理捕获");
+  expect(snapShotSetupButtonLabel({ ...state, shortcutRegistered: false })).toBe("管理捕获");
   expect(
     snapShotSetupButtonLabel({
       ...state,
       gnomeExtension: { status: "disabled", message: "Enable the extension" },
     }),
-  ).toBe("Set up GNOME capture");
-  expect(snapShotSetupSummary({ ...state, shortcutVerified: true }, false)).toContain(
-    "Enable capture",
-  );
+  ).toBe("设置 GNOME 捕获");
+  expect(snapShotSetupSummary({ ...state, shortcutVerified: true }, false)).toContain("启用捕获");
   expect(
     snapShotSetupSummary(
       {
@@ -168,19 +166,19 @@ it("distinguishes saved shortcuts from observed delivery without making users re
       },
       true,
     ),
-  ).toBe("Set up active-window snapshots");
+  ).toBe("设置当前窗口快照");
   expect(
     snapShotSetupSummary(
       { ...state, linuxBackend: "niri", gnomeExtension: undefined, shortcutRegistered: false },
       true,
     ),
-  ).toBe("Finish shortcut setup");
+  ).toBe("完成快捷键设置");
   expect(
     snapShotSetupSummary(
       { ...state, linuxBackend: "picker", gnomeExtension: undefined, shortcutVerified: true },
       true,
     ),
-  ).toBe("Manual capture only — you'll choose a window each time");
+  ).toBe("仅手动捕获 — 每次需选择窗口");
   expect(
     snapShotSetupSummary(
       {
@@ -191,7 +189,7 @@ it("distinguishes saved shortcuts from observed delivery without making users re
       },
       true,
     ),
-  ).toBe("Ready to capture");
+  ).toBe("已可捕获");
 });
 
 it.each([
@@ -209,7 +207,7 @@ it.each([
       shortcutMessage: null,
       message: "Capability check failed",
     };
-    expect(snapShotSetupButtonLabel(state)).toBe(`Set up ${name} capture`);
+    expect(snapShotSetupButtonLabel(state)).toBe(`设置 ${name} 捕获`);
   },
 );
 
@@ -223,18 +221,18 @@ it("keeps picker limitations visible after shortcut verification without recomme
     message: null,
     shortcutVerified: true,
   };
-  expect(snapShotStatus(state, true)).toContain("Manual capture only");
-  expect(snapShotDescription(state)).toContain("Automatic capture isn't available");
+  expect(snapShotStatus(state, true)).toContain("仅手动捕获");
+  expect(snapShotDescription(state)).toContain("此处不支持自动捕获");
   expect(snapShotFeedbackUnavailableMessage(state)).not.toContain("GNOME");
-  expect(snapShotAccessibilityUnavailableMessage(state)).toContain("only provides a screenshot");
+  expect(snapShotAccessibilityUnavailableMessage(state)).toContain("仅支持截图");
   expect(
     snapShotAccessibilityUnavailableMessage({ ...state, linuxBackend: "screenshot-portal" }),
-  ).toContain("only provides a screenshot");
+  ).toContain("仅支持截图");
   expect(
     snapShotAccessibilityUnavailableMessage({ ...state, linuxBackend: "kde" }),
   ).toBeUndefined();
   expect(snapShotFeedbackUnavailableMessage({ ...state, linuxBackend: "kde" })).toContain(
-    "capture helper",
+    "捕获辅助程序",
   );
   expect(
     snapShotFeedbackUnavailableMessage({
@@ -249,7 +247,7 @@ it("keeps picker limitations visible after shortcut verification without recomme
       { ...state, linuxBackend: "kde", kdeHelper: { status: "not-installed", message: "Install" } },
       true,
     ),
-  ).toContain("Install the capture helper");
+  ).toContain("安装捕获辅助程序");
 });
 
 it("does not ask Niri users to repeat setup when its capture endpoint is available", () => {
@@ -262,8 +260,8 @@ it("does not ask Niri users to repeat setup when its capture endpoint is availab
     shortcutMessage: null,
     message: null,
   };
-  expect(snapShotStatus(state, true)).toBe("Use your shortcut from another app");
-  expect(snapShotSetupButtonLabel(state)).toBe("Manage capture");
+  expect(snapShotStatus(state, true)).toBe("在其他应用中使用快捷键");
+  expect(snapShotSetupButtonLabel(state)).toBe("管理捕获");
 });
 
 it("reports pending, denied, and assigned shortcuts without inferring consent from saved keys", () => {
@@ -276,7 +274,7 @@ it("reports pending, denied, and assigned shortcuts without inferring consent fr
     shortcutMessage: null,
     message: null,
   };
-  expect(snapShotStatus(state, true)).toContain("Waiting for shortcut permission");
+  expect(snapShotStatus(state, true)).toContain("正在等待快捷键权限");
   expect(snapShotShortcutStatus(state)).toContain("Approve the shortcut permission prompt");
   const denied = { ...state, shortcutPending: false, shortcutMessage: "Permission wasn't granted" };
   expect(snapShotShortcutStatus(denied)).toBe("Permission wasn't granted");
@@ -286,7 +284,7 @@ it("reports pending, denied, and assigned shortcuts without inferring consent fr
     shortcutLabel: "Press <Shift><Control>2",
     shortcutMessage: "Desktop shortcut: Press <Shift><Control>2",
   };
-  expect(snapShotStatus(approved, true)).toBe("Ready to capture");
+  expect(snapShotStatus(approved, true)).toBe("已可捕获");
   expect(snapShotShortcutStatus(approved)).toBeNull();
   expect(snapShotShortcutStatus({ ...approved, shortcutPending: true })).toContain(
     "Approve the shortcut permission prompt",
@@ -318,8 +316,8 @@ it("hides macOS setup only while permissions and the shortcut are all in place",
     message: "Allow Accessibility in System Settings, then restart FR Code.",
   };
   expect(snapShotSetupComplete(revoked, true)).toBe(false);
-  expect(snapShotStatus(revoked, true)).toBe("Capture needs attention");
-  expect(snapShotSetupButtonLabel(revoked)).toBe("Continue setup");
+  expect(snapShotStatus(revoked, true)).toBe("捕获需要处理");
+  expect(snapShotSetupButtonLabel(revoked)).toBe("继续设置");
   expect(snapShotSetupComplete({ ...revoked, message: null }, false)).toBe(true);
   expect(
     snapShotSetupComplete(

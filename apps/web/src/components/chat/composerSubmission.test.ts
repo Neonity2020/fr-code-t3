@@ -48,9 +48,7 @@ describe("submitComposerDraft", () => {
 
     expect(dispatchedDrafts).toEqual([]);
     expect(draft).toHaveLength(PROVIDER_SEND_TURN_MAX_INPUT_CHARS + 1);
-    expect(validationMessage).toBe(
-      "Prompt is 1 character over the 120,000-character limit. Shorten or split it before sending.",
-    );
+    expect(validationMessage).toBe("提示词超过 120,000 字符限制 1 个字符。请缩短或拆分后发送。");
     expect(preventDefault).toHaveBeenCalledOnce();
 
     draft = "Corrected prompt";
@@ -90,8 +88,7 @@ describe("submitComposerDraft", () => {
     });
 
     expect(result).toEqual({
-      validationMessage:
-        "Prompt is 18 characters over the 120,000-character limit. Shorten or split it before sending.",
+      validationMessage: "提示词超过 120,000 字符限制 18 个字符。请缩短或拆分后发送。",
       didDispatch: false,
     });
     expect(draft).toHaveLength(PROVIDER_SEND_TURN_MAX_INPUT_CHARS);
@@ -161,8 +158,7 @@ describe("submitComposerDraft", () => {
       });
 
       expect(result).toEqual({
-        validationMessage:
-          "Prompt is 1 character over the 120,000-character limit. Shorten or split it before sending.",
+        validationMessage: "提示词超过 120,000 字符限制 1 个字符。请缩短或拆分后发送。",
         didDispatch: false,
       });
       expect(onSend).not.toHaveBeenCalled();
@@ -192,8 +188,7 @@ describe("submitComposerDraft", () => {
     });
 
     expect(result).toEqual({
-      validationMessage:
-        "Prompt is 1 character over the 120,000-character limit. Shorten or split it before sending.",
+      validationMessage: "提示词超过 120,000 字符限制 1 个字符。请缩短或拆分后发送。",
       didDispatch: false,
     });
     expect(onSend).not.toHaveBeenCalled();
@@ -235,7 +230,7 @@ describe("submitComposerDraft", () => {
     });
 
     expect(result.didDispatch).toBe(false);
-    expect(result.validationMessage).toContain("over the 120,000-character limit");
+    expect(result.validationMessage).toContain("超过 120,000 字符限制");
     expect(onSend).not.toHaveBeenCalled();
   });
 

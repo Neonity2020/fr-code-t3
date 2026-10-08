@@ -54,7 +54,7 @@ describe("linked pull request thread navigation", () => {
       threadSearchItems: items,
     });
     expect(groups.flatMap((group) => group.items)).toEqual(items);
-    expect(items[0]?.description).toBe("Archived thread");
+    expect(items[0]?.description).toBe("已归档会话");
     await items[0]?.run();
     expect(runThread).toHaveBeenCalledWith({ environmentId, id });
   });
@@ -173,8 +173,8 @@ describe("buildCommandPaletteProjectMetadata", () => {
       locationByEnvironmentId: new Map(),
     });
 
-    expect(metadata.searchTerms).toContain("Remote");
-    expect(metadata.environmentLabels).toEqual(["Remote"]);
+    expect(metadata.searchTerms).toContain("远端");
+    expect(metadata.environmentLabels).toEqual(["远端"]);
   });
 });
 
@@ -324,7 +324,7 @@ function makeThread(overrides: Partial<Thread> = {}): Thread {
     id: ThreadId.make("thread-1"),
     environmentId: LOCAL_ENVIRONMENT_ID,
     projectId: PROJECT_ID,
-    title: "Thread",
+    title: "会话",
     modelSelection: { instanceId: ProviderInstanceId.make("codex"), model: "gpt-5" },
     runtimeMode: "full-access",
     interactionMode: "default",
@@ -396,8 +396,8 @@ describe("buildThreadActionItems", () => {
         "thread:thread-older",
         "thread:thread-newer",
       ]);
-      expect(items[0]?.timestamp).toBe("1d ago");
-      expect(items[1]?.timestamp).toBe("5d ago");
+      expect(items[0]?.timestamp).toBe("1 天 前");
+      expect(items[1]?.timestamp).toBe("5 天 前");
     } finally {
       vi.useRealTimers();
     }
@@ -565,7 +565,7 @@ describe("buildThreadActionItems", () => {
           kind: "action",
           value: "setting:theme",
           searchTerms: ["Themes", "Appearance"],
-          title: "Themes",
+          title: "主题",
           icon: null,
           run: async () => undefined,
         },
@@ -691,7 +691,7 @@ describe("buildThreadActionItems", () => {
         }),
         makeThread({
           id: ThreadId.make("thread-archived"),
-          title: "Archived thread",
+          title: "已归档会话",
           archivedAt: "2026-03-20T00:00:00.000Z",
           updatedAt: "2026-03-20T00:00:00.000Z",
         }),

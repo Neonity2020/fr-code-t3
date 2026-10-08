@@ -108,11 +108,11 @@ export function whenAstToExpression(node: KeybindingWhenNode | undefined): strin
 }
 
 export function whenNodeRemoveLabel(node: KeybindingWhenNode, depth: number): string {
-  if (depth === 0) return "Clear all conditions";
+  if (depth === 0) return "清除所有条件";
   if (node.type === "identifier" || (node.type === "not" && node.node.type === "identifier")) {
-    return "Remove condition";
+    return "移除条件";
   }
-  return "Remove group and its conditions";
+  return "移除组及其条件";
 }
 
 function wrapWhenExpression(node: KeybindingWhenNode): string {
@@ -130,7 +130,7 @@ export function parseWhenExpressionDraft(
   if (!ast) {
     return {
       ok: false,
-      message: "Use variables with !, &&, ||, and parentheses.",
+      message: "使用变量、!、&&、|| 和括号。",
     };
   }
 
@@ -311,23 +311,90 @@ export function buildKeybindingCommandOptions(
   return [...commands].toSorted((left, right) => compareCommands(left, right, commandLabel));
 }
 
+const COMMAND_SEGMENT_LABELS: Readonly<Record<string, string>> = {
+  sidebar: "侧边栏",
+  navigation: "导航",
+  back: "后退",
+  forward: "前进",
+  terminal: "终端",
+  toggle: "切换",
+  split: "水平拆分",
+  splitVertical: "垂直拆分",
+  new: "新建",
+  close: "关闭",
+  rightPanel: "右侧面板",
+  threadPanel: "会话面板",
+  toggleMaximized: "切换最大化",
+  pullRequest: "拉取请求",
+  copyNumber: "复制编号",
+  diff: "差异",
+  preview: "预览",
+  refresh: "刷新",
+  focusUrl: "聚焦地址栏",
+  zoomIn: "放大",
+  zoomOut: "缩小",
+  resetZoom: "重置缩放",
+  commandPalette: "命令面板",
+  filePicker: "文件选择器",
+  projectSearch: "项目搜索",
+  usage: "用量",
+  open: "打开",
+  theme: "主题",
+  select: "选择",
+  appearance: "外观",
+  cycle: "循环切换",
+  themeEditor: "主题编辑器",
+  composer: "输入框",
+  stash: "暂存草稿",
+  host: "环境",
+  cycleHost: "切换环境",
+  effort: "推理强度",
+  mode: "模式",
+  workspace: "工作区",
+  previousWorktree: "之前的工作树",
+  branch: "分支",
+  chat: "会话",
+  newLocal: "新建本地会话",
+  newWithoutProject: "无需项目新建",
+  editor: "编辑器",
+  openFavorite: "在首选编辑器中打开",
+  modelPicker: "模型选择器",
+  previousProvider: "上一个提供方",
+  nextProvider: "下一个提供方",
+  jump: "跳转",
+  thread: "会话",
+  stop: "停止",
+  previous: "上一个",
+  next: "下一个",
+  settle: "标记完成",
+  pin: "置顶",
+  undo: "撤销",
+};
+
 export function commandLabel(command: KeybindingCommand): string {
-  if (command === "composer.sendAlternate") return "Composer: Opposite Queue or Steer Action";
-  if (command === "composer.sendBackground") return "Composer: Start in Background";
-  if (command === "composer.sendAndNewThread") return "Composer: Send and Start New Thread";
-  if (command === "thread.steerQueuedMessage") return "Queue: Send First Queued Message as Steer";
-  if (command === "thread.editQueuedMessage") return "Queue: Edit Last Queued Message";
-  if (command === "thread.copyReference") return "Pull Request: Copy Link or Thread ID";
+  if (command === "composer.sendAlternate") return "输入框：执行相反的排队或引导操作";
+  if (command === "composer.sendBackground") return "输入框：在后台启动";
+  if (command === "composer.sendAndNewThread") return "输入框：发送并新建会话";
+  if (command === "thread.steerQueuedMessage") return "队列：将首条排队消息作为引导发送";
+  if (command === "thread.editQueuedMessage") return "队列：编辑最后一条排队消息";
+  if (command === "thread.copyReference") return "拉取请求：复制链接或会话 ID";
   const usageMetric = METRIC_OPTIONS.find((option) => option.command === command);
-  if (usageMetric) return `Usage: ${usageMetric.label}`;
+  if (usageMetric) return `用量：${usageMetric.label}`;
   const usagePeriod = WINDOW_OPTIONS.find((option) => option.command === command);
-  if (usagePeriod) return `Usage: Period: ${usagePeriod.label}`;
-  if (command === "view.reopenClosed") return "Reopen Closed Tab";
+  if (usagePeriod) return `用量：时段：${usagePeriod.label}`;
+  if (command === "view.reopenClosed") return "重新打开已关闭的标签页";
   const raw = String(command);
   if (raw.startsWith("script.") && raw.endsWith(".run")) {
-    return `Run Script: ${titleCaseCommandSegment(raw.slice("script.".length, -".run".length))}`;
+    return `运行脚本：${titleCaseCommandSegment(raw.slice("script.".length, -".run".length))}`;
   }
-  return raw.split(".").map(titleCaseCommandSegment).join(": ");
+  return raw
+    .split(".")
+    .map((segment) =>
+      Object.hasOwn(COMMAND_SEGMENT_LABELS, segment)
+        ? COMMAND_SEGMENT_LABELS[segment]
+        : titleCaseCommandSegment(segment),
+    )
+    .join("：");
 }
 
 function titleCaseCommandSegment(segment: string): string {

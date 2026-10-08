@@ -32,15 +32,14 @@ export function DeviceHostUpdates({
               <p className="whitespace-pre-wrap break-words text-muted-foreground">
                 {status.detail ??
                   (failed
-                    ? "Device support could not start."
+                    ? "设备支持无法启动。"
                     : status.status === "installing"
-                      ? "Installing device tools…"
-                      : "Starting device tools…")}
+                      ? "正在安装设备工具…"
+                      : "正在启动设备工具…")}
               </p>
               {failed ? (
                 <p className="mt-1 text-muted-foreground">
-                  Check the host connection and network access, then retry. Your device settings are
-                  saved.
+                  请检查主机连接和网络后重试。设备设置已保存。
                 </p>
               ) : null}
             </div>
@@ -56,7 +55,7 @@ export function DeviceHostUpdates({
                   );
                 }}
               >
-                {pending === host.id ? "Retrying…" : "Retry"}
+                {pending === host.id ? "正在重试…" : "重试"}
               </Button>
             ) : null}
           </div>

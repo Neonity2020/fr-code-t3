@@ -25,7 +25,7 @@ import { DeviceWorkspace } from "./DeviceWorkspace";
 import { PreviewPanelShell, type PreviewPanelMode } from "../preview/PreviewPanelShell";
 
 const platformLabel = (platform: DevicePlatform) =>
-  platform === "ios" ? "iOS Simulators" : "Android Emulators";
+  platform === "ios" ? "iOS 模拟器" : "Android 模拟器";
 
 const deviceKey = (device: Pick<DeviceSummary, "hostId" | "id">) =>
   `${device.hostId}\u0000${device.id}`;
@@ -178,7 +178,7 @@ export function DevicePanel(props: {
       <DeviceHostUpdates state={state} environmentId={environmentId} />
       {bootingDevices.length > 0 ? (
         <div role="status" className="border-b px-3 py-2 text-xs text-muted-foreground">
-          Starting {bootingDevices.map((device) => device.name).join(", ")}… This can take a minute.
+          正在启动 {bootingDevices.map((device) => device.name).join(", ")}…这可能需要一分钟。
         </div>
       ) : null}
       {operationError ? (
@@ -190,7 +190,7 @@ export function DevicePanel(props: {
           <Button
             size="icon-xs"
             variant="ghost"
-            aria-label="Dismiss device error"
+            aria-label="关闭设备错误提示"
             onClick={() => setOperationError(null)}
           >
             <X className="size-3" />
@@ -204,7 +204,7 @@ export function DevicePanel(props: {
             environmentId={environmentId}
             device={activeDevice}
             hostLabel={
-              state.hosts.find((host) => host.id === activeDevice.hostId)?.label ?? "Device host"
+              state.hosts.find((host) => host.id === activeDevice.hostId)?.label ?? "设备主机"
             }
             hostDiagnostics={state.hostStatusDetail}
             visible={props.visible}
@@ -214,21 +214,21 @@ export function DevicePanel(props: {
           />
         ) : pendingDevice || hostBusy || !loaded ? (
           <DeviceLoadingView
-            name={pendingDevice?.name ?? "Devices"}
+            name={pendingDevice?.name ?? "设备"}
             description={
               pendingDevice
-                ? `${state.hosts.find((host) => host.id === pendingDevice.hostId)?.label ?? "Device host"} · ${pendingDevice.version}`
+                ? `${state.hosts.find((host) => host.id === pendingDevice.hostId)?.label ?? "设备主机"} · ${pendingDevice.version}`
                 : ""
             }
             stage="opening"
             message={
               pendingDevice
                 ? pendingDevice.booted
-                  ? "Opening device…"
-                  : "Starting device…"
+                  ? "正在打开设备…"
+                  : "正在启动设备…"
                 : state.hostStatus === "installing"
-                  ? (state.hostStatusDetail ?? "Installing device support…")
-                  : "Finding devices…"
+                  ? (state.hostStatusDetail ?? "正在安装设备支持…")
+                  : "正在查找设备…"
             }
           />
         ) : (
@@ -244,8 +244,8 @@ export function DevicePanel(props: {
                   <Smartphone className="size-6 opacity-60" />
                   <p className="max-w-sm">
                     {state.hostStatus === "failed"
-                      ? (state.hostStatusDetail ?? "The device hub failed to start.")
-                      : "No simulators or emulators were found on this environment."}
+                      ? (state.hostStatusDetail ?? "设备中心启动失败。")
+                      : "此环境未找到模拟器。"}
                   </p>
                 </>
               ) : null}
@@ -267,16 +267,16 @@ export function DevicePanel(props: {
                               </span>
                             }
                             title={device.name}
-                            description={`${state.hosts.find((host) => host.id === device.hostId)?.label} · ${device.version} · ${device.booted ? "Running" : "Stopped"}`}
+                            description={`${state.hosts.find((host) => host.id === device.hostId)?.label} · ${device.version} · ${device.booted ? "正在运行" : "已停止"}`}
                             disabled={pendingDeviceKey !== null}
-                            aria-label={`${device.booted ? "Open" : "Start"} ${device.name}`}
+                            aria-label={`${device.booted ? "打开" : "启动"} ${device.name}`}
                             onClick={() => void selectDevice(deviceKey(device))}
                             action={
                               pendingDeviceKey === deviceKey(device) ? (
                                 <Spinner size="xs" />
                               ) : (
                                 <span className="text-xs text-muted-foreground">
-                                  {device.booted ? "Open" : "Start"}
+                                  {device.booted ? "打开" : "启动"}
                                 </span>
                               )
                             }
@@ -291,8 +291,7 @@ export function DevicePanel(props: {
               !state.devices.some((device) => device.platform === "android") &&
               !unavailablePlatforms.some((platform) => platform.platform === "android") ? (
                 <p className="max-w-sm text-xs">
-                  No Android virtual devices found. Create one in Android Studio's Device Manager,
-                  then refresh.
+                  未找到 Android 虚拟设备。请在 Android Studio 的设备管理器中创建后刷新。
                 </p>
               ) : null}
               {loaded && !hostBusy ? (
@@ -302,7 +301,7 @@ export function DevicePanel(props: {
                   size="sm"
                   onClick={() => void list({ environmentId, input: {} })}
                 >
-                  Refresh devices
+                  刷新设备
                 </Button>
               ) : null}
             </div>

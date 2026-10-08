@@ -122,7 +122,7 @@ it.each(["niri", "hyprland"] as const)(
     state = { ...state, linuxBackend: desktop };
     const tree = await mount();
     expect(wizard(tree)).toBeNull();
-    button(tree, "Change shortcut").onClick();
+    button(tree, "更改快捷键").onClick();
     await finish(bridge.getSnapShotState.mock.results[1]!.value);
     const opened = render();
     expect(visitElements(opened, (element) => element.type === CaptureShortcutConfig)).toBeNull();
@@ -139,7 +139,7 @@ it.each(["niri", "hyprland"] as const)(
 it("returns to Access if the Hyprland helper needs attention before changing keys", async () => {
   const tree = await mount();
   state = { ...state, hyprlandHelper: { status: "not-installed", message: "Install helper" } };
-  button(tree, "Change shortcut").onClick();
+  button(tree, "更改快捷键").onClick();
   await finish(bridge.getSnapShotState.mock.results[1]!.value);
   expect(wizard(render())?.props.initialStep).toBe("access");
   expect(bridge.previewSnapShotConfig).not.toHaveBeenCalled();
@@ -162,7 +162,7 @@ it.each(["direct", "gnome-extension", "kde"] as const)(
       return control.props;
     };
     if (backend !== "direct") {
-      expect(recorder(tree)["aria-label"]).toBe("Record snapshot shortcut, currently Ctrl+Shift+2");
+      expect(recorder(tree)["aria-label"]).toBe("录制快照快捷键，当前为 Ctrl+Shift+2");
       const keycaps = visitElements(tree, (element) => element.type === SnapShotShortcutKeys);
       expect(keycaps?.props.shortcut).toMatchObject({ key: "2", ctrlKey: true, shiftKey: true });
       expect(
@@ -184,8 +184,8 @@ it.each(["direct", "gnome-extension", "kde"] as const)(
     });
     await finish(bridge.checkSnapShotShortcut.mock.results[0]!.value);
     expect(recorder(render()).size).toBe("xs");
-    expect(recorder(render())["aria-label"]).toBe("Record snapshot shortcut, currently Ctrl+Alt+Y");
-    button(render(), "Save").onClick();
+    expect(recorder(render())["aria-label"]).toBe("录制快照快捷键，当前为 Ctrl+Alt+Y");
+    button(render(), "保存").onClick();
     await finish(settingsStore.update.mock.results[0]!.value);
     expect(settingsStore.update).toHaveBeenCalledWith({
       snapShotShortcut: expect.objectContaining({ key: "y", modKey: true, altKey: true }),
@@ -199,17 +199,14 @@ it("turns capture on directly on Windows without opening setup", async () => {
   settingsStore.current = { ...settingsStore.current, snapShotEnabled: false };
   state = { ...state, mode: "direct", linuxBackend: undefined, windows: true };
   const tree = await mount();
-  const toggle = visitElements(
-    tree,
-    (element) => element.props["aria-label"] === "Enable snapshots",
-  );
+  const toggle = visitElements(tree, (element) => element.props["aria-label"] === "启用快照");
   if (!toggle) throw new Error("Missing capture toggle");
   (toggle.props.onCheckedChange as (checked: boolean) => void)(true);
   await finish(settingsStore.update.mock.results[0]!.value);
   expect(settingsStore.update).toHaveBeenCalledWith({ snapShotEnabled: true });
   expect(wizard(renderWithEffects())).toBeNull();
   expect(
-    visitElements(renderWithEffects(), (element) => element.props.children === "Manage capture"),
+    visitElements(renderWithEffects(), (element) => element.props.children === "管理捕获"),
   ).toBeNull();
 });
 
@@ -222,7 +219,7 @@ it("keeps the approved desktop shortcut when recording is cancelled in setup", a
     shortcutLabel: "Press <Control><Alt>8",
   };
   const tree = await mount();
-  button(tree, "Manage capture").onClick();
+  button(tree, "管理捕获").onClick();
   await finish(bridge.getSnapShotState.mock.results[1]!.value);
   const shortcut = () => {
     const input = visitElements(
@@ -232,16 +229,16 @@ it("keeps the approved desktop shortcut when recording is cancelled in setup", a
     if (!input) throw new Error("Missing setup shortcut recorder");
     return input.props;
   };
-  expect(shortcut()["aria-label"]).toBe("Record snapshot shortcut, currently Ctrl+Alt+8");
+  expect(shortcut()["aria-label"]).toBe("录制快照快捷键，当前为 Ctrl+Alt+8");
   (shortcut().onClick as () => void)();
   await finish(bridge.setSnapShotShortcutSuppressed.mock.results.at(-1)!.value);
-  expect(shortcut().children).toBe("Press shortcut…");
+  expect(shortcut().children).toBe("按下快捷键…");
   (shortcut().onKeyDown as (event: object) => void)({
     key: "Escape",
     preventDefault: vi.fn(),
     stopPropagation: vi.fn(),
   });
-  expect(shortcut()["aria-label"]).toBe("Record snapshot shortcut, currently Ctrl+Alt+8");
+  expect(shortcut()["aria-label"]).toBe("录制快照快捷键，当前为 Ctrl+Alt+8");
   expect(settingsStore.update).not.toHaveBeenCalled();
   expect(bridge.checkSnapShotShortcut).not.toHaveBeenCalled();
 });
@@ -278,13 +275,13 @@ it("keeps older portal shortcuts editable without offering unsupported permissio
   expect(
     visitElements(render(), (element) => "data-keybinding-capture" in element.props)?.props
       .children,
-  ).toBe("Press shortcut…");
+  ).toBe("按下快捷键…");
 });
 
 it("shows permission errors once in a toast and allows retrying", async () => {
   usePortalShortcut(true);
   bridge.setupSnapShot.mockRejectedValueOnce(new Error("The desktop service disconnected."));
-  button(await mount(), "Shortcut permissions").onClick();
+  button(await mount(), "快捷键权限").onClick();
   await finish(bridge.setupSnapShot.mock.results[0]!.value.catch(() => undefined));
   const tree = renderWithEffects();
   expect(toastManager.add).toHaveBeenCalledExactlyOnceWith({
@@ -294,7 +291,7 @@ it("shows permission errors once in a toast and allows retrying", async () => {
   });
   expect(visitElements(tree, (element) => element.props.role === "alert")).toBeNull();
   expect(state.shortcutRegistered).toBe(true);
-  button(renderWithEffects(), "Shortcut permissions").onClick();
+  button(renderWithEffects(), "快捷键权限").onClick();
   await finish(bridge.setupSnapShot.mock.results[1]!.value);
   renderWithEffects();
   expect(bridge.setupSnapShot).toHaveBeenCalledTimes(2);
@@ -306,7 +303,7 @@ it("keeps a failed preference unchanged and reports the save error in a toast", 
   const flash = (tree: ReturnType<typeof render>) => {
     const control = visitElements(
       tree,
-      (element) => element.props["aria-label"] === "Flash captured window",
+      (element) => element.props["aria-label"] === "闪烁捕获窗口",
     );
     if (!control) throw new Error("Missing flash control");
     return control.props as { onCheckedChange: (checked: boolean) => void; checked: boolean };
@@ -328,7 +325,7 @@ it("keeps a failed preference unchanged and reports the save error in a toast", 
 
 it("keeps setup errors in the wizard and does not toast them after closing it", async () => {
   usePortalShortcut(true);
-  button(await mount(), "Manage capture").onClick();
+  button(await mount(), "管理捕获").onClick();
   await finish(bridge.getSnapShotState.mock.results[1]!.value);
   bridge.setupSnapShot.mockRejectedValueOnce(new Error("The desktop service disconnected."));
   const action = wizard(render())!.props.onAction as (action: "retry-shortcut") => Promise<void>;
@@ -363,10 +360,7 @@ it.each([false, true])(
       macPermissions: { screenRecording: false, accessibility: false },
     };
     const tree = await mount();
-    const toggle = visitElements(
-      tree,
-      (element) => element.props["aria-label"] === "Enable snapshots",
-    );
+    const toggle = visitElements(tree, (element) => element.props["aria-label"] === "启用快照");
     (toggle!.props.onCheckedChange as (checked: boolean) => void)(true);
     await finish(bridge.getSnapShotState.mock.results[1]!.value);
     bridge.setupSnapShot.mockImplementationOnce(async () => {
@@ -401,10 +395,7 @@ it("requires a successful macOS test capture before enabling and allows retry", 
     macPermissions: { screenRecording: true, accessibility: true },
   };
   const tree = await mount();
-  const toggle = visitElements(
-    tree,
-    (element) => element.props["aria-label"] === "Enable snapshots",
-  );
+  const toggle = visitElements(tree, (element) => element.props["aria-label"] === "启用快照");
   (toggle!.props.onCheckedChange as (checked: boolean) => void)(true);
   await finish(bridge.getSnapShotState.mock.results[1]!.value);
   bridge.setupSnapShot.mockRejectedValueOnce(new Error("Capture was denied"));

@@ -68,19 +68,15 @@ describe("hourly usage formatting", () => {
   it("makes hourly tooltip dates relative to the window in its requested time zone", () => {
     const windowEnd = "2026-08-11T14:37:00.000Z";
 
-    expect(formatRelativeHourShort("2026-08-10T17:37:00.000Z", windowEnd, "UTC")).toBe(
-      "5 PM yesterday",
-    );
-    expect(formatRelativeHourShort("2026-08-11T14:37:00.000Z", windowEnd, "UTC")).toBe(
-      "2 PM today",
-    );
+    expect(formatRelativeHourShort("2026-08-10T17:37:00.000Z", windowEnd, "UTC")).toBe("5 PM 昨天");
+    expect(formatRelativeHourShort("2026-08-11T14:37:00.000Z", windowEnd, "UTC")).toBe("2 PM 今天");
     expect(
       formatRelativeHourShort(
         "2026-08-11T01:37:00.000Z",
         "2026-08-11T10:37:00.000Z",
         "America/Los_Angeles",
       ),
-    ).toBe("6 PM yesterday");
+    ).toBe("6 PM 昨天");
   });
 
   it("builds an exact minute-aligned 24-hour request", () => {

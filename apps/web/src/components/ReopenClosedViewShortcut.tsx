@@ -132,7 +132,7 @@ export function ReopenClosedViewShortcut() {
       .catch((error: unknown) => {
         toastManager.add({
           type: "error",
-          title: "Could not reopen view",
+          title: "无法重新打开视图",
           description: error instanceof Error ? error.message : String(error),
         });
       });

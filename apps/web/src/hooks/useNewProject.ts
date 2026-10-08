@@ -15,9 +15,7 @@ import { useAtomCommand } from "~/state/use-atom-command";
 import { useNewThreadHandler } from "./useHandleNewThread";
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error && error.message.trim().length > 0
-    ? error.message
-    : "An error occurred.";
+  return error instanceof Error && error.message.trim().length > 0 ? error.message : "发生错误。";
 }
 
 /**
@@ -55,8 +53,8 @@ export function useNewProject() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not create the GitHub repository",
-              description: `${errorMessage(squashAtomCommandFailure(result))} Use Publish Repository in the Git menu to try again.`,
+              title: "无法创建 GitHub 仓库",
+              description: `${errorMessage(squashAtomCommandFailure(result))} 请使用 Git 菜单中的“发布仓库”重试。`,
             }),
           );
         }
@@ -65,7 +63,7 @@ export function useNewProject() {
       toastManager.add(
         stackedThreadToast({
           type: "success",
-          title: "Published to GitHub",
+          title: "已发布到 GitHub",
           description: result.value.repository.nameWithOwner,
         }),
       );
@@ -88,7 +86,7 @@ export function useNewProject() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not create the project",
+              title: "无法创建项目",
               description: errorMessage(squashAtomCommandFailure(result)),
             }),
           );
@@ -101,11 +99,11 @@ export function useNewProject() {
       toastManager.add(
         stackedThreadToast(
           commitError === undefined
-            ? { type: "success", title: `Created ${input.name}`, description: workspaceRoot }
+            ? { type: "success", title: `已创建 ${input.name}`, description: workspaceRoot }
             : {
                 type: "warning",
-                title: `Created ${input.name} without a first commit`,
-                description: `${commitError} The project is in ${workspaceRoot}.`,
+                title: `已创建 ${input.name}，尚无首次提交`,
+                description: `${commitError} 项目位于 ${workspaceRoot}。`,
               },
         ),
       );
@@ -124,8 +122,8 @@ export function useNewProject() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to open project",
-            description: `${errorMessage(error)} It will appear in the sidebar once this client catches up.`,
+            title: "打开项目失败",
+            description: `${errorMessage(error)} 此客户端同步后会显示在侧边栏。`,
           }),
         );
         return null;
@@ -135,7 +133,7 @@ export function useNewProject() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to open project",
+            title: "打开项目失败",
             description: errorMessage(error),
           }),
         );

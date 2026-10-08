@@ -49,7 +49,7 @@ function resolveTailscaleIpAdvertisedEndpoints(input: {
           httpBaseUrl: `http://${address.address}:${input.port}`,
           reachability: "private-network",
           status: "available",
-          description: "Reachable from devices on the same Tailnet.",
+          description: "同一 Tailnet 上的设备可访问。",
         }),
       );
     }
@@ -92,8 +92,8 @@ const resolveTailscaleMagicDnsAdvertisedEndpoint = Effect.fn(
       hostedHttpsCompatibility: isReachable ? "compatible" : "requires-configuration",
       status: isReachable ? "available" : "unavailable",
       description: isReachable
-        ? "HTTPS endpoint served by Tailscale Serve."
-        : "MagicDNS hostname. Configure Tailscale Serve for HTTPS access.",
+        ? "由 Tailscale Serve 提供的 HTTPS 端点。"
+        : "MagicDNS 主机名。请配置 Tailscale Serve 以启用 HTTPS 访问。",
     }),
   );
 });

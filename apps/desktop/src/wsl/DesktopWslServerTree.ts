@@ -39,7 +39,7 @@ export class DesktopWslServerTreeExtractError extends Schema.TaggedError<Desktop
   },
 ) {
   override get message(): string {
-    return `Failed to extract the WSL server tree to ${this.targetDir}.`;
+    return `无法将 WSL 服务端文件解压到 ${this.targetDir}。`;
   }
 }
 

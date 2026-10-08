@@ -24,9 +24,9 @@ const FAILURE_OPERATION_BY_ACTION = {
 } as const satisfies Record<ExternalLinkContextMenuAction, ExternalLinkContextMenuFailureOperation>;
 
 const EXTERNAL_LINK_CONTEXT_MENU_ITEMS = [
-  { id: "open-in-preview", label: "Open in integrated browser" },
-  { id: "open-external", label: "Open in system browser" },
-  { id: "copy-link", label: "Copy Link" },
+  { id: "open-in-preview", label: "在内置浏览器打开" },
+  { id: "open-external", label: "在系统浏览器打开" },
+  { id: "copy-link", label: "复制链接" },
 ] as const satisfies readonly ContextMenuItem<ExternalLinkContextMenuAction>[];
 
 /**
@@ -46,8 +46,7 @@ function externalLinkContextMenuItems(options: {
   return [
     {
       id: options.threadLinkAction,
-      label:
-        options.threadLinkAction === "link-to-thread" ? "Link to thread" : "Unlink from thread",
+      label: options.threadLinkAction === "link-to-thread" ? "关联到会话" : "取消会话关联",
     },
     ...items,
   ];

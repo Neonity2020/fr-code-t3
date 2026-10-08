@@ -166,19 +166,19 @@ function errorCode(error: unknown): string | null {
 
 function preparationErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message === "voice-operation-busy") {
-    return "Voice transcription is still finishing. Try again shortly.";
+    return "语音转写仍在完成中。请稍后重试。";
   }
   if (errorCode(error) === "unsupported-locale") {
-    return "Voice transcription is not available for this language.";
+    return "此语言不支持语音转写。";
   }
-  return "Could not prepare voice transcription.";
+  return "无法准备语音转写。";
 }
 
 function transcriptionErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message === "voice-operation-busy") {
-    return "Voice transcription is still finishing. Try again shortly.";
+    return "语音转写仍在完成中。请稍后重试。";
   }
-  return "Could not transcribe this recording.";
+  return "无法转写此录音。";
 }
 
 const IDLE_STATE: VoiceInputState = { phase: "idle", error: null, errorAction: null };
@@ -208,7 +208,7 @@ export class VoiceInputController {
     if (this.state.phase !== "idle" && this.state.phase !== "error") return;
     const initiatingDraft = this.dependencies.readDraft();
     if (!initiatingDraft) {
-      this.setError("This draft is no longer available.", "retry");
+      this.setError("此草稿已不可用。", "retry");
       return;
     }
     let sessionToken: VoiceInputSession | null = null;
@@ -226,7 +226,7 @@ export class VoiceInputController {
       }
       sessionToken = acquireSession();
       if (!sessionToken) {
-        this.setError("Another voice recording is already active.", "retry");
+        this.setError("已有另一段语音正在录制。", "retry");
         return;
       }
       this.sessionToken = sessionToken;
@@ -235,17 +235,14 @@ export class VoiceInputController {
 
       const transcriber = this.dependencies.getTranscriber();
       if (!transcriber) {
-        this.setError("Voice transcription is not available.", null);
+        this.setError("语音转写不可用。", null);
         return;
       }
 
       const permission = await this.dependencies.requestPermission();
       if (!this.isCurrent(operationToken)) return;
       if (!permission.granted) {
-        this.setError(
-          "Microphone access is required for voice input.",
-          permission.canAskAgain ? "retry" : "settings",
-        );
+        this.setError("语音输入需要麦克风权限。", permission.canAskAgain ? "retry" : "settings");
         return;
       }
 
@@ -269,15 +266,14 @@ export class VoiceInputController {
 
       const capturedDraft = this.dependencies.readDraft();
       if (!capturedDraft || capturedDraft.ownerKey !== initiatingDraft.ownerKey) {
-        this.setError("This draft is no longer available.", "retry");
+        this.setError("此草稿已不可用。", "retry");
         return;
       }
       this.capturedDraft = capturedDraft;
       this.dependencies.recorder.record({ forDuration: VOICE_RECORDING_LIMIT_SECONDS });
       this.setState({ phase: "recording", error: null, errorAction: null });
     } catch {
-      if (this.isCurrent(operationToken))
-        this.setError("Could not start voice recording.", "retry");
+      if (this.isCurrent(operationToken)) this.setError("无法开始录音。", "retry");
     } finally {
       if (sessionToken && this.sessionToken === sessionToken) {
         if (this.isCurrent(operationToken) && this.state.phase === "error") {
@@ -328,7 +324,7 @@ export class VoiceInputController {
   appMovedToBackground(): Promise<void> | void {
     if (this.state.phase === "preparing") {
       this.invalidateOperation();
-      this.setError("Voice input stopped when the app moved to the background.", "retry");
+      this.setError("应用切到后台时语音输入已停止。", "retry");
       return;
     }
     return this.interruptRecording();
@@ -387,7 +383,7 @@ export class VoiceInputController {
         !this.transcriptionAbortController ||
         !this.capturedDraft
       ) {
-        this.setError("Could not finish voice recording.", "retry");
+        this.setError("无法完成录音。", "retry");
         return;
       }
 
@@ -415,14 +411,11 @@ export class VoiceInputController {
         transcription.locale,
       );
       if (result.kind === "stale") {
-        this.setError(
-          "The draft changed while voice input was running. The transcript was not added.",
-          "retry",
-        );
+        this.setError("语音输入期间草稿发生变化，转写内容未添加。", "retry");
         return;
       }
       if (result.kind === "empty") {
-        this.setError("No speech was detected.", "retry");
+        this.setError("未检测到语音。", "retry");
         return;
       }
 
@@ -430,7 +423,7 @@ export class VoiceInputController {
       this.setState(IDLE_STATE);
     } catch {
       if (this.isCurrent(operationToken)) {
-        this.setError("Could not finish voice recording.", "retry");
+        this.setError("无法完成录音。", "retry");
       }
     } finally {
       this.finishing = false;

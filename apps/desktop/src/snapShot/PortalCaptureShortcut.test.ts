@@ -64,7 +64,7 @@ class FakeBus extends NodeEvents.EventEmitter {
         [
           this.boundId,
           {
-            description: new Variant("s", "Capture a window"),
+            description: new Variant("s", "截取窗口"),
             trigger_description: new Variant("s", this.actualLabel),
           },
         ],
@@ -144,14 +144,14 @@ it("accepts Hyprland's action-only binding without claiming the keys are reserve
   });
   expect(bus.boundId).toBe("capture-window");
   expect(bus.calls.find((call) => call.member === "BindShortcuts")?.body[1]).toEqual([
-    ["capture-window", { description: new Variant("s", "Capture a window") }],
+    ["capture-window", { description: new Variant("s", "截取窗口") }],
   ]);
   bus.activate("wrong");
   bus.activate(bus.boundId, bus.session, ":1.999");
   expect(capture).not.toHaveBeenCalled();
   bus.activate();
   expect(capture).toHaveBeenCalledOnce();
-  await expect(client.configure()).rejects.toThrow("Hyprland config");
+  await expect(client.configure()).rejects.toThrow("Hyprland 配置");
   bus.signal(portal, "ShortcutsChanged", root, [bus.session, []]);
   bus.activate();
   expect(capture).toHaveBeenCalledOnce();
@@ -224,7 +224,7 @@ it("binds only the requested shortcut with a stable ID across sessions", async (
     [
       bus.boundId,
       {
-        description: new Variant("s", "Capture a window"),
+        description: new Variant("s", "截取窗口"),
         preferred_trigger: new Variant("s", "CTRL+SHIFT+2"),
       },
     ],
@@ -256,7 +256,7 @@ it("replaces a binding without restarting the application and stops the old call
     [
       next.bus.boundId,
       {
-        description: new Variant("s", "Capture a window"),
+        description: new Variant("s", "截取窗口"),
         preferred_trigger: new Variant("s", "CTRL+SHIFT+8"),
       },
     ],
@@ -283,7 +283,7 @@ it.each([1, 2])(
     expect(client.state.shortcutRegistered).toBe(false);
     expect(client.state.shortcutPending).toBe(false);
     expect(client.state.shortcutCanRetry).toBe(true);
-    expect(client.state.shortcutMessage).toContain("wasn't granted");
+    expect(client.state.shortcutMessage).toContain("尚未获得快捷键权限");
     bus.activate();
     expect(capture).not.toHaveBeenCalled();
     await client.configure();
@@ -318,9 +318,9 @@ it("guides users to manual desktop settings when the portal cannot open them", a
   expect(client.hasSession).toBe(true);
   expect(client.state.shortcutCanRetry).toBe(false);
   expect(client.state.shortcutMessage).toBe(
-    "Shortcut permission wasn't granted. Allow FR Code in your desktop's shortcut settings.",
+    "尚未获得快捷键权限。请在桌面快捷键设置中允许 FR Code。",
   );
-  await expect(client.configure()).rejects.toThrow("Open your desktop's shortcut settings");
+  await expect(client.configure()).rejects.toThrow("请打开桌面的快捷键设置");
   expect(bus.calls.some((message) => message.member === "ConfigureShortcuts")).toBe(false);
   client.close();
   expect(client.hasSession).toBe(false);
@@ -338,7 +338,7 @@ it("captures on older portals without offering an unsupported permission dialog"
   expect(client.state).toMatchObject({
     shortcutRegistered: false,
     shortcutCanRetry: false,
-    shortcutMessage: "No shortcut is assigned. Choose one in your desktop's shortcut settings.",
+    shortcutMessage: "尚未分配快捷键。请在桌面快捷键设置中选择一个快捷键。",
   });
   bus.signal("org.freedesktop.portal.Session", "Closed", bus.session, []);
   expect(client.hasSession).toBe(false);
@@ -371,7 +371,7 @@ it("bounds unanswered consent and cleans up the pending request", async () => {
   await vi.advanceTimersByTimeAsync(120_000);
   await client.ready;
   expect(client.state.shortcutPending).toBe(false);
-  expect(client.state.shortcutMessage).toContain("timed out");
+  expect(client.state.shortcutMessage).toContain("超时");
   expect(bus.disconnect).toHaveBeenCalledOnce();
   expect(vi.getTimerCount()).toBe(0);
 });
@@ -387,7 +387,7 @@ it("handles a disappearing portal without keeping a false registered state", asy
     "org.freedesktop.DBus",
   );
   expect(client.state.shortcutRegistered).toBe(false);
-  expect(client.state.shortcutMessage).toContain("restarted");
+  expect(client.state.shortcutMessage).toContain("已重启");
   expect(bus.disconnect).toHaveBeenCalledOnce();
 });
 

@@ -134,12 +134,12 @@ describe("DesktopApplicationMenu", () => {
       yield* configureMenu(selectedAction, applicationMenuTemplate);
 
       const template = yield* Deferred.await(applicationMenuTemplate);
-      const fileMenu = template.find((item) => item.label === "File");
+      const fileMenu = template.find((item) => item.label === "文件");
       assert.isDefined(fileMenu);
       if (!Array.isArray(fileMenu.submenu)) {
         throw new Error("Expected File menu submenu to be an array.");
       }
-      const settingsItem = fileMenu.submenu.find((item) => item.label === "Settings...");
+      const settingsItem = fileMenu.submenu.find((item) => item.label === "设置…");
       assert.isDefined(settingsItem);
       const settingsClick = settingsItem.click;
       if (typeof settingsClick !== "function") {
@@ -160,12 +160,12 @@ describe("DesktopApplicationMenu", () => {
       yield* configureMenu(selectedAction, applicationMenuTemplate);
 
       const template = yield* Deferred.await(applicationMenuTemplate);
-      const editMenu = template.find((item) => item.label === "Edit");
+      const editMenu = template.find((item) => item.label === "编辑");
       assert.isDefined(editMenu);
       if (!Array.isArray(editMenu.submenu)) {
         throw new Error("Expected Edit menu submenu to be an array.");
       }
-      const pasteAsTextItem = editMenu.submenu.find((item) => item.label === "Paste as Text");
+      const pasteAsTextItem = editMenu.submenu.find((item) => item.label === "粘贴为纯文本");
       assert.isDefined(pasteAsTextItem);
       assert.equal(pasteAsTextItem.accelerator, "CmdOrCtrl+Shift+V");
       if (typeof pasteAsTextItem.click !== "function") {
@@ -192,11 +192,11 @@ describe("DesktopApplicationMenu", () => {
       yield* configureMenu(selectedAction, applicationMenuTemplate);
 
       const template = yield* Deferred.await(applicationMenuTemplate);
-      const editMenu = template.find((item) => item.label === "Edit");
+      const editMenu = template.find((item) => item.label === "编辑");
       if (!Array.isArray(editMenu?.submenu)) {
         throw new Error("Expected Edit menu submenu to be an array.");
       }
-      const pasteAsTextItem = editMenu.submenu.find((item) => item.label === "Paste as Text");
+      const pasteAsTextItem = editMenu.submenu.find((item) => item.label === "粘贴为纯文本");
       if (typeof pasteAsTextItem?.click !== "function") {
         throw new Error("Expected Paste as Text menu item to have a click handler.");
       }
@@ -224,7 +224,7 @@ describe("DesktopApplicationMenu", () => {
       yield* configureMenu(selectedAction, applicationMenuTemplate);
 
       const template = yield* Deferred.await(applicationMenuTemplate);
-      const viewMenu = template.find((item) => item.label === "View");
+      const viewMenu = template.find((item) => item.label === "视图");
       assert.isDefined(viewMenu);
       if (!Array.isArray(viewMenu.submenu)) {
         throw new Error("Expected View menu submenu to be an array.");
@@ -234,7 +234,7 @@ describe("DesktopApplicationMenu", () => {
         viewMenu.submenu.find((item) => item.role?.toLowerCase().includes("zoom")),
       );
 
-      const zoomIn = viewMenu.submenu.find((item) => item.label === "Zoom In");
+      const zoomIn = viewMenu.submenu.find((item) => item.label === "放大");
       assert.isDefined(zoomIn);
       assert.equal(zoomIn.accelerator, "CmdOrCtrl+=");
       if (typeof zoomIn.click !== "function") {

@@ -19,7 +19,7 @@ export function deriveThreadTitleSeed(input: ThreadTitleSeedInput): string {
 
   const attachmentName = normalizeTitleSeed(input.attachments[0]?.name ?? "");
   if (attachmentName.length > 0) {
-    return truncate(`Image: ${attachmentName}`);
+    return truncate(`图片：${attachmentName}`);
   }
 
   for (const label of input.fallbackLabels ?? []) {
@@ -29,5 +29,5 @@ export function deriveThreadTitleSeed(input: ThreadTitleSeedInput): string {
     }
   }
 
-  return "New thread";
+  return "新建会话";
 }

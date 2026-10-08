@@ -77,7 +77,7 @@ const buildEnvironmentAuthHeaders = (
     }
     if (Option.isNone(signer)) {
       return yield* new RemoteEnvironmentAuthFetchError({
-        message: "No DPoP signer is available to authorize the environment request.",
+        message: "没有可用的 DPoP 签名器来授权环境请求。",
         cause: authorization._tag,
       });
     }
@@ -87,7 +87,7 @@ const buildEnvironmentAuthHeaders = (
         Effect.mapError(
           (cause) =>
             new RemoteEnvironmentAuthFetchError({
-              message: "Could not create the environment request authorization proof.",
+              message: "无法创建环境请求授权证明。",
               cause,
             }),
         ),
@@ -154,7 +154,7 @@ const executeEnvironmentRequest = Effect.fnUntraced(function* <
         const remote = input.remoteAuthorization;
         if (remote === undefined || Option.isNone(remote)) {
           return yield* new RemoteEnvironmentAuthFetchError({
-            message: "No relay authorization service is available for the environment request.",
+            message: "没有可用的中继授权服务来处理环境请求。",
             cause: input.prepared.target._tag,
           });
         }
@@ -167,7 +167,7 @@ const executeEnvironmentRequest = Effect.fnUntraced(function* <
             Effect.mapError(
               (cause) =>
                 new RemoteEnvironmentAuthFetchError({
-                  message: "Could not authorize the environment request.",
+                  message: "无法授权环境请求。",
                   cause,
                 }),
             ),
@@ -215,7 +215,7 @@ const executeEnvironmentRequest = Effect.fnUntraced(function* <
           continue;
         }
         return yield* new RemoteEnvironmentAuthFetchError({
-          message: "The environment rejected the renewed session authorization.",
+          message: "环境拒绝了续期后的会话授权。",
           cause: result.success,
         });
       }

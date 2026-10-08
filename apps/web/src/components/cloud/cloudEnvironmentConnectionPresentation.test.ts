@@ -13,14 +13,14 @@ function connection(
 describe("saved cloud environment connection presentation", () => {
   it("only labels a live connection as connected", () => {
     expect(presentSavedCloudEnvironmentConnection(connection("connected"))).toEqual({
-      buttonLabel: "Connected",
-      statusText: "Connected",
+      buttonLabel: "已连接",
+      statusText: "已连接",
       tone: "connected",
     });
 
     expect(presentSavedCloudEnvironmentConnection(connection("connecting"))).toEqual({
-      buttonLabel: "Connecting…",
-      statusText: "Connecting...",
+      buttonLabel: "正在连接…",
+      statusText: "正在连接…",
       tone: "connecting",
     });
   });
@@ -31,18 +31,17 @@ describe("saved cloud environment connection presentation", () => {
         connection("reconnecting", "Relay environment endpoint is unavailable."),
       ),
     ).toEqual({
-      buttonLabel: "Reconnecting…",
-      statusText:
-        "Failed to connect. Reconnecting... Reason: Relay environment endpoint is unavailable.",
+      buttonLabel: "正在重新连接…",
+      statusText: "连接失败。正在重新连接…原因：Relay environment endpoint is unavailable.",
       tone: "connecting",
     });
   });
 
   it.each([
-    ["error", "Connection failed", "Connection failed. Reason: Access denied.", "error"],
-    ["unsupported", "Client not supported", "Client not supported", "idle"],
-    ["offline", "Offline", "Offline", "idle"],
-    ["available", "Not connected", "Available", "idle"],
+    ["error", "连接失败", "连接失败。原因：Access denied.", "error"],
+    ["unsupported", "不支持此客户端", "不支持此客户端", "idle"],
+    ["offline", "离线", "离线", "idle"],
+    ["available", "未连接", "可连接", "idle"],
   ] as const)(
     "presents %s without claiming the environment is connected",
     (phase, buttonLabel, statusText, tone) => {

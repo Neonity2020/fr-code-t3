@@ -31,7 +31,7 @@ export class PreviewWebviewConfigLoadError extends Schema.TaggedError<PreviewWeb
   },
 ) {
   override get message(): string {
-    return `Failed to load desktop preview configuration for environment "${this.environmentId}".`;
+    return `无法加载环境“${this.environmentId}”的桌面预览配置。`;
   }
 }
 

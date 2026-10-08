@@ -117,14 +117,12 @@ function dedupeProvidersByInstanceId<T extends ServerProvider>(providers: Readon
 function getProviderUpdatedTitle(provider: Pick<ServerProvider, "driver" | "version">): string {
   const providerName = PROVIDER_DISPLAY_NAMES[provider.driver] ?? provider.driver;
   return provider.version
-    ? `${providerName} updated: ${formatVersion(provider.version)}`
-    : `${providerName} updated`;
+    ? `${providerName} 已更新：${formatVersion(provider.version)}`
+    : `${providerName} 已更新`;
 }
 
 function getProviderUpdatedDescription(providerCount: number): string {
-  return providerCount === 1
-    ? "New sessions will use the updated provider."
-    : "New sessions will use the updated providers.";
+  return providerCount === 1 ? "新会话将使用更新后的提供方。" : "新会话将使用更新后的提供方。";
 }
 
 function getProviderFailedUpdateTitle(
@@ -133,8 +131,8 @@ function getProviderFailedUpdateTitle(
   const providerName = PROVIDER_DISPLAY_NAMES[provider.driver] ?? provider.driver;
   const attemptedVersion = provider.versionAdvisory?.latestVersion;
   return attemptedVersion
-    ? `${providerName} ${formatVersion(attemptedVersion)} update failed`
-    : `${providerName} update failed`;
+    ? `${providerName} ${formatVersion(attemptedVersion)} 更新失败`
+    : `${providerName} 更新失败`;
 }
 
 export function isProviderUpdateCandidate(
@@ -232,7 +230,7 @@ function formatProviderList(providers: ReadonlyArray<Pick<ServerProvider, "drive
   if (names.length <= 2) {
     return names.join(" and ");
   }
-  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+  return `${names.slice(0, -1).join(", ")}，以及 ${names[names.length - 1]}`;
 }
 
 export function getProviderUpdateInitialToastView(input: {
@@ -245,8 +243,8 @@ export function getProviderUpdateInitialToastView(input: {
     title: getProviderUpdateInitialToastTitle(input.updateProviders),
     description:
       input.oneClickProviders.length > 0
-        ? "Install the update now or review provider settings."
-        : `${formatProviderList(input.updateProviders)} can be updated from provider settings.`,
+        ? "立即安装更新或检查提供方设置。"
+        : `可在提供方设置中更新 ${formatProviderList(input.updateProviders)}。`,
   };
 }
 
@@ -258,8 +256,8 @@ function getProviderUpdateRunningToastView(providerCount: number): ProviderUpdat
   return {
     phase: "running",
     type: "loading",
-    title: providerCount === 1 ? "Updating provider" : "Updating providers",
-    description: "Running provider update command.",
+    title: providerCount === 1 ? "正在更新提供方" : "正在更新提供方",
+    description: "正在运行提供方更新命令。",
   };
 }
 
@@ -270,7 +268,7 @@ export function getProviderUpdateRejectedToastView(
   return {
     phase: "failed",
     type: "error",
-    title: providerCount === 1 ? "Provider update failed" : "Provider updates failed",
+    title: providerCount === 1 ? "提供方更新失败" : "提供方更新失败",
     description: message,
   };
 }
@@ -285,7 +283,7 @@ export function getProviderUpdateProgressToastView(input: {
     return {
       phase: "failed",
       type: "error",
-      title: failedProviders.length === 1 ? "Provider update failed" : "Provider updates failed",
+      title: failedProviders.length === 1 ? "提供方更新失败" : "提供方更新失败",
       description: getFailedProviderUpdateDescription(failedProviders),
     };
   }
@@ -297,13 +295,8 @@ export function getProviderUpdateProgressToastView(input: {
     return {
       phase: "unchanged",
       type: "warning",
-      title:
-        unchangedProviders.length === 1
-          ? "Provider still needs an update"
-          : "Providers still need updates",
-      description: `${formatProviderList(unchangedProviders)} ${
-        unchangedProviders.length === 1 ? "still appears" : "still appear"
-      } outdated. Check provider settings for details.`,
+      title: unchangedProviders.length === 1 ? "提供方仍需更新" : "提供方仍需更新",
+      description: `${formatProviderList(unchangedProviders)} ${unchangedProviders.length === 1 ? "仍显示为" : "仍显示为"} 已过期，请查看提供方设置了解详情。`,
     };
   }
 
@@ -322,7 +315,7 @@ export function getProviderUpdateProgressToastView(input: {
     return {
       phase: "succeeded",
       type: "success",
-      title: input.providerCount === 1 ? "Provider updated" : "Provider updates finished",
+      title: input.providerCount === 1 ? "提供方已更新" : "提供方更新完成",
       description: getProviderUpdatedDescription(input.providerCount),
       dismissAfterVisibleMs: PROVIDER_UPDATE_SUCCESS_VISIBLE_MS,
     };
@@ -358,7 +351,7 @@ export function getProviderUpdateRunToastView(
     const label = `${run.machineLabel} · ${PROVIDER_DISPLAY_NAMES[run.driver] ?? run.driver}`;
     if (run.result._tag === "Failure") {
       const error = squashAtomCommandFailure(run.result);
-      return [`${label}: ${error instanceof Error ? error.message : "Provider update failed."}`];
+      return [`${label}: ${error instanceof Error ? error.message : "提供方更新失败。"}`];
     }
     const updateState = run.result.value.providers.find(
       (provider) => provider.instanceId === run.instanceId,
@@ -370,7 +363,7 @@ export function getProviderUpdateRunToastView(
   if (failureLines.length === 0) {
     return {
       type: "success",
-      title: settled.length === 1 ? "Provider updated" : `${settled.length} providers updated`,
+      title: settled.length === 1 ? "提供方已更新" : `已更新 ${settled.length} 个提供方`,
       description: getProviderUpdatedDescription(settled.length),
     };
   }
@@ -378,10 +371,10 @@ export function getProviderUpdateRunToastView(
     type: "error",
     title:
       failureLines.length < settled.length
-        ? `${failureLines.length} of ${settled.length} provider updates failed`
+        ? `${settled.length} 个提供方中有 ${failureLines.length} 个更新失败`
         : settled.length === 1
-          ? "Provider update failed"
-          : "Provider updates failed",
+          ? "提供方更新失败"
+          : "提供方更新失败",
     description: failureLines.join("\n"),
   };
 }
@@ -416,7 +409,7 @@ export function firstFailedProviderUpdateMessage(
     return null;
   }
   const error = squashAtomCommandFailure(failed);
-  return error instanceof Error ? error.message : "Provider update failed.";
+  return error instanceof Error ? error.message : "提供方更新失败。";
 }
 
 function getUpdateFinishedAt(provider: ServerProvider): string | null {
@@ -466,12 +459,12 @@ export function getProviderUpdateSidebarPillView(
       tone: "loading",
       title:
         activeProviders.length === 1
-          ? `Updating ${activeProviderName}`
-          : `Updating ${activeProviders.length} providers`,
+          ? `正在更新 ${activeProviderName}`
+          : `正在更新 ${activeProviders.length} 个提供方`,
       description:
         activeProviders.length === 1
-          ? `${formatProviderList(activeProviders)} update in progress.`
-          : `${formatProviderList(activeProviders)} updates are in progress.`,
+          ? `${formatProviderList(activeProviders)} 正在更新。`
+          : `${formatProviderList(activeProviders)} 正在更新。`,
     };
   }
 
@@ -497,7 +490,7 @@ export function getProviderUpdateSidebarPillView(
       title:
         failedProviders.length === 1
           ? getProviderFailedUpdateTitle(failedProvider)
-          : `${failedProviders.length} provider updates failed`,
+          : `${failedProviders.length} 个提供方更新失败`,
       description: getFailedProviderUpdateDescription(failedProviders),
       dismissible: true,
     });
@@ -521,11 +514,9 @@ export function getProviderUpdateSidebarPillView(
       tone: "warning",
       title:
         unchangedProviders.length === 1
-          ? `${unchangedProviderName} still needs an update`
-          : `${unchangedProviders.length} providers still need updates`,
-      description: `${formatProviderList(unchangedProviders)} ${
-        unchangedProviders.length === 1 ? "still appears" : "still appear"
-      } outdated. Review provider settings for details.`,
+          ? `${unchangedProviderName} 仍需更新`
+          : `${unchangedProviders.length} 个提供方仍需更新`,
+      description: `${formatProviderList(unchangedProviders)} ${unchangedProviders.length === 1 ? "仍显示为" : "仍显示为"} 已过期，请检查提供方设置了解详情。`,
       dismissible: true,
     });
   }
@@ -547,7 +538,7 @@ export function getProviderUpdateSidebarPillView(
       title:
         succeededProviders.length === 1
           ? getProviderUpdatedTitle(succeededProvider)
-          : `${succeededProviders.length} providers updated`,
+          : `已更新 ${succeededProviders.length} 个提供方`,
       description: getProviderUpdatedDescription(succeededProviders.length),
       dismissAfterVisibleMs: PROVIDER_UPDATE_SUCCESS_VISIBLE_MS,
     });
@@ -582,9 +573,9 @@ function getProviderUpdateInitialToastTitle(
   if (providers.length === 1) {
     const provider = providers[0]!;
     const providerName = PROVIDER_DISPLAY_NAMES[provider.driver] ?? provider.driver;
-    return `Update Available: ${providerName} ${formatVersion(provider.versionAdvisory.latestVersion)}`;
+    return `有可用更新：${providerName} ${formatVersion(provider.versionAdvisory.latestVersion)}`;
   }
-  return `Updates Available: ${providers.length} providers`;
+  return `${providers.length} 个提供方有可用更新`;
 }
 
 function getFailedProviderUpdateDescription(providers: ReadonlyArray<ServerProvider>): string {
@@ -594,7 +585,7 @@ function getFailedProviderUpdateDescription(providers: ReadonlyArray<ServerProvi
       return provider.updateState.message;
     }
   }
-  return `${formatProviderList(providers)} failed to update. Check provider settings for details.`;
+  return `${formatProviderList(providers)} 更新失败，请查看提供方设置了解详情。`;
 }
 
 // ===========================================================================
@@ -643,7 +634,7 @@ export function firstRejectedProviderUpdateMessage(
   if (!rejected) {
     return null;
   }
-  return rejected.reason instanceof Error ? rejected.reason.message : "Provider update failed.";
+  return rejected.reason instanceof Error ? rejected.reason.message : "提供方更新失败。";
 }
 
 /**

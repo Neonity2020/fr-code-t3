@@ -28,7 +28,7 @@ function MobileClientStatusBadge({
 }) {
   return (
     <Badge variant={enabled ? "success" : "outline"}>
-      {label}: {enabled ? "On" : "Off"}
+      {label}: {enabled ? "开启" : "关闭"}
     </Badge>
   );
 }
@@ -50,11 +50,8 @@ function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord 
         </p>
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
-        <MobileClientStatusBadge
-          enabled={device.notifications.enabled}
-          label="Push notifications"
-        />
-        <MobileClientStatusBadge enabled={device.liveActivities.enabled} label="Live Activities" />
+        <MobileClientStatusBadge enabled={device.notifications.enabled} label="推送通知" />
+        <MobileClientStatusBadge enabled={device.liveActivities.enabled} label="实时活动" />
       </div>
       <p className="mt-1.5 text-xs leading-4.5 text-muted-foreground/80">
         {mobileClientNotificationDetail(device)}
@@ -65,7 +62,7 @@ function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord 
 
 function MobileClientsSkeleton() {
   return (
-    <div aria-label="Loading mobile clients" className="divide-y border-t" role="status">
+    <div aria-label="正在加载移动客户端" className="divide-y border-t" role="status">
       {MOBILE_CLIENT_SKELETON_ROWS.map((row) => (
         <div key={row} className="py-4">
           <div className="flex gap-3">
@@ -92,10 +89,9 @@ function EmptyMobileClients() {
         <SmartphoneIcon />
       </EmptyMedia>
       <EmptyHeader>
-        <EmptyTitle>No mobile clients</EmptyTitle>
+        <EmptyTitle>没有移动客户端</EmptyTitle>
         <EmptyDescription>
-          Install FR Code on your phone and sign in to T3 Connect to get push notifications and Live
-          Activities.
+          在手机上安装 FR Code 并登录 T3 Connect，即可接收推送通知和实时活动。
         </EmptyDescription>
       </EmptyHeader>
     </Empty>
@@ -111,8 +107,8 @@ export function MobileClientsUserProfilePage() {
 
   return (
     <ClerkUserProfilePage
-      title="Mobile clients"
-      description="Mobile devices that get notifications from your environments."
+      title="移动客户端"
+      description="接收您环境通知的移动设备。"
       action={
         <ClerkUserProfileRefreshButton
           isPending={devicesState.isPending}
@@ -127,13 +123,11 @@ export function MobileClientsUserProfilePage() {
             role="alert"
           >
             <div>
-              <p className="font-medium text-destructive-foreground">
-                Could not load mobile clients
-              </p>
+              <p className="font-medium text-destructive-foreground">无法加载移动客户端</p>
               <p className="mt-0.5 text-xs text-muted-foreground">{devicesState.error}</p>
             </div>
             <Button size="xs" variant="outline" onClick={devicesState.refresh}>
-              Try again
+              重试
             </Button>
           </div>
         ) : null}

@@ -44,8 +44,8 @@ describe("ComposerStashMenu", () => {
     );
 
     expect(markup).toContain('src="data:image/png;base64,AA=="');
-    expect(markup).toContain("1 image dropped");
-    expect(markup).toContain("saving 1 image");
+    expect(markup).toContain("已丢弃 1 张图片");
+    expect(markup).toContain("正在保存 1 张图片");
   });
 
   it("labels mixed file and image stashes without treating images as files", () => {
@@ -85,7 +85,7 @@ describe("ComposerStashMenu", () => {
       />,
     );
 
-    expect(markup).toContain("(2 attachments)");
+    expect(markup).toContain("（2 个附件）");
     expect(markup).not.toContain("(2 files)");
   });
 });

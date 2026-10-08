@@ -84,7 +84,7 @@ export function buildFileContextMenuItems(input: {
   if (!input.hasAbsolutePath) return [];
   const items: ContextMenuItem<FileContextMenuAction>[] = [];
   if (input.capabilities.canOpenDefault) {
-    items.push({ id: "open", label: "Open", icon: "pencil" });
+    items.push({ id: "open", label: "打开", icon: "pencil" });
   }
   if (input.capabilities.revealLabel !== undefined) {
     items.push({
@@ -97,7 +97,7 @@ export function buildFileContextMenuItems(input: {
   if (editorIds.length > 0) {
     items.push({
       id: "open-with",
-      label: "Open with",
+      label: "打开方式",
       children: editorIds.map((editorId) => ({
         id: `editor:${editorId}` as FileContextMenuAction,
         label: EDITOR_LABEL_BY_ID.get(editorId) ?? editorId,
@@ -157,10 +157,10 @@ export function useFileContextMenu(environmentId: EnvironmentId | null) {
         type: "error",
         title:
           action === "open"
-            ? "Could not open file"
+            ? "无法打开文件"
             : reveal
-              ? "Unable to reveal file"
-              : `Could not open in ${EDITOR_LABEL_BY_ID.get(editor) ?? editor}`,
+              ? "无法显示文件所在位置"
+              : `无法在 ${EDITOR_LABEL_BY_ID.get(editor) ?? editor} 中打开`,
         description: absolutePath,
       });
     };

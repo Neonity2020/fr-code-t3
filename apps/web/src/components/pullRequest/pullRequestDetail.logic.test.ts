@@ -625,7 +625,7 @@ describe("pull request timeline", () => {
   it("calls a comment markdown and a commit headline plain text", () => {
     const events = buildPullRequestTimeline(TIMELINE_SOURCE);
     // A headline reading `fix: drop *legacy* path` is not asking for emphasis.
-    expect(events.map((event) => [event.title.startsWith("Commit"), event.markdown])).toEqual(
+    expect(events.map((event) => [event.title.startsWith("提交"), event.markdown])).toEqual(
       expect.arrayContaining([[true, false]]),
     );
     expect(events.find((event) => event.id === "c1")?.markdown).toBe(true);
@@ -1165,7 +1165,7 @@ describe("asking about a change rather than working on it", () => {
     expect(handoff.reviewComments).toEqual([
       expect.objectContaining({
         // What the chip reads as: which pull request, and what it is called.
-        filePath: "PR #42",
+        filePath: "拉取请求 #42",
         rangeLabel: "Add the pull requests page",
         pullRequest: {
           number: 42,
@@ -1211,7 +1211,7 @@ describe("asking about a change rather than working on it", () => {
     expect(handoff.prompt).toBe("what is this for?");
     // Two chips: which pull request, and which lines.
     expect(handoff.reviewComments.map((entry) => entry.filePath)).toEqual([
-      "PR #42",
+      "拉取请求 #42",
       "apps/web/src/page.tsx",
     ]);
     expect(handoff.reviewComments[0]?.text).not.toContain("Do not change any code");
@@ -1683,7 +1683,7 @@ describe("the compact row's single action slot", () => {
   });
 
   it("describes every live facet of the checks at once", () => {
-    expect(describePullRequestChecks([])).toBe("No checks reported");
+    expect(describePullRequestChecks([])).toBe("没有检查结果");
     expect(describePullRequestChecks([check("success"), check("success")])).toBe(
       "All checks passed",
     );

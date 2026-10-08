@@ -309,7 +309,7 @@ export function serverUpdateStateForServerVersion(
 }
 
 export function serverUpdateFailureMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Server update failed.";
+  return error instanceof Error ? error.message : "服务器更新失败。";
 }
 
 function isRpcSocketError(error: unknown): boolean {

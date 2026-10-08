@@ -34,10 +34,10 @@ export function codexAuthorizationRequest(value: string) {
     url.password ||
     url.hash
   )
-    throw new Error("Invalid ChatGPT sign-in request.");
+    throw new Error("ChatGPT 登录请求无效。");
   const single = (key: string) => {
     const values = url.searchParams.getAll(key);
-    if (values.length !== 1 || !values[0]) throw new Error("Invalid ChatGPT sign-in request.");
+    if (values.length !== 1 || !values[0]) throw new Error("ChatGPT 登录请求无效。");
     return values[0];
   };
   const redirectUri = single("redirect_uri");
@@ -52,7 +52,7 @@ export function codexAuthorizationRequest(value: string) {
     !/^[\w-]{43}$/u.test(single("code_challenge")) ||
     !/^(dynamic_agent_client|oaiapp_[\w-]+)$/u.test(single("client_id"))
   )
-    throw new Error("Invalid ChatGPT sign-in request.");
+    throw new Error("ChatGPT 登录请求无效。");
   return { authorizationUrl: url.toString(), redirectUri, state };
 }
 

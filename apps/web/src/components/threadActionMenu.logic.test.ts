@@ -59,7 +59,7 @@ describe("buildThreadActionMenuItems", () => {
     const copyIndex = items.findIndex((item) => item.id === "copy");
     expect(items[copyIndex + 1]).toMatchObject({
       id: "project-settings",
-      label: "Project settings",
+      label: "项目设置",
       icon: "settings",
     });
     expect(items[copyIndex + 2]?.id).toBe("archive");
@@ -72,7 +72,7 @@ describe("buildThreadActionMenuItems", () => {
         ...baseState,
         projectFilter: { label: "Beta Project", isActive: false },
       }).find((item) => item.id === "filter-by-project"),
-    ).toMatchObject({ label: "Filter by Beta Project", icon: "folder-tree" });
+    ).toMatchObject({ label: "按 Beta Project 筛选", icon: "folder-tree" });
   });
 
   it("offers the way back to all projects once the list is scoped", () => {
@@ -81,7 +81,7 @@ describe("buildThreadActionMenuItems", () => {
       projectFilter: { label: "Beta Project", isActive: true },
     });
     const filterIndex = items.findIndex((candidate) => candidate.id === "filter-by-project");
-    expect(items[filterIndex]).toMatchObject({ label: "Show all projects", icon: "folder-tree" });
+    expect(items[filterIndex]).toMatchObject({ label: "显示所有项目", icon: "folder-tree" });
     expect(items[filterIndex - 1]?.id).toBe("mark-unread");
     expect(items[filterIndex + 1]?.id).toBe("auto-settle");
   });
@@ -105,7 +105,7 @@ describe("buildThreadActionMenuItems", () => {
     const find = (state: ThreadActionMenuState) =>
       buildThreadActionMenuItems(state).find((item) => item.id === "auto-settle");
     const on = find(baseState);
-    expect(on?.label).toBe("Auto-settle behavior");
+    expect(on?.label).toBe("自动完成行为");
     expect(on?.children?.map((child) => [child.id, child.checked])).toEqual([
       ["auto-settle:enabled", true],
       ["auto-settle:disabled", false],
@@ -132,7 +132,7 @@ describe("buildThreadActionMenuItems", () => {
     const item = buildThreadActionMenuItems({ ...baseState, isRegeneratingTitle: true }).find(
       (candidate) => candidate.id === "regenerate-title",
     );
-    expect(item).toMatchObject({ label: "Regenerating…", disabled: true });
+    expect(item).toMatchObject({ label: "正在重新生成…", disabled: true });
   });
 
   it("marks delete as destructive and keeps it last", () => {
@@ -189,6 +189,6 @@ describe("buildDraftActionMenuItems", () => {
   it("drops project settings without a project and keeps discard last", () => {
     const items = buildDraftActionMenuItems({ hasPath: true, hasBranch: false, hasProject: false });
     expect(items.map((item) => item.id)).toEqual(["copy", "discard"]);
-    expect(items.at(-1)).toMatchObject({ label: "Discard draft", destructive: true });
+    expect(items.at(-1)).toMatchObject({ label: "丢弃草稿", destructive: true });
   });
 });

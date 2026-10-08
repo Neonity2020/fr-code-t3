@@ -12,7 +12,7 @@ describe("subagentGroupSummary", () => {
     "keeps a mixed group live while a member is %s",
     (status) => {
       expect(subagentGroupSummary([{ status: "completed" }, { status }])).toEqual({
-        label: "Kicked off 2 subagents",
+        label: "已发起 2 个子智能体",
         active: true,
         failed: false,
       });
@@ -27,7 +27,7 @@ describe("subagentGroupSummary", () => {
       "interrupted",
     ];
     expect(subagentGroupSummary(statuses.map((status) => ({ status })))).toEqual({
-      label: "Ran 4 subagents",
+      label: "已运行 4 个子智能体",
       active: false,
       failed: true,
     });
@@ -35,7 +35,7 @@ describe("subagentGroupSummary", () => {
 
   it("uses a singular label for one idle member", () => {
     expect(subagentGroupSummary([{ status: "idle" }])).toEqual({
-      label: "Ran 1 subagent",
+      label: "已运行 1 个子智能体",
       active: false,
       failed: false,
     });
@@ -88,8 +88,8 @@ describe("resolveSubagentMetadata", () => {
         model: null,
         provider: { driver: ProviderDriverKind.make("codex"), models: [] },
       }).modelLabel,
-    ).toBe("Not reported");
-    expect(resolveSubagentMetadata({ model: " " }).modelLabel).toBe("Not reported");
+    ).toBe("未报告");
+    expect(resolveSubagentMetadata({ model: " " }).modelLabel).toBe("未报告");
   });
 
   const parentThread = { projectId: ProjectId.make("parent"), worktreePath: null };
@@ -109,8 +109,8 @@ describe("resolveSubagentMetadata", () => {
         },
       }).workspace,
     ).toEqual([
-      { label: "Project", value: "Other project" },
-      { label: "Branch", value: "fix/agents" },
+      { label: "项目", value: "Other project" },
+      { label: "分支", value: "fix/agents" },
     ]);
   });
 
@@ -122,7 +122,7 @@ describe("resolveSubagentMetadata", () => {
         parentProject,
         childThread: { branch: null, worktreePath: "/worktrees/agents" },
       }).workspace,
-    ).toEqual([{ label: "Worktree", value: "agents" }]);
+    ).toEqual([{ label: "工作树", value: "agents" }]);
     expect(
       resolveSubagentMetadata({
         model: null,
@@ -134,7 +134,7 @@ describe("resolveSubagentMetadata", () => {
           workspaceRoot: "/other",
         },
       }).workspace,
-    ).toEqual([{ label: "Workspace", value: "other" }]);
+    ).toEqual([{ label: "工作区", value: "other" }]);
   });
 
   it("hides redundant workspace metadata and tolerates unavailable child shells", () => {
