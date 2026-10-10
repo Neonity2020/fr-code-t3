@@ -23,7 +23,6 @@ import * as Schema from "effect/Schema";
 
 import * as GitWorkflowService from "../git/GitWorkflowService.ts";
 import * as ProjectService from "../project/ProjectService.ts";
-import * as ProviderAuthService from "../provider/ProviderAuthService.ts";
 import * as EventSink from "./EventSink.ts";
 import * as ContextHandoffService from "./ContextHandoffService.ts";
 import {
@@ -91,7 +90,6 @@ export const layer: Layer.Layer<
   | FileSystem.FileSystem
   | GitWorkflowService.GitWorkflowService
   | ProjectService.ProjectService
-  | ProviderAuthService.ProviderAuthService
   | ProjectionStore.ProjectionStoreV2
   | ProviderSessionManager.ProviderSessionManagerV2
   | RunExecutionService.RunExecutionServiceV2
@@ -105,7 +103,6 @@ export const layer: Layer.Layer<
     const fileSystem = yield* FileSystem.FileSystem;
     const gitWorkflow = yield* GitWorkflowService.GitWorkflowService;
     const projects = yield* ProjectService.ProjectService;
-    const providerAuth = yield* ProviderAuthService.ProviderAuthService;
     const projectionStore = yield* ProjectionStore.ProjectionStoreV2;
     const providerSessions = yield* ProviderSessionManager.ProviderSessionManagerV2;
     const runExecution = yield* RunExecutionService.RunExecutionServiceV2;
@@ -372,80 +369,20 @@ export const layer: Layer.Layer<
       if (message.attachments.length === 0 && message.text.trimStart().startsWith("/")) {
         const isEmptyCompaction =
           message.text.trim().toLowerCase() === "/compact" && !projection.hasConversation;
-        // Preparing a run may already point the thread at a newly selected
-        // provider. Account commands still belong to its last native session.
-        const nativeThreads = new Map(
-          projection.providerThreads
-            .filter(
-              (candidate) => candidate.ownerNodeId === null && candidate.nativeThreadRef !== null,
-            )
-            .map((candidate) => [candidate.id, candidate]),
-        );
-        const previousNativeRun = projection.runs.reduce<OrchestrationV2Run | undefined>(
-          (previous, candidate) =>
-            candidate.ordinal < run.ordinal &&
-            candidate.providerThreadId !== null &&
-            nativeThreads.has(candidate.providerThreadId) &&
-            (previous === undefined || candidate.ordinal > previous.ordinal)
-              ? candidate
-              : previous,
-          undefined,
-        );
-        const nativeThread = nativeThreads.get(
-          previousNativeRun?.providerThreadId ??
-            projection.thread.activeProviderThreadId ??
-            providerThread.id,
-        );
-        const authInstanceId = nativeThread?.providerInstanceId ?? run.providerInstanceId;
-        const authResult = isEmptyCompaction
-          ? null
-          : yield* Effect.result(
-              providerAuth.tryHandlePromptCommand({
-                instanceId: authInstanceId,
-                text: projectComposerContextForProvider({
-                  text: message.text,
-                  records: message.context?.records ?? [],
-                }),
-                hasAttachments: false,
-              }),
-            );
-        if (isEmptyCompaction || authResult?._tag === "Failure" || authResult?.success) {
+        if (isEmptyCompaction) {
           const now = yield* DateTime.now;
-          const failure = isEmptyCompaction
-            ? makeProviderFailure({
-                class: "validation_error",
-                message: "Start a conversation before compacting this thread.",
-              })
-            : authResult?._tag === "Failure"
-              ? makeProviderFailure({
-                  class: "permission_error",
-                  message: authResult.failure.detail,
-                })
-              : undefined;
-          const status = failure === undefined ? "completed" : "failed";
+          const failure = makeProviderFailure({
+            class: "validation_error",
+            message: "请先开始对话，再压缩此会话。",
+          });
           yield* settleRunBeforeStart({
-            signal: isEmptyCompaction ? "empty-compaction" : "provider-sign-out",
-            status,
+            signal: "empty-compaction",
+            status: "failed",
             now,
             startedAt: now,
-            providerInstanceId: authInstanceId,
-            itemProviderThreadId: nativeThread?.id ?? providerThread.id,
-            item:
-              failure !== undefined
-                ? {
-                    type: "error",
-                    title: isEmptyCompaction
-                      ? "Cannot compact an empty thread"
-                      : "Provider sign-out failed",
-                    failure,
-                  }
-                : {
-                    type: "command_execution",
-                    title: "Provider signed out",
-                    input: message.text.trim(),
-                    output: "Provider signed out",
-                    exitCode: 0,
-                  },
+            providerInstanceId: run.providerInstanceId,
+            itemProviderThreadId: providerThread.id,
+            item: { type: "error", title: "无法压缩空会话", failure },
             providerThreadUpdate: {
               ...providerThread,
               status: providerThread.nativeThreadRef === null ? "not_loaded" : "idle",

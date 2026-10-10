@@ -13,7 +13,7 @@ import { createModelCapabilities, resolveSelectableModel } from "@t3tools/shared
 const EMPTY_CAPABILITIES: ModelCapabilities = createModelCapabilities({
   optionDescriptors: [],
 });
-const DEFAULT_DRIVER_KIND = ProviderDriverKind.make("codex");
+const DEFAULT_DRIVER_KIND = ProviderDriverKind.make("pi");
 
 export function formatProviderDriverKindLabel(provider: ProviderDriverKind): string {
   return provider

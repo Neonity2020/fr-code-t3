@@ -1,4 +1,4 @@
-import { expect, it, vi } from "vite-plus/test";
+import { expect, vi } from "vite-plus/test";
 import { it as effectIt } from "@effect/vitest";
 import {
   CheckpointScopeId,
@@ -12,7 +12,6 @@ import {
   RunAttemptId,
   RunId,
   ThreadId,
-  ProjectId,
   type OrchestrationV2ThreadProjection,
   OrchestrationV2DomainEvent,
 } from "@t3tools/contracts";
@@ -21,16 +20,14 @@ import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
-import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";
 
 import * as GitWorkflow from "../git/GitWorkflowService.ts";
 import * as ProjectService from "../project/ProjectService.ts";
-import * as ProviderAuthService from "../provider/ProviderAuthService.ts";
 import * as ContextHandoffService from "./ContextHandoffService.ts";
 import * as EventSink from "./EventSink.ts";
 import * as IdAllocator from "./IdAllocator.ts";
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as ProjectionStore from "./ProjectionStore.ts";
 import { ProviderAdapterEventStreamError } from "./ProviderAdapter.ts";
 import * as ProviderSessionManager from "./ProviderSessionManager.ts";
@@ -39,119 +36,6 @@ import * as RunExecutionService from "./RunExecutionService.ts";
 import * as RuntimePolicy from "./RuntimePolicy.ts";
 
 const isDomainEvent = Schema.is(OrchestrationV2DomainEvent);
-
-it("does not commit running state when inherited background routing cannot be read", async () => {
-  const threadId = ThreadId.make("thread_provider_turn_start_projection_failure");
-  const runId = RunId.make("run_provider_turn_start_projection_failure");
-  const attemptId = RunAttemptId.make("attempt_provider_turn_start_projection_failure");
-  const rootNodeId = NodeId.make("node_provider_turn_start_projection_failure");
-  const providerThreadId = ProviderThreadId.make(
-    "provider_thread_provider_turn_start_projection_failure",
-  );
-  const providerSessionId = ProviderSessionId.make(
-    "provider_session_provider_turn_start_projection_failure",
-  );
-  const messageId = MessageId.make("message_provider_turn_start_projection_failure");
-  const checkpointScopeId = CheckpointScopeId.make(
-    "checkpoint_scope_provider_turn_start_projection_failure",
-  );
-  const projection = {
-    thread: {
-      id: threadId,
-      projectId: ProjectId.make("project_provider_turn_start_projection_failure"),
-      branch: "feature/restore",
-      worktreePath: "/tmp/missing-provider-turn-start-worktree",
-    },
-    runs: [
-      {
-        id: runId,
-        status: "starting",
-        rootNodeId,
-        activeAttemptId: attemptId,
-        providerThreadId,
-        userMessageId: messageId,
-        ordinal: 2,
-      },
-    ],
-    nodes: [{ id: rootNodeId, checkpointScopeId }],
-    attempts: [{ id: attemptId }],
-    providerThreads: [{ id: providerThreadId, providerSessionId }],
-    messages: [{ id: messageId, text: "Continue", attachments: [] }],
-    checkpointScopes: [{ id: checkpointScopeId }],
-    contextHandoffs: [],
-    contextTransfers: [],
-    turnItems: [],
-  } as unknown as OrchestrationV2ThreadProjection;
-  let projectionReadCount = 0;
-  const writeIfRunCurrent = vi.fn(() =>
-    Effect.succeed({ committed: true, storedEvents: [] } as never),
-  );
-  const startRootRun = vi.fn(() => Effect.void);
-  const pruneWorktrees = vi.fn(() => Effect.void);
-  const createWorktree = vi.fn(() => Effect.succeed({} as never));
-  const layer = ProviderTurnStart.layer.pipe(
-    Layer.provide(
-      Layer.mergeAll(
-        Layer.mock(ContextHandoffService.ContextHandoffServiceV2)({}),
-        Layer.mock(EventSink.EventSinkV2)({ writeIfRunCurrent }),
-        IdAllocator.layer,
-        Layer.succeed(FileSystem.FileSystem, { exists: () => Effect.succeed(false) } as never),
-        Layer.mock(GitWorkflow.GitWorkflowService)({ pruneWorktrees, createWorktree }),
-        Layer.mock(ProjectService.ProjectService)({
-          getById: () =>
-            Effect.succeed(
-              Option.some({ workspaceRoot: "/tmp/provider-turn-start-project" } as never),
-            ),
-        }),
-        Layer.mock(ProjectionStore.ProjectionStoreV2)({
-          getTurnStartContext: () => {
-            projectionReadCount += 1;
-            return Effect.succeed({
-              ...projection,
-              hasConversation: projection.messages.some(
-                (m) =>
-                  m.role === "user" &&
-                  (m.text.trim().toLowerCase() !== "/compact" || m.attachments.length > 0),
-              ),
-            });
-          },
-          getRuntimeRecoveryProjection: () => {
-            projectionReadCount += 1;
-            return Effect.fail(
-              new ProjectionStore.ProjectionStoreReadError({
-                threadId,
-                cause: "simulated inherited-background projection failure",
-              }),
-            );
-          },
-        }),
-        Layer.mock(ProviderSessionManager.ProviderSessionManagerV2)({}),
-        Layer.mock(ProviderAuthService.ProviderAuthService)({
-          tryHandlePromptCommand: () => Effect.succeed(false),
-        }),
-        Layer.mock(RunExecutionService.RunExecutionServiceV2)({ startRootRun }),
-        Layer.mock(RuntimePolicy.RuntimePolicyV2)({}),
-      ),
-    ),
-  );
-
-  await Effect.gen(function* () {
-    const error = yield* (yield* ProviderTurnStart.ProviderTurnStartServiceV2)
-      .start({ threadId, runId })
-      .pipe(Effect.flip);
-
-    expect(error._tag).toBe("ProviderTurnStartError");
-    expect(projectionReadCount).toBe(2);
-    expect(pruneWorktrees).toHaveBeenCalledWith({ cwd: "/tmp/provider-turn-start-project" });
-    expect(createWorktree).toHaveBeenCalledWith({
-      cwd: "/tmp/provider-turn-start-project",
-      refName: "feature/restore",
-      path: "/tmp/missing-provider-turn-start-worktree",
-    });
-    expect(writeIfRunCurrent).not.toHaveBeenCalled();
-    expect(startRootRun).not.toHaveBeenCalled();
-  }).pipe(Effect.provide(layer), Effect.runPromise);
-});
 
 function makeLocalCommandHarness(input: {
   readonly text: string;
@@ -424,7 +308,7 @@ function makeLocalCommandHarness(input: {
                     status: "ready",
                     cwd: "/tmp/native-account-command",
                     model: null,
-                    capabilities: CodexProviderCapabilitiesV2,
+                    capabilities: FullThreadTestCapabilities,
                     createdAt: now,
                     updatedAt: now,
                     lastError: null,
@@ -522,7 +406,6 @@ function makeLocalCommandHarness(input: {
             ),
         }),
         Layer.mock(ProviderSessionManager.ProviderSessionManagerV2)({ open }),
-        Layer.mock(ProviderAuthService.ProviderAuthService)({ tryHandlePromptCommand }),
         Layer.mock(RunExecutionService.RunExecutionServiceV2)({ startRootRun }),
         Layer.mock(RuntimePolicy.RuntimePolicyV2)({
           resolve: () => Effect.succeed({} as never),
@@ -772,64 +655,6 @@ effectIt.effect("does not overwrite a run interrupted while its thread loads", (
   }),
 );
 
-effectIt.effect(
-  "signs out the existing native provider before opening the newly selected provider",
-  () =>
-    Effect.gen(function* () {
-      const harness = makeLocalCommandHarness({ text: "/logout", previousNativeSession: true });
-
-      yield* harness.start;
-      yield* harness.start;
-
-      expect(harness.tryHandlePromptCommand).toHaveBeenCalledExactlyOnceWith({
-        instanceId: harness.oldInstanceId,
-        text: "/logout",
-        hasAttachments: false,
-      });
-      expect(harness.open).not.toHaveBeenCalled();
-      expect(harness.startRootRun).not.toHaveBeenCalled();
-      const projection = harness.projection();
-      expect(projection.runs.at(-1)?.status).toBe("completed");
-      expect(projection.attempts[0]?.status).toBe("completed");
-      expect(projection.nodes[0]?.status).toBe("completed");
-      expect(projection.turnItems).toMatchObject([
-        {
-          type: "command_execution",
-          title: "Provider signed out",
-          output: "Provider signed out",
-          status: "completed",
-        },
-      ]);
-      expect(projection.providerTurns).toEqual([]);
-      expect(projection.checkpoints).toEqual([]);
-    }),
-);
-
-effectIt.effect("persists a failed sign-out without starting a provider turn", () =>
-  Effect.gen(function* () {
-    const harness = makeLocalCommandHarness({
-      text: "/logout",
-      logoutFailure: "Could not stop all sessions for this provider. Try again.",
-    });
-
-    yield* harness.start;
-
-    expect(harness.open).not.toHaveBeenCalled();
-    expect(harness.startRootRun).not.toHaveBeenCalled();
-    expect(harness.projection().runs.at(-1)?.status).toBe("failed");
-    expect(harness.projection().turnItems).toMatchObject([
-      {
-        type: "error",
-        title: "Provider sign-out failed",
-        failure: {
-          class: "permission_error",
-          message: "Could not stop all sessions for this provider. Try again.",
-        },
-      },
-    ]);
-  }),
-);
-
 for (const previousMessages of [[], ["/compact", " /COMPACT "]]) {
   effectIt.effect(
     `rejects compaction without conversation context after ${previousMessages.length} prior compactions`,
@@ -848,7 +673,7 @@ for (const previousMessages of [[], ["/compact", " /COMPACT "]]) {
             type: "error",
             failure: {
               class: "validation_error",
-              message: "Start a conversation before compacting this thread.",
+              message: "请先开始对话，再压缩此会话。",
             },
           },
         ]);

@@ -62,8 +62,7 @@ import {
   nativeHeaderScrollEdgeEffects,
 } from "../../native/StackHeader";
 import { NATIVE_LIQUID_GLASS_SUPPORTED } from "../../native/native-glass";
-import { ChatGptSharingStatus } from "./ChatGptSharingStatus";
-import { environmentServerConfigsAtom, serverEnvironment } from "../../state/server";
+import { serverEnvironment } from "../../state/server";
 import { mobilePreferencesAtom, updateMobilePreferencesAtom } from "../../state/preferences";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { useNewTaskFlow } from "./new-task-flow-provider";
@@ -98,11 +97,7 @@ import {
  * and friends) starts folded so a 300-model catalog cannot bury the list. All
  * provider headers remain user-collapsible.
  */
-const PRIMARY_PROVIDER_DRIVERS: ReadonlySet<string> = new Set([
-  "claudeAgent",
-  "codex",
-  "antigravity",
-]);
+const PRIMARY_PROVIDER_DRIVERS: ReadonlySet<string> = new Set(["pi"]);
 /**
  * Keep measured row changes stable, but let catalog mutations use the list's
  * native bounds so a filtered catalog that underflows returns to the top.
@@ -718,12 +713,6 @@ function ThreadSettingsOptionsItem(props: {
 }) {
   const insets = useSafeAreaInsets();
   const session = useThreadSettingsSession();
-  const configs = useAtomValue(environmentServerConfigsAtom);
-  const selectedProvider = session.environmentId
-    ? (configs
-        .get(session.environmentId)
-        ?.providers.find((provider) => provider.instanceId === session.providerInstanceId) ?? null)
-    : null;
   const bottomToolbarInset =
     Platform.OS === "ios" && NATIVE_MAIL_SEARCH_TOOLBAR_SUPPORTED
       ? NATIVE_MAIL_SEARCH_TOOLBAR_CONTENT_INSET
@@ -731,7 +720,6 @@ function ThreadSettingsOptionsItem(props: {
 
   return (
     <View style={{ paddingBottom: insets.bottom + bottomToolbarInset + 12 }}>
-      <ChatGptSharingStatus provider={selectedProvider} />
       <Text className="px-5 pb-2 pt-2 text-sm font-t3-medium text-foreground-muted">Options</Text>
       <Animated.View
         className="mx-4 overflow-hidden rounded-2xl bg-grouped-card"

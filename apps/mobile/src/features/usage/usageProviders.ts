@@ -6,6 +6,7 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
  * order, so it also fixes which band sits on top of the bars.
  */
 export const PROVIDER_ORDER: readonly UsageProviderKind[] = [
+  "pi",
   "codex",
   "claude",
   "grok",
@@ -16,6 +17,7 @@ export const PROVIDER_ORDER: readonly UsageProviderKind[] = [
 
 export const PROVIDER_LABEL: Record<UsageProviderKind, string> = {
   claude: "Claude Code",
+  pi: "Pi",
   codex: "Codex",
   grok: "Grok Build",
   cursor: "Cursor",
@@ -30,6 +32,7 @@ export const PROVIDER_LABEL: Record<UsageProviderKind, string> = {
 export function useProviderColors(): Record<UsageProviderKind, string> {
   const { themeAppearance: scheme } = useAppearancePreferences();
   return {
+    pi: scheme === "dark" ? "#e6e6e6" : "#3c3c43",
     claude: "#d97757",
     codex: scheme === "dark" ? "#e6e6e6" : "#3c3c43",
     grok: scheme === "dark" ? "#a1a1aa" : "#52525b",

@@ -29,7 +29,6 @@ import {
   createEnvironmentQueryAtomFamily,
   createEnvironmentRpcQueryAtomFamily,
   createEnvironmentRpcSubscriptionAtomFamily,
-  createEnvironmentSubscriptionAtomFamily,
   createRuntimeCommand,
   scheduleAtomCommandEffect,
 } from "./runtime.ts";
@@ -986,77 +985,6 @@ export function createServerEnvironmentAtoms<R, E>(
     updateStateAtom,
     settingsValueAtom,
     providersValueAtom,
-    providerAuthState: createEnvironmentRpcSubscriptionAtomFamily(runtime, {
-      label: "environment-data:provider:auth-state",
-      tag: WS_METHODS.providerAuthSubscribe,
-      idleTtlMs: 0,
-    }),
-    startProviderAuth: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:auth-start",
-      tag: WS_METHODS.providerAuthStart,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) => JSON.stringify([environmentId, input]),
-      },
-    }),
-    respondProviderAuth: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:auth-respond",
-      tag: WS_METHODS.providerAuthRespond,
-    }),
-    completeProviderAuth: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:auth-complete",
-      tag: WS_METHODS.providerAuthComplete,
-    }),
-    chatGptReconnectProfile: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:chatgpt:reconnect-profile",
-      tag: WS_METHODS.chatGptReconnectProfile,
-    }),
-    chatGptImportProfile: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:chatgpt:import-profile",
-      tag: WS_METHODS.chatGptImportProfile,
-    }),
-    chatGptHandoffState: createEnvironmentSubscriptionAtomFamily(runtime, {
-      label: "environment-data:chatgpt:handoff",
-      sensitiveInput: true,
-      // OAuth must not be replayed when the connection recovers.
-      subscribe: (input: EnvironmentRpcInput<typeof WS_METHODS.chatGptHandoffSubscribe>) =>
-        runStream(WS_METHODS.chatGptHandoffSubscribe, input),
-      idleTtlMs: 0,
-    }),
-    codexAuthCallbackState: createEnvironmentRpcSubscriptionAtomFamily(runtime, {
-      label: "environment-data:codex:auth-callback",
-      tag: WS_METHODS.codexAuthCallbackSubscribe,
-      idleTtlMs: 0,
-    }),
-    cancelProviderAuth: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:auth-cancel",
-      tag: WS_METHODS.providerAuthCancel,
-    }),
-    logoutProviderAuth: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:auth-logout",
-      tag: WS_METHODS.providerAuthLogout,
-    }),
-    providerInstallState: createEnvironmentRpcSubscriptionAtomFamily(runtime, {
-      label: "environment-data:provider:install-state",
-      tag: WS_METHODS.providerInstallSubscribe,
-      idleTtlMs: 0,
-    }),
-    startProviderInstall: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:install-start",
-      tag: WS_METHODS.providerInstallStart,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId }) => environmentId,
-      },
-    }),
-    cancelProviderInstall: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:install-cancel",
-      tag: WS_METHODS.providerInstallCancel,
-    }),
-    removeProviderInstallation: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:provider:install-remove",
-      tag: WS_METHODS.providerInstallRemove,
-    }),
     traceDiagnostics: createEnvironmentRpcQueryAtomFamily(runtime, {
       label: "environment-data:server:trace-diagnostics",
       tag: WS_METHODS.serverGetTraceDiagnostics,
@@ -1106,14 +1034,6 @@ export function createServerEnvironmentAtoms<R, E>(
       label: "environment-data:server:resource-telemetry-history",
       tag: WS_METHODS.serverGetResourceTelemetryHistory,
       staleTimeMs: 5_000,
-    }),
-    searchAcpRegistry: createEnvironmentRpcQueryAtomFamily(runtime, {
-      label: "environment-data:server:acp-registry:search",
-      tag: WS_METHODS.serverSearchAcpRegistry,
-      // Each submitted search refreshes the server-side registry. Dropping an
-      // abandoned query immediately also interrupts stale in-flight requests.
-      staleTimeMs: 0,
-      idleTtlMs: 0,
     }),
     configProjection,
     welcome,
@@ -1177,93 +1097,6 @@ export function createServerEnvironmentAtoms<R, E>(
     // environment-serial scheduler. The named boundary keeps clients on the
     // atomic map-entry payload instead of rebuilding a stale whole map.
     mutateProviderInstance: updateSettings,
-    prepareAcpRegistryAgent: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:prepare",
-      tag: WS_METHODS.serverPrepareAcpRegistryAgent,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) => `${environmentId}:${input.agentId}`,
-      },
-    }),
-    uninstallAcpRegistryManagedBinary: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:uninstall-managed-binary",
-      tag: WS_METHODS.serverUninstallAcpRegistryManagedBinary,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) => `${environmentId}:${input.agentId}`,
-      },
-    }),
-    acceptAcpRegistryUrlAuth: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:accept-url-auth",
-      tag: WS_METHODS.serverAcceptAcpRegistryUrlAuth,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.elicitationId}`,
-      },
-    }),
-    listAcpRegistrySessions: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:list-sessions",
-      tag: WS_METHODS.serverListAcpRegistrySessions,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.projectId}:${input.cursor ?? "first"}`,
-      },
-    }),
-    importAcpRegistrySession: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:import-session",
-      tag: WS_METHODS.serverImportAcpRegistrySession,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.projectId}:${input.sessionId}`,
-      },
-    }),
-    deleteAcpRegistrySession: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:delete-session",
-      tag: WS_METHODS.serverDeleteAcpRegistrySession,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.projectId}:${input.sessionId}`,
-      },
-    }),
-    listAcpRegistryProviders: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:list-providers",
-      tag: WS_METHODS.serverListAcpRegistryProviders,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.projectId}`,
-      },
-    }),
-    setAcpRegistryProvider: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:set-provider",
-      tag: WS_METHODS.serverSetAcpRegistryProvider,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.projectId}:${input.providerId}`,
-      },
-    }),
-    disableAcpRegistryProvider: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:disable-provider",
-      tag: WS_METHODS.serverDisableAcpRegistryProvider,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) =>
-          `${environmentId}:${input.instanceId}:${input.projectId}:${input.providerId}`,
-      },
-    }),
-    logoutAcpRegistry: createEnvironmentRpcCommand(runtime, {
-      label: "environment-data:server:acp-registry:logout",
-      tag: WS_METHODS.serverLogoutAcpRegistry,
-      concurrency: {
-        mode: "singleFlight",
-        key: ({ environmentId, input }) => `${environmentId}:${input.instanceId}`,
-      },
-    }),
     signalProcess: createEnvironmentRpcCommand(runtime, {
       label: "environment-data:server:signal-process",
       tag: WS_METHODS.serverSignalProcess,

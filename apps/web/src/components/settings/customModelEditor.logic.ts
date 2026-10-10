@@ -38,13 +38,6 @@ export interface DescriptorPreset {
   readonly choices?: ReadonlyArray<{ id: string; label: string; isDefault?: boolean }>;
 }
 
-const EFFORT_CHOICES = [
-  { id: "low", label: "低" },
-  { id: "medium", label: "中", isDefault: true },
-  { id: "high", label: "高" },
-  { id: "xhigh", label: "极高" },
-] as const;
-
 /**
  * Option ids each adapter actually reads off a turn's model selection, with
  * the usual choices pre-filled. Anything else the user types is stored
@@ -53,42 +46,6 @@ const EFFORT_CHOICES = [
 export const DESCRIPTOR_PRESETS_BY_KIND: Partial<
   Record<ProviderDriverKind, ReadonlyArray<DescriptorPreset>>
 > = {
-  [ProviderDriverKind.make("codex")]: [
-    { id: "reasoningEffort", label: "推理", type: "select", choices: EFFORT_CHOICES },
-    {
-      id: "serviceTier",
-      label: "速度",
-      type: "select",
-      choices: [
-        { id: "default", label: "标准", isDefault: true },
-        { id: "fast", label: "快速" },
-      ],
-    },
-  ],
-  [ProviderDriverKind.make("claudeAgent")]: [
-    {
-      id: "effort",
-      label: "推理",
-      type: "select",
-      choices: [
-        { id: "low", label: "低" },
-        { id: "medium", label: "中" },
-        { id: "high", label: "高", isDefault: true },
-        { id: "xhigh", label: "极高" },
-        { id: "max", label: "最高" },
-      ],
-    },
-    { id: "fastMode", label: "快速模式", type: "boolean" },
-    { id: "thinking", label: "正在思考", type: "boolean" },
-  ],
-  [ProviderDriverKind.make("cursor")]: [
-    { id: "reasoning", label: "推理", type: "select", choices: EFFORT_CHOICES },
-    { id: "fastMode", label: "快速模式", type: "boolean" },
-    { id: "thinking", label: "正在思考", type: "boolean" },
-  ],
-  [ProviderDriverKind.make("grok")]: [
-    { id: "reasoningEffort", label: "推理", type: "select", choices: EFFORT_CHOICES },
-  ],
   [ProviderDriverKind.make("pi")]: [
     {
       id: "thinking",
@@ -102,18 +59,6 @@ export const DESCRIPTOR_PRESETS_BY_KIND: Partial<
         { id: "high", label: "高" },
         { id: "xhigh", label: "极高" },
         { id: "max", label: "最高" },
-      ],
-    },
-  ],
-  [ProviderDriverKind.make("opencode")]: [
-    { id: "variant", label: "推理", type: "select", choices: EFFORT_CHOICES },
-    {
-      id: "agent",
-      label: "智能体",
-      type: "select",
-      choices: [
-        { id: "build", label: "构建", isDefault: true },
-        { id: "plan", label: "计划" },
       ],
     },
   ],

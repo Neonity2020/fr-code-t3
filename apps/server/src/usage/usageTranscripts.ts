@@ -72,6 +72,7 @@ export function totalTokens(totals: UsageTokenTotals): number {
  * an order of magnitude.
  */
 export function mightCarryUsage(line: string, provider: UsageProviderKind): boolean {
+  if (provider === "pi") return line.includes('"usage"');
   if (provider === "claude") return line.includes('"usage"');
   if (provider === "grok") return line.includes('"turn_completed"');
   return line.includes('"token_count"');
@@ -528,3 +529,46 @@ export function parseGrokRecord(parsed: unknown): readonly UsageRecord[] {
 }
 
 export { EMPTY_TOTALS };
+
+/** Pi writes usage on assistant message entries, independently of the selected model vendor. */
+export function parsePiRecord(parsed: unknown): UsageRecord | null {
+  const record = (value: unknown): Record<string, unknown> =>
+    value !== null && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
+  const entry = record(parsed);
+  const message = record(entry.message);
+  const usage = record(message.usage);
+  if (entry.type !== "message" || message.role !== "assistant" || typeof message.model !== "string")
+    return null;
+  const timestampMs =
+    typeof message.timestamp === "number" ? message.timestamp : parseTimestampMs(entry.timestamp);
+  if (timestampMs === null || !Number.isFinite(timestampMs)) return null;
+  const totals: UsageTokenTotals = {
+    uncachedInputTokens: int(usage.input),
+    cachedInputTokens: int(usage.cacheRead),
+    cacheCreationTokens: int(usage.cacheWrite),
+    outputTokens: int(usage.output),
+    reasoningTokens: 0,
+  };
+  if (totalTokens(totals) === 0) return null;
+  const cost = record(usage.cost).total;
+  return {
+    provider: "pi",
+    timestampMs,
+    model: message.model,
+    sessionId: "",
+    totals,
+    reportedCostUsd: typeof cost === "number" && Number.isFinite(cost) && cost >= 0 ? cost : null,
+    speed: "standard",
+    dedupeKey: typeof entry.id === "string" ? `pi:${entry.id}` : null,
+  };
+}
+
+export function parsePiLine(line: string): UsageRecord | null {
+  try {
+    return parsePiRecord(JSON.parse(line));
+  } catch {
+    return null;
+  }
+}

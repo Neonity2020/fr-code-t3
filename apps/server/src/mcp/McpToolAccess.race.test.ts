@@ -16,7 +16,7 @@ import { McpSchema, McpServer, Tool, Toolkit } from "effect/ai";
 
 import * as SqlitePersistence from "../persistence/Sqlite.ts";
 import { DispatchModeLimit } from "../orchestration-v2/DispatchModeLimit.ts";
-import { CodexProviderCapabilitiesV2 } from "../orchestration-v2/Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "../orchestration-v2/testkit/ProviderCapabilities.ts";
 import * as Orchestrator from "../orchestration-v2/Orchestrator.ts";
 import * as ProjectionStore from "../orchestration-v2/ProjectionStore.ts";
 import type { ProviderAdapterV2Shape } from "../orchestration-v2/ProviderAdapter.ts";
@@ -35,7 +35,7 @@ const instanceId = ProviderInstanceId.make("codex");
 const adapter = {
   instanceId,
   driver: ProviderDriverKind.make("codex"),
-  getCapabilities: () => Effect.succeed(CodexProviderCapabilitiesV2),
+  getCapabilities: () => Effect.succeed(FullThreadTestCapabilities),
   planSelectionTransition: () => Effect.succeed({ type: "apply_on_next_turn" as const }),
   openSession: () => Effect.die("No provider process needed for metadata commands"),
 } as ProviderAdapterV2Shape;

@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { ProviderDriverKind, ProviderInstanceId } from "@t3tools/contracts";
 
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import { decideProviderSessionTransition } from "./ProviderSessionTransitionPolicy.ts";
 
 const driver = ProviderDriverKind.make("codex");
@@ -13,7 +13,7 @@ const base = {
   runtimeMode: "full-access" as const,
   interactionMode: "default" as const,
   workspace: "/repo",
-  capabilities: CodexProviderCapabilitiesV2,
+  capabilities: FullThreadTestCapabilities,
 };
 
 it("reuses compatible sessions and treats interaction mode as turn-scoped", () => {

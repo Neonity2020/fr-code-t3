@@ -71,7 +71,7 @@ import type { ProviderAdapterV2SessionRuntime, ProviderAdapterV2Shape } from "./
 import * as ProviderSessionManager from "./ProviderSessionManager.ts";
 import * as RuntimeLayer from "./runtimeLayer.ts";
 import { shellStreamItemFromThreadShell } from "./ShellStream.ts";
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as ThreadManagementService from "./ThreadManagementService.ts";
 import * as ThreadCommandExecutor from "./ThreadCommandExecutor.ts";
 
@@ -113,7 +113,7 @@ const driver = ProviderDriverKind.make("codex");
 const orchestrationAdapter = {
   instanceId: modelSelection.instanceId,
   driver,
-  getCapabilities: () => Effect.succeed(CodexProviderCapabilitiesV2),
+  getCapabilities: () => Effect.succeed(FullThreadTestCapabilities),
   planSelectionTransition: () => Effect.succeed({ type: "apply_on_next_turn" }),
   openSession: () => Effect.die("sessions are not used by lifecycle tests"),
 } as ProviderAdapterV2Shape;
@@ -878,7 +878,7 @@ it.layer(layerTest)("OrchestrationV2LayerLive", (it) => {
         status: "running" as const,
         cwd: process.cwd(),
         model: modelSelection.model,
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         createdAt: now,
         updatedAt: now,
         lastError: null,

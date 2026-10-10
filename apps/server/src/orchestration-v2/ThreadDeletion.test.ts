@@ -19,7 +19,7 @@ import {
 import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";
 
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as IdAllocator from "./IdAllocator.ts";
 import { applyToProjection, emptyProjection } from "./ProjectionStore.ts";
 import { planThreadDeletion } from "./ThreadDeletion.ts";
@@ -238,7 +238,7 @@ it.effect("queues provider and resource cleanup and preserves an earlier deletio
         status: status === "running" ? "running" : status === "stopped" ? "stopped" : "error",
         cwd: "/workspace/feature",
         model: null,
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         createdAt,
         updatedAt: createdAt,
         lastError: null,

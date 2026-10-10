@@ -12,7 +12,7 @@ import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";
 import { copySorted } from "./Array.ts";
 
-const DEFAULT_PROVIDER_DRIVER_KIND = ProviderDriverKind.make("codex");
+const DEFAULT_PROVIDER_DRIVER_KIND = ProviderDriverKind.make("pi");
 
 /** Choose the command for a model change against the thread's current provider instance. */
 export function modelSelectionCommandType(

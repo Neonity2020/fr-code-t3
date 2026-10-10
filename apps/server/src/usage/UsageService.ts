@@ -15,10 +15,6 @@
 import * as NodeOS from "node:os";
 
 import {
-  ClaudeSettings,
-  CodexSettings,
-  type ProviderInstanceConfig,
-  ProviderInstanceId,
   USAGE_CONTRACT_VERSION,
   type ServerSettings as ServerSettingsValue,
   type UsageProviderKind,
@@ -28,11 +24,10 @@ import {
   type UsageSummaryInput,
   UsageReadError,
 } from "@t3tools/contracts";
-import { HostProcessEnvironment, HostProcessPlatform } from "@t3tools/shared/hostProcess";
+import { HostProcessEnvironment } from "@t3tools/shared/hostProcess";
 import * as Cause from "effect/Cause";
 import * as Clock from "effect/Clock";
 import * as Context from "effect/Context";
-import * as Crypto from "effect/Crypto";
 import * as DateTime from "effect/DateTime";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
@@ -48,12 +43,8 @@ import { writeFileStringAtomically } from "../atomicWrite.ts";
 import * as ServerConfig from "../config.ts";
 import { expandHomePath } from "../pathExpansion.ts";
 import * as ServerSettings from "../serverSettings.ts";
-import { resolveCodexHomeLayout } from "../provider/Drivers/CodexHomeLayout.ts";
-import { resolveAntigravityInstanceDirectories } from "../provider/antigravityAuthSupport.ts";
+import { deriveProviderInstanceConfigMap } from "../provider/ProviderInstanceRegistryHydration.ts";
 import { mergeProviderInstanceEnvironment } from "../provider/ProviderInstanceEnvironment.ts";
-import { readOpenCodeUsage } from "./opencodeUsageReader.ts";
-import { readAntigravityUsage } from "./antigravityUsageReader.ts";
-import { readCursorAccountUsage } from "./cursorUsageReader.ts";
 import { resolveModelAliases, UsageAggregator } from "./usageAggregation.ts";
 import { createOverrideRateTable, parseRateTable, type RateTable } from "./usagePricing.ts";
 import {
@@ -94,9 +85,6 @@ const CACHE_RETENTION_DAYS = 90;
 
 /** Transcripts parsed at once. More gains little once the disk stays busy. */
 const TRANSCRIPT_READ_CONCURRENCY = 4;
-
-const decodeCodexSettings = Schema.decodeOption(CodexSettings);
-const decodeClaudeSettings = Schema.decodeOption(ClaudeSettings);
 
 /** On-disk shape of the rate snapshot. */
 const RatesCacheFile = Schema.Struct({
@@ -157,42 +145,13 @@ export class UsageService extends Context.Service<
   }
 >()("t3/usage/UsageService") {}
 
-const EMPTY_PRICING: UsagePricing = {
-  status: "unavailable",
-  source: LITELLM_RATES_URL,
-  fetchedAt: null,
-  knownModels: 0,
-};
-
-/** Empty summary, for suites that only need the RPC surface to resolve. */
-const layerTest = Layer.succeed(
-  UsageService,
-  UsageService.of({
-    readSummary: (input) =>
-      Effect.succeed({
-        contractVersion: USAGE_CONTRACT_VERSION,
-        readAt: "1970-01-01T00:00:00.000Z",
-        timeZone: input.timeZone,
-        sinceDay: input.sinceDay,
-        untilDay: input.untilDay,
-        buckets: [],
-        sources: [],
-        pricing: EMPTY_PRICING,
-        scanDurationMs: 0,
-      }),
-    refreshRates: Effect.succeed(EMPTY_PRICING),
-  }),
-);
-
 export const make = Effect.gen(function* () {
-  const crypto = yield* Crypto.Crypto;
   const fileSystem = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const config = yield* ServerConfig.ServerConfig;
   const settingsService = yield* ServerSettings.ServerSettingsService;
   const httpClient = yield* HttpClient.HttpClient;
   const hostEnvironment = yield* HostProcessEnvironment;
-  const platform = yield* HostProcessPlatform;
 
   const fileCache: ScanCache = new Map();
   const sourceCache = new Map<string, typeof CachedSource.Type>();
@@ -309,87 +268,48 @@ export const make = Effect.gen(function* () {
       fileName?: string;
     }> = [];
     const seen = new Set<string>();
-    for (const driver of ["claudeAgent", "codex", "grok"] as const) {
-      // Disabled accounts still have history. Explicit default slots replace
-      // the legacy settings, just as they do in the provider registry.
-      const instances: Array<
-        Pick<ProviderInstanceConfig, "config" | "environment"> & { instanceId: ProviderInstanceId }
-      > = Object.entries(settings.providerInstances)
-        .filter(([, instance]) => instance.driver === driver)
-        .map(([id, instance]) => ({ ...instance, instanceId: ProviderInstanceId.make(id) }));
-      if (!Object.hasOwn(settings.providerInstances, driver)) {
-        instances.push({
-          config: settings.providers[driver],
-          instanceId: ProviderInstanceId.make(driver),
-        });
+    const instances = Object.values(deriveProviderInstanceConfigMap(settings));
+    for (const instance of instances) {
+      const environment = mergeProviderInstanceEnvironment(instance.environment, hostEnvironment);
+      const home = expandHomePath(
+        environment.PI_CODING_AGENT_DIR?.trim() || path.join(NodeOS.homedir(), ".pi", "agent"),
+      );
+      const provider = "pi" as const;
+      const directory = path.resolve(home, "sessions");
+      const sourceKey = provider + "\0" + directory;
+      const previous = sourceCache.get(sourceKey);
+      // Keep canonical paths and source fingerprints stable after root cleanup,
+      // including aliases and clients merging pre-cleanup environment summaries.
+      const dir = yield* fileSystem
+        .realPath(directory)
+        .pipe(Effect.orElseSucceed(() => previous?.dir ?? directory));
+      const currentVolumeId = yield* Effect.promise(() => readDirectoryVolumeId(dir));
+      const hasRetainedHistory = fileCache
+        .entries()
+        .some(
+          ([filePath, entry]) =>
+            entry.provider === provider &&
+            entry.mtimeMs >= retentionCutoffMs &&
+            entry.records.length + entry.tailRecords.length > 0 &&
+            isWithinDirectory(filePath, dir),
+        );
+      // A recreated directory still reports the retained history under its old identity.
+      const volumeId =
+        previous?.dir === dir && (hasRetainedHistory || !currentVolumeId)
+          ? previous.volumeId || currentVolumeId
+          : currentVolumeId;
+      if (previous?.dir !== dir || previous.volumeId !== volumeId) {
+        sourceCache.set(sourceKey, { dir, volumeId });
+        cacheDirty = true;
       }
-      for (const instance of instances) {
-        const environment = mergeProviderInstanceEnvironment(instance.environment, hostEnvironment);
-        const provider = driver === "claudeAgent" ? "claude" : driver;
-        let home: string;
-        if (driver === "codex") {
-          const decoded = decodeCodexSettings(instance.config ?? {});
-          if (Option.isNone(decoded)) continue;
-          const codexConfig = decoded.value;
-          const environmentHome = environment.CODEX_HOME?.trim();
-          const layout = yield* resolveCodexHomeLayout(
-            codexConfig.setupMode !== "managed" &&
-              !codexConfig.homePath.trim() &&
-              !codexConfig.shadowHomePath.trim() &&
-              environmentHome
-              ? { ...codexConfig, homePath: environmentHome }
-              : codexConfig,
-          );
-          home = layout.sharedHomePath;
-        } else if (driver === "claudeAgent") {
-          const decoded = decodeClaudeSettings(instance.config ?? {});
-          if (Option.isNone(decoded)) continue;
-          const configured = decoded.value.homePath.trim();
-          home = configured
-            ? expandHomePath(configured)
-            : environment.CLAUDE_CONFIG_DIR?.trim() || path.join(NodeOS.homedir(), ".claude");
-        } else {
-          home = expandHomePath(
-            environment.GROK_HOME?.trim() || path.join(NodeOS.homedir(), ".grok"),
-          );
-        }
-        const directory = path.resolve(home, provider === "claude" ? "projects" : "sessions");
-        const sourceKey = provider + "\0" + directory;
-        const previous = sourceCache.get(sourceKey);
-        // Keep canonical paths and source fingerprints stable after root cleanup,
-        // including aliases and clients merging pre-cleanup environment summaries.
-        const dir = yield* fileSystem
-          .realPath(directory)
-          .pipe(Effect.orElseSucceed(() => previous?.dir ?? directory));
-        const currentVolumeId = yield* Effect.promise(() => readDirectoryVolumeId(dir));
-        const hasRetainedHistory = fileCache
-          .entries()
-          .some(
-            ([filePath, entry]) =>
-              entry.provider === provider &&
-              entry.mtimeMs >= retentionCutoffMs &&
-              entry.records.length + entry.tailRecords.length > 0 &&
-              isWithinDirectory(filePath, dir),
-          );
-        // A recreated directory still reports the retained history under its old identity.
-        const volumeId =
-          previous?.dir === dir && (hasRetainedHistory || !currentVolumeId)
-            ? previous.volumeId || currentVolumeId
-            : currentVolumeId;
-        if (previous?.dir !== dir || previous.volumeId !== volumeId) {
-          sourceCache.set(sourceKey, { dir, volumeId });
-          cacheDirty = true;
-        }
-        const key = `${provider}\0${dir}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        dirs.push({
-          provider,
-          dir,
-          volumeId,
-          ...(provider === "grok" ? { fileName: "updates.jsonl" } : {}),
-        });
-      }
+      const key = `${provider}\0${dir}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      dirs.push({
+        provider,
+        dir,
+        volumeId,
+      });
     }
     return dirs;
   });
@@ -591,172 +511,6 @@ export const make = Effect.gen(function* () {
       scanned.push({ provider, dir, volumeId, files: parsedFiles });
     }
 
-    const home = NodeOS.homedir();
-    const envRoots = Effect.fnUntraced(function* (key: string, defaults: readonly string[]) {
-      const roots = hostEnvironment[key]
-        ?.split(",")
-        .map((value) => value.trim())
-        .filter(Boolean);
-      const canonical = new Set<string>();
-      for (const root of roots?.length ? roots : defaults) {
-        const resolved = path.resolve(expandHomePath(root));
-        canonical.add(
-          yield* fileSystem.realPath(resolved).pipe(Effect.orElseSucceed(() => resolved)),
-        );
-      }
-      return [...canonical];
-    });
-    const dataHome = hostEnvironment["XDG_DATA_HOME"]?.trim();
-    for (const dir of yield* envRoots("OPENCODE_DATA_DIR", [
-      path.join(
-        dataHome && path.isAbsolute(dataHome) ? dataHome : path.join(home, ".local", "share"),
-        "opencode",
-      ),
-    ])) {
-      const result = yield* Effect.promise(() => readOpenCodeUsage(dir, windowStartMs));
-      scanned.push({
-        provider: "opencode",
-        dir,
-        volumeId: yield* Effect.promise(() => readDirectoryVolumeId(dir)),
-        files: result.missing && !result.error ? null : result.files,
-        status: result.error ? "partial" : "ok",
-        ...(result.error ? { message: "Some OpenCode history could not be read." } : {}),
-      });
-    }
-    const antigravityRoots = yield* envRoots("ANTIGRAVITY_DATA_DIR", [
-      ...["antigravity", "antigravity-cli", "antigravity-ide", "antigravity-backup"].map((name) =>
-        path.join(home, ".gemini", name),
-      ),
-      path.join(home, ".config", "antigravity"),
-    ]);
-    for (const [instanceId, instance] of Object.entries(settings.providerInstances)) {
-      if (instance.driver === "antigravity") {
-        const directories = yield* resolveAntigravityInstanceDirectories(
-          config.stateDir,
-          ProviderInstanceId.make(instanceId),
-        ).pipe(
-          Effect.provideService(Crypto.Crypto, crypto),
-          Effect.provideService(Path.Path, path),
-          Effect.mapError(
-            (cause) =>
-              new UsageReadError({
-                reason: "scanFailed",
-                detail: "Antigravity profile directory could not be resolved.",
-                cause,
-              }),
-          ),
-        );
-        antigravityRoots.push(path.join(directories.profile, "antigravity-acp"));
-      }
-    }
-    const antigravityDirs = new Set<string>();
-    for (const root of antigravityRoots) {
-      const resolvedRoot = yield* fileSystem.realPath(root).pipe(Effect.orElseSucceed(() => root));
-      const nested = path.join(resolvedRoot, "conversations");
-      const dir = (yield* fileSystem
-        .exists(nested)
-        .pipe(Effect.catchCause(() => Effect.succeed(false))))
-        ? nested
-        : resolvedRoot;
-      antigravityDirs.add(yield* fileSystem.realPath(dir).pipe(Effect.orElseSucceed(() => dir)));
-    }
-    const antigravity = yield* Effect.promise(() =>
-      readAntigravityUsage([...antigravityDirs], windowStartMs),
-    );
-    for (const dir of antigravityDirs) {
-      const exists = yield* fileSystem
-        .exists(dir)
-        .pipe(Effect.catchCause(() => Effect.succeed(false)));
-      const failed = antigravity.errors.some(
-        (error) => error === dir || error.startsWith(`${dir}${path.sep}`),
-      );
-      scanned.push({
-        provider: "antigravity",
-        dir,
-        volumeId: yield* Effect.promise(() => readDirectoryVolumeId(dir)),
-        files: !exists && !failed ? null : antigravity.files.filter((file) => file.root === dir),
-        status: failed ? "partial" : "ok",
-        ...(failed ? { message: "Some Antigravity history could not be read." } : {}),
-      });
-    }
-    const cursorUserHome =
-      (platform === "win32" ? hostEnvironment["USERPROFILE"] : hostEnvironment["HOME"]) || home;
-    const configHome = hostEnvironment["XDG_CONFIG_HOME"]?.trim();
-    const cursorHome =
-      platform === "darwin"
-        ? path.join(cursorUserHome, "Library", "Application Support")
-        : platform === "win32"
-          ? hostEnvironment["APPDATA"] || path.join(cursorUserHome, "AppData", "Roaming")
-          : configHome && path.isAbsolute(configHome)
-            ? configHome
-            : path.join(cursorUserHome, ".config");
-    const cursorAuthPath =
-      platform === "darwin"
-        ? path.join(cursorUserHome, ".cursor", "auth.json")
-        : path.join(cursorHome, platform === "win32" ? "Cursor" : "cursor", "auth.json");
-    const credentialStore = hostEnvironment["AGENT_CLI_CREDENTIAL_STORE"];
-    const loginUnavailable =
-      Boolean(hostEnvironment["CURSOR_AUTH_TOKEN"]?.trim()) ||
-      Boolean(hostEnvironment["CURSOR_API_KEY"]?.trim()) ||
-      credentialStore === "memory";
-    if (
-      platform === "darwin" &&
-      credentialStore !== "file" &&
-      !loginUnavailable &&
-      !settings.cursorKeychainUsageEnabled
-    ) {
-      scanned.push({
-        provider: "cursor",
-        dir: cursorAuthPath,
-        volumeId: "",
-        files: null,
-        message: "Cursor account usage is off on this environment.",
-        action: "enableCursorKeychain",
-      });
-      return scanned;
-    }
-    const cursorUntilMs = yield* Clock.currentTimeMillis;
-    const account = loginUnavailable
-      ? {
-          accountKey: null,
-          records: [],
-          missing: true,
-          error: "Cursor account history needs a Cursor CLI login on this server.",
-        }
-      : yield* Effect.promise(() =>
-          readCursorAccountUsage(
-            platform === "darwin" && credentialStore !== "file"
-              ? { kind: "keychain" }
-              : cursorAuthPath,
-            windowStartMs,
-            cursorUntilMs,
-          ),
-        );
-    // No saved login means there is no account source to report, not a setup error.
-    if (account.missing && account.error === null) return scanned;
-    if (account.accountKey !== null && account.error === null && !account.missing) {
-      // The same account includes CLI and desktop history from every machine.
-      // A stable remote fingerprint prevents connected environments counting it twice.
-      const source = `cursor-account:${account.accountKey}`;
-      scanned.push({
-        provider: "cursor",
-        dir: source,
-        hostId: "cursor.com",
-        volumeId: account.accountKey,
-        files: [{ path: source, records: account.records }],
-        status: "ok",
-      });
-      return scanned;
-    }
-    scanned.push({
-      provider: "cursor",
-      dir: cursorAuthPath,
-      volumeId: yield* Effect.promise(() => readDirectoryVolumeId(cursorAuthPath)),
-      // Never combine a local fallback with another server's account-wide history.
-      files: null,
-      message:
-        account.error ?? "Cursor account history needs a Cursor CLI login saved on this server.",
-    });
     return scanned;
   });
 

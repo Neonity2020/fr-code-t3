@@ -23,10 +23,6 @@
  */
 import type {
   ProviderConsumeResetCreditOutcome,
-  AcpRegistryListSessionsResult,
-  AcpRegistryListProvidersResult,
-  AcpRegistryOperationError,
-  AcpRegistrySetProviderInput,
   ProviderDriverKind,
   ProviderInstanceEnvironment,
   ProviderInstanceId,
@@ -40,7 +36,6 @@ import type * as Scope from "effect/Scope";
 import type { TextGeneration } from "../textGeneration/TextGeneration.ts";
 import type { ProviderAdapterV2Shape } from "../orchestration-v2/ProviderAdapter.ts";
 import type { ProviderDriverError } from "./Errors.ts";
-import type { ProviderAuthController } from "./ProviderAuthService.ts";
 import type { ServerProviderShape } from "./ServerProvider.ts";
 
 /**
@@ -97,30 +92,6 @@ export interface ProviderInstance {
   >;
   readonly orchestrationAdapter: ProviderAdapterV2Shape;
   readonly textGeneration: TextGeneration["Service"];
-  readonly auth?: ProviderAuthController;
-  readonly acpSessionManagement?: {
-    readonly listSessions: (input: {
-      readonly cwd: string;
-      readonly cursor?: string;
-    }) => Effect.Effect<AcpRegistryListSessionsResult, AcpRegistryOperationError>;
-    readonly logout: (cwd: string) => Effect.Effect<void, AcpRegistryOperationError>;
-    readonly deleteSession: (input: {
-      readonly cwd: string;
-      readonly sessionId: string;
-    }) => Effect.Effect<void, AcpRegistryOperationError>;
-    readonly listProviders: (
-      cwd: string,
-    ) => Effect.Effect<AcpRegistryListProvidersResult, AcpRegistryOperationError>;
-    readonly setProvider: (
-      input: Omit<AcpRegistrySetProviderInput, "instanceId" | "projectId"> & {
-        readonly cwd: string;
-      },
-    ) => Effect.Effect<void, AcpRegistryOperationError>;
-    readonly disableProvider: (input: {
-      readonly cwd: string;
-      readonly providerId: string;
-    }) => Effect.Effect<void, AcpRegistryOperationError>;
-  };
 }
 
 export interface ProviderContinuationIdentity {

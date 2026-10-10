@@ -5,7 +5,6 @@ import * as OrchestrationCommandReceipts from "../persistence/OrchestrationComma
 import * as OrchestrationEventStore from "../persistence/OrchestrationEventStore.ts";
 import * as ProviderSessionRuntime from "../persistence/ProviderSessionRuntime.ts";
 import * as TextGeneration from "../textGeneration/TextGeneration.ts";
-import * as ProviderAuthService from "../provider/ProviderAuthService.ts";
 import * as AgentSessionImporter from "../project/AgentSessionImporter.ts";
 import * as AgentSessionScanner from "../project/AgentSessionScanner.ts";
 import * as ProjectService from "../project/ProjectService.ts";
@@ -134,10 +133,6 @@ const layerProviderSessionManagerProvided = ProviderSessionManager.layer.pipe(
   ),
 );
 
-const layerProviderAuthServiceProvided = ProviderAuthService.layer.pipe(
-  Layer.provide(Layer.merge(ProjectionStore.layer, layerProviderSessionManagerProvided)),
-);
-
 const layerRunExecutionServiceProvided = RunExecutionService.layer.pipe(
   Layer.provide(
     Layer.mergeAll(
@@ -157,7 +152,7 @@ const layerProviderTurnStartServiceProvided = ProviderTurnStartService.layer.pip
       IdAllocator.layer,
       ProjectionStore.layer,
       layerProviderSessionManagerProvided,
-      layerProviderAuthServiceProvided,
+
       layerRunExecutionServiceProvided,
       layerRuntimePolicyProvided,
     ),
@@ -319,7 +314,7 @@ export const layer = Layer.mergeAll(
   layerThreadManagementProvided,
   layerEffectWorkerProvided,
   layerProviderSessionManagerProvided,
-  layerProviderAuthServiceProvided,
+
   layerProviderRuntimeRecoveryProvided,
   layerProjectionMaintenanceProvided,
   layerLegacyV1ThreadImporterProvided,

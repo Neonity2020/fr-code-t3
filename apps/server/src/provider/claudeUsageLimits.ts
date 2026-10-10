@@ -10,7 +10,31 @@
  *
  * @module provider/claudeUsageLimits
  */
-import type { SDKControlGetUsageResponse, SDKRateLimitInfo } from "@anthropic-ai/claude-agent-sdk";
+interface SDKRateLimitInfo {
+  readonly status?: string;
+  readonly rateLimitType?: string;
+  readonly utilization?: number;
+  readonly resetsAt?: number;
+}
+interface SDKControlGetUsageResponse {
+  readonly rate_limits_available: boolean;
+  readonly rate_limits?: {
+    readonly five_hour?: {
+      readonly utilization: number | null;
+      readonly resets_at: string | null;
+    } | null;
+    readonly seven_day?: {
+      readonly utilization: number | null;
+      readonly resets_at: string | null;
+    } | null;
+    readonly extra_usage?: unknown;
+    readonly seven_day_opus?: {
+      readonly utilization: number | null;
+      readonly resets_at: string | null;
+    } | null;
+    readonly model_scoped?: readonly ModelScopedWindow[];
+  } | null;
+}
 import type {
   ProviderUsageLimitsUpdate,
   ServerProviderUsageLimits,

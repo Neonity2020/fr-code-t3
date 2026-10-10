@@ -57,6 +57,22 @@ function cacheWith(entries: readonly [string, number, readonly UsageRecord[]][])
 }
 
 describe("scan cache round trip", () => {
+  it("persists Pi records and incremental scan positions", () => {
+    const original: ScanCache = new Map([
+      [
+        "/pi.jsonl",
+        {
+          size: 120,
+          mtimeMs: 100,
+          provider: "pi",
+          records: [record({ provider: "pi", model: "openai/gpt-6", dedupeKey: "pi:message" })],
+          tailRecords: [],
+          position: position(),
+        },
+      ],
+    ]);
+    expect(decodeScanCache(encodeScanCache(original))).toEqual(original);
+  });
   it("restores records unchanged", () => {
     const original = cacheWith([
       [

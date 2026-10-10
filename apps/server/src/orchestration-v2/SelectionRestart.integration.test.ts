@@ -24,7 +24,7 @@ import * as Queue from "effect/Queue";
 import * as Ref from "effect/Ref";
 import * as Stream from "effect/Stream";
 
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as EffectWorker from "./EffectWorker.ts";
 import * as EventSink from "./EventSink.ts";
 import * as Orchestrator from "./Orchestrator.ts";
@@ -58,11 +58,11 @@ const handoffSelection = {
   instanceId: handoffProviderInstanceId,
   model: "handoff-model",
 } satisfies ModelSelection;
-const pooledCapabilities: OrchestrationV2ProviderCapabilities = CodexProviderCapabilitiesV2;
+const pooledCapabilities: OrchestrationV2ProviderCapabilities = FullThreadTestCapabilities;
 const exclusiveCapabilities: OrchestrationV2ProviderCapabilities = {
-  ...CodexProviderCapabilitiesV2,
+  ...FullThreadTestCapabilities,
   sessions: {
-    ...CodexProviderCapabilitiesV2.sessions,
+    ...FullThreadTestCapabilities.sessions,
     supportsMultipleProviderThreadsPerSession: false,
     supportsModelSwitchInSession: false,
   },

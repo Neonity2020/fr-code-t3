@@ -7,7 +7,6 @@ import {
   ArrowUpCircleIcon,
   CopyIcon,
   DownloadIcon,
-  ExternalLinkIcon,
   PlusIcon,
   Trash2Icon,
   XIcon,
@@ -22,9 +21,7 @@ import {
   type ProviderInstanceConfig,
   type ProviderInstanceEnvironmentVariable,
   type ProviderInstanceId,
-  type AcpRegistryUrlAuthAction,
   type EnvironmentId,
-  type ProjectId,
   type ProviderDriverKind,
   type ServerProvider,
   type ServerProviderModel,
@@ -51,11 +48,7 @@ import { deriveProviderSettingsFields, ProviderSettingsForm } from "./ProviderSe
 import { ProviderModelsSection } from "./ProviderModelsSection";
 import { ProviderInstanceIcon } from "../chat/ProviderInstanceIcon";
 import { ProviderAccentColorPicker } from "./ProviderAccentColorPicker";
-import { RedactedSensitiveText } from "./RedactedSensitiveText";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
-import { AcpSessionManagementSection } from "./AcpSessionManagementSection";
-import { FoldedSettingsSection } from "./FoldedSettingsSection";
-import { readCodexSetupMode } from "./CodexSetupSection.logic";
 import {
   getProviderVersionAdvisoryPresentation,
   PROVIDER_STATUS_STYLES,
@@ -135,12 +128,6 @@ function readConfigCustomModels(config: unknown): ReadonlyArray<CustomModelDefin
   return readCustomModelEntries((config as Record<string, unknown>).customModels);
 }
 
-function readConfigString(config: unknown, key: string): string | null {
-  if (config === null || typeof config !== "object") return null;
-  const value = (config as Record<string, unknown>)[key];
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-}
-
 /**
  * Set `key` to an arbitrary value on the opaque config blob. Unlike
  * provider settings field updates, does not drop empty-looking values — the
@@ -183,21 +170,6 @@ export function deriveProviderModelsForDisplay(input: {
       entry.capabilities ?? liveCustomModelsBySlug.get(entry.slug)?.capabilities ?? null,
   }));
   return [...serverModels, ...customModels];
-}
-
-function ProviderAuthEmail(props: { readonly email: string | undefined }) {
-  const email = props.email?.trim();
-  if (!email) return null;
-
-  return (
-    <RedactedSensitiveText
-      value={email}
-      ariaLabel="切换账号邮箱可见性"
-      revealTooltip="Click to reveal email"
-      hideTooltip="Click to hide email"
-      className="max-w-full truncate"
-    />
-  );
 }
 
 export function readProviderEnvironmentVariable(
@@ -490,8 +462,6 @@ interface ProviderInstanceCardProps {
    * omit it.
    */
   readonly headerAction?: ReactNode | undefined;
-  readonly setup?: ReactNode;
-  readonly runtime?: ReactNode;
   readonly hiddenModels: ReadonlyArray<string>;
   readonly favoriteModels: ReadonlyArray<string>;
   readonly modelOrder: ReadonlyArray<string>;
@@ -501,18 +471,8 @@ interface ProviderInstanceCardProps {
   readonly onRunUpdate?: (() => void) | undefined;
   readonly onInstallRecommended?: (() => void) | undefined;
   readonly isUpdating?: boolean | undefined;
-  readonly onAcceptUrlAuth?: ((action: AcpRegistryUrlAuthAction) => void) | undefined;
   readonly environmentId?: EnvironmentId | undefined;
-  readonly acpProjects?:
-    | ReadonlyArray<{
-        readonly id: ProjectId;
-        readonly title: string;
-        readonly workspaceRoot: string;
-      }>
-    | undefined;
 }
-
-const EMPTY_ACP_PROJECTS: NonNullable<ProviderInstanceCardProps["acpProjects"]> = [];
 
 /**
  * Renders one provider instance as either a compact selectable list row or
@@ -545,8 +505,6 @@ export function ProviderInstanceCard({
   onUpdate,
   onDelete,
   headerAction,
-  setup,
-  runtime,
   hiddenModels,
   favoriteModels,
   modelOrder,
@@ -556,9 +514,6 @@ export function ProviderInstanceCard({
   onRunUpdate,
   onInstallRecommended,
   isUpdating = false,
-  onAcceptUrlAuth,
-  environmentId,
-  acpProjects = EMPTY_ACP_PROJECTS,
 }: ProviderInstanceCardProps) {
   const enabled = resolveProviderInstanceEnabled(instance);
   const compatibility = enabled ? liveProvider?.compatibilityAdvisory : undefined;
@@ -571,12 +526,6 @@ export function ProviderInstanceCard({
   const summary = enabled
     ? getProviderSummary(liveProvider)
     : { headline: "Disabled", detail: null };
-  const authEmail = liveProvider?.auth.email?.trim();
-  const isAuthenticated = enabled && liveProvider?.auth.status === "authenticated";
-  const authLabel =
-    enabled && liveProvider?.auth.status === "authenticated"
-      ? (liveProvider.auth.label ?? liveProvider.auth.type ?? null)
-      : null;
   const versionLabel = getProviderVersionLabel(liveProvider?.version);
   const versionAdvisory = getProviderVersionAdvisoryPresentation(
     liveProvider?.versionAdvisory,
@@ -594,7 +543,6 @@ export function ProviderInstanceCard({
     : versionAdvisory?.targetVersion
       ? onInstallRecommended
       : onRunUpdate;
-  const urlAuthAction = liveProvider?.auth.action;
   const displayName =
     instance.displayName?.trim() || driverOption?.label || String(instance.driver);
   const accentColor = normalizeProviderAccentColor(instance.accentColor);
@@ -713,16 +661,6 @@ export function ProviderInstanceCard({
       driverKind={driverKind ?? instance.driver}
       displayName={displayName}
       accentColor={accentColor}
-      acpRegistryAgentId={
-        readConfigString(instance.config, "source") === "local"
-          ? undefined
-          : (readConfigString(instance.config, "agentId") ?? undefined)
-      }
-      acpRegistryIconUrl={
-        readConfigString(instance.config, "source") === "local"
-          ? undefined
-          : (readConfigString(instance.config, "registryIconUrl") ?? undefined)
-      }
       showBadge={Boolean(accentColor)}
       className="size-5"
       iconClassName="size-4 text-foreground/80"
@@ -753,26 +691,6 @@ export function ProviderInstanceCard({
         ? "Unsupported"
         : "Limited support"
     : summary.detail;
-  const editorStatusNode =
-    isAuthenticated && authEmail ? (
-      <>
-        {needsAttention ? statusDotNode : null}
-        <span>已认证为</span>
-        <ProviderAuthEmail email={authEmail} />
-        {authLabel ? <span>· {authLabel}</span> : null}
-        {inlineStatusDetail ? (
-          <span className="min-w-0 [overflow-wrap:anywhere]">· {inlineStatusDetail}</span>
-        ) : null}
-      </>
-    ) : (
-      <>
-        {statusDotNode}
-        <span>{summary.headline}</span>
-        {inlineStatusDetail ? (
-          <span className="min-w-0 [overflow-wrap:anywhere]">· {inlineStatusDetail}</span>
-        ) : null}
-      </>
-    );
   const versionAdvisoryNode = versionAdvisory ? (
     <Popover>
       <Tooltip>
@@ -985,41 +903,7 @@ export function ProviderInstanceCard({
       <SettingsSection title={displayName} icon={titleIconNode} headerAction={editorHeaderAction}>
         <SettingsRow
           title="显示名称"
-          status={
-            <>
-              <ProviderStatusDiagnostic detail={statusDiagnostic}>
-                <div
-                  tabIndex={statusDiagnostic ? 0 : undefined}
-                  className="flex min-w-0 flex-wrap items-baseline gap-x-1.5"
-                >
-                  {editorStatusNode}
-                </div>
-              </ProviderStatusDiagnostic>
-              {urlAuthAction && onAcceptUrlAuth ? (
-                <div className="grid max-w-xl gap-1.5 pt-1 text-xs">
-                  <p>{urlAuthAction.message}</p>
-                  <code className="break-all text-2xs">{urlAuthAction.url}</code>
-                  <Button
-                    render={
-                      <a
-                        href={urlAuthAction.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => onAcceptUrlAuth(urlAuthAction)}
-                      />
-                    }
-                    size="xs"
-                    variant="outline"
-                    className="w-fit"
-                    disabled={readOnly}
-                  >
-                    <ExternalLinkIcon />
-                    继续认证
-                  </Button>
-                </div>
-              ) : null}
-            </>
-          }
+          status={<span>{summary.headline}</span>}
           control={
             <div
               inert={readOnly}
@@ -1050,9 +934,8 @@ export function ProviderInstanceCard({
         />
       </SettingsSection>
 
-      {setup || environmentFields.length > 0 ? (
+      {environmentFields.length > 0 ? (
         <SettingsSection title="配置">
-          {setup}
           <div
             inert={readOnly}
             aria-disabled={readOnly || undefined}
@@ -1076,22 +959,7 @@ export function ProviderInstanceCard({
         </SettingsSection>
       ) : null}
 
-      {instance.driver === "codex" && readCodexSetupMode(instance.config) === "managed" ? (
-        <div
-          inert={readOnly}
-          aria-disabled={readOnly || undefined}
-          className={readOnly ? "opacity-50 select-none" : undefined}
-        >
-          <FoldedSettingsSection
-            key={instanceId}
-            id={`provider-instance-${instanceId}-runtime`}
-            title="运行时"
-            headerPlacement="outside"
-          >
-            {runtime ?? runtimeFields}
-          </FoldedSettingsSection>
-        </div>
-      ) : !driverOption || deriveProviderSettingsFields(driverOption).length > 0 ? (
+      {!driverOption || deriveProviderSettingsFields(driverOption).length > 0 ? (
         <SettingsSection
           title="运行时"
           inert={readOnly}
@@ -1112,15 +980,6 @@ export function ProviderInstanceCard({
           environment={genericEnvironment}
           onChange={updateGenericEnvironment}
         />
-        {environmentId !== undefined && liveProvider?.driver === "acpRegistry" ? (
-          <AcpSessionManagementSection
-            environmentId={environmentId}
-            instanceId={instanceId}
-            provider={liveProvider}
-            projects={acpProjects}
-            readOnly={readOnly}
-          />
-        ) : null}
       </SettingsSection>
 
       {driverOption !== undefined ? (

@@ -12,7 +12,7 @@ import {
   ServerSettingsError,
   TerminalProviderInstanceNotFoundError,
 } from "@t3tools/contracts";
-import { HostProcessPlatform, HostProcessArchitecture } from "@t3tools/shared/hostProcess";
+import { HostProcessPlatform } from "@t3tools/shared/hostProcess";
 import * as Data from "effect/Data";
 import * as Clock from "effect/Clock";
 import * as Deferred from "effect/Deferred";
@@ -28,7 +28,6 @@ import * as PlatformError from "effect/PlatformError";
 import * as Path from "effect/Path";
 import * as Ref from "effect/Ref";
 import * as Schedule from "effect/Schedule";
-import * as Schema from "effect/Schema";
 import * as Scope from "effect/Scope";
 import * as Stream from "effect/Stream";
 import * as TestClock from "effect/testing/TestClock";
@@ -42,8 +41,6 @@ import * as ProcessRunner from "../processRunner.ts";
 import * as ServerSettings from "../serverSettings.ts";
 import * as TerminalManager from "./Manager.ts";
 import * as PtyAdapter from "./PtyAdapter.ts";
-
-const encodeUnknownJson = Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
 
 class WaitForConditionError extends Data.TaggedError("WaitForConditionError")<{
   readonly message: string;
@@ -1090,7 +1087,7 @@ it.layer(
             (event) =>
               event.type === "activity" &&
               event.hasRunningSubprocess === false &&
-              event.label === "Terminal 1",
+              event.label === "终端 1",
           ),
         ),
         "1200 millis",
@@ -1882,70 +1879,6 @@ it.layer(
     }),
   );
 
-  it.effect("preserves Windows Path casing when appending managed ACP binaries", () =>
-    Effect.gen(function* () {
-      const fileSystem = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const cacheDir = yield* fileSystem.makeTempDirectoryScoped({
-        prefix: "t3-terminal-acp-path-",
-      });
-      const installBin = path.join(
-        cacheDir,
-        "tools",
-        "example-agent",
-        "1.2.3",
-        "windows-x86_64",
-        "bin",
-      );
-      yield* fileSystem.makeDirectory(installBin, { recursive: true });
-      yield* fileSystem.makeDirectory(path.join(cacheDir, "acp-registry"), { recursive: true });
-      yield* fileSystem.writeFileString(
-        path.join(cacheDir, "acp-registry", "registry.json"),
-        encodeUnknownJson({
-          version: "1.0.0",
-          agents: [
-            {
-              id: "example-agent",
-              name: "Example Agent",
-              version: "1.2.3",
-              description: "ACP Registry test agent",
-              distribution: {
-                binary: {
-                  "windows-x86_64": {
-                    archive: "https://registry.test/example-agent.zip",
-                    cmd: "bin/example-agent.exe",
-                  },
-                },
-              },
-            },
-          ],
-        }),
-      );
-      const { manager, ptyAdapter } = yield* createManager(5, {
-        managedBinaryCacheDir: cacheDir,
-        managedBinaryToolsDir: path.join(cacheDir, "tools"),
-        env: {
-          ComSpec: "C:\\Windows\\System32\\cmd.exe",
-          Path: "C:\\Windows\\System32",
-          SystemRoot: "C:\\Windows",
-        },
-      }).pipe(
-        Effect.provide(
-          Layer.merge(
-            layerWithHostPlatform("win32"),
-            Layer.succeed(HostProcessArchitecture, "x64"),
-          ),
-        ),
-      );
-
-      yield* manager.open(openInput());
-
-      const spawnEnv = ptyAdapter.spawnInputs[0]?.env;
-      expect(spawnEnv?.PATH).toBeUndefined();
-      expect(spawnEnv?.Path).toBe(`C:\\Windows\\System32;${installBin}`);
-    }),
-  );
-
   it.effect("falls back to built-in PowerShell by absolute path on Windows", () =>
     Effect.gen(function* () {
       const ptyAdapter = new FakePtyAdapter();
@@ -2032,15 +1965,13 @@ it.layer(
       yield* manager.open({
         ...openInput(),
         env: {
-          CODEX_HOME: "~/.codex-work",
-          CLAUDE_CONFIG_DIR: "~/.claude-work",
+          PI_CODING_AGENT_DIR: "~/.pi-work",
           CUSTOM_ACCOUNT: "~/leave-this-value-alone",
         },
       });
 
       const environment = ptyAdapter.spawnInputs[0]?.env;
-      expect(environment?.CODEX_HOME).toMatch(/[\\/][.]codex-work$/);
-      expect(environment?.CLAUDE_CONFIG_DIR).toMatch(/[\\/][.]claude-work$/);
+      expect(environment?.PI_CODING_AGENT_DIR).toMatch(/[\\/][.]pi-work$/);
       expect(environment?.CUSTOM_ACCOUNT).toBe("~/leave-this-value-alone");
     }),
   );
@@ -2223,126 +2154,6 @@ it.layer(
     }),
   );
 
-  it.effect.each([
-    {
-      name: "Codex home",
-      driver: "codex",
-      variable: "CODEX_HOME",
-      config: { homePath: "/configured/codex" },
-      expectedHome: "/configured/codex",
-    },
-    {
-      name: "Codex shadow home",
-      driver: "codex",
-      variable: "CODEX_HOME",
-      config: { homePath: "/configured/codex", shadowHomePath: "/configured/codex-shadow" },
-      expectedHome: "/configured/codex-shadow",
-    },
-    {
-      name: "Claude home",
-      driver: "claudeAgent",
-      variable: "CLAUDE_CONFIG_DIR",
-      config: { homePath: "/configured/claude" },
-      expectedHome: "/configured/claude",
-    },
-  ])("prefers $name over the instance environment", ({ driver, variable, config, expectedHome }) =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path;
-      const serverSettings = yield* ServerSettings.ServerSettingsService;
-      const environment = yield* TerminalManager.resolveProviderInstanceTerminalEnvironment({
-        serverSettings,
-        path,
-        rawProviderInstanceId: "configured_home",
-        env: undefined,
-      });
-
-      expect(environment[variable]).toBe(path.resolve(expectedHome));
-    }).pipe(
-      Effect.provide(
-        ServerSettings.layerTest({
-          providerInstances: {
-            [ProviderInstanceId.make("configured_home")]: {
-              driver: ProviderDriverKind.make(driver),
-              environment: [{ name: variable, value: "~/.environment-account", sensitive: false }],
-              config,
-            },
-          },
-        }),
-      ),
-    ),
-  );
-
-  it.effect("resolves the legacy Codex default instance", () =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path;
-      const serverSettings = yield* ServerSettings.ServerSettingsService;
-      const environment = yield* TerminalManager.resolveProviderInstanceTerminalEnvironment({
-        serverSettings,
-        path,
-        rawProviderInstanceId: "codex",
-        env: undefined,
-      });
-
-      expect(environment.CODEX_HOME).toMatch(/[\\/][.]codex-legacy$/);
-    }).pipe(
-      Effect.provide(
-        ServerSettings.ServerSettingsService.layerTest({
-          providerInstances: {},
-          providers: { codex: { homePath: "~/.codex-legacy" } },
-        }),
-      ),
-    ),
-  );
-
-  it.effect("resolves the legacy Claude default instance", () =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path;
-      const serverSettings = yield* ServerSettings.ServerSettingsService;
-      const environment = yield* TerminalManager.resolveProviderInstanceTerminalEnvironment({
-        serverSettings,
-        path,
-        rawProviderInstanceId: "claudeAgent",
-        env: undefined,
-      });
-
-      expect(environment.CLAUDE_CONFIG_DIR).toMatch(/[\\/][.]claude-legacy$/);
-    }).pipe(
-      Effect.provide(
-        ServerSettings.ServerSettingsService.layerTest({
-          providerInstances: {},
-          providers: { claudeAgent: { homePath: "~/.claude-legacy" } },
-        }),
-      ),
-    ),
-  );
-
-  it.effect("prefers an explicit default instance over legacy provider settings", () =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path;
-      const serverSettings = yield* ServerSettings.ServerSettingsService;
-      const environment = yield* TerminalManager.resolveProviderInstanceTerminalEnvironment({
-        serverSettings,
-        path,
-        rawProviderInstanceId: "codex",
-        env: undefined,
-      });
-
-      expect(environment.CODEX_HOME).toMatch(/[\\/][.]codex-explicit$/);
-    }).pipe(
-      Effect.provide(
-        ServerSettings.ServerSettingsService.layerTest({
-          providers: { codex: { homePath: "~/.codex-legacy" } },
-          providerInstances: {
-            [ProviderInstanceId.make("codex")]: {
-              driver: "codex",
-              config: { homePath: "~/.codex-explicit" },
-            },
-          },
-        }),
-      ),
-    ),
-  );
-
   it.effect("keeps unknown provider instance ids unavailable after legacy hydration", () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
@@ -2400,9 +2211,12 @@ it.layer(
         serverSettings.updateSettings({
           providerInstances: {
             [providerInstanceId]: {
-              driver: ProviderDriverKind.make("codex"),
-              config: { homePath },
-              environment: [{ name: "PROVIDER_SECRET", value, sensitive: true }],
+              driver: ProviderDriverKind.make("pi"),
+              config: {},
+              environment: [
+                { name: "PROVIDER_SECRET", value, sensitive: true },
+                { name: "PI_CODING_AGENT_DIR", value: homePath, sensitive: false },
+              ],
             },
           },
         });
@@ -2433,7 +2247,7 @@ it.layer(
       expect(ptyAdapter.spawnInputs).toHaveLength(2);
       expect(ptyAdapter.spawnInputs[1]?.env).toMatchObject({
         PROVIDER_SECRET: "second-secret",
-        CODEX_HOME: homePath,
+        PI_CODING_AGENT_DIR: homePath,
         CLIENT_FLAG: "1",
       });
       expect(restarted.history).toBe("");

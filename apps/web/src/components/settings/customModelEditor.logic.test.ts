@@ -165,7 +165,7 @@ describe("customModelEditor.logic", () => {
       }),
     );
     expect(
-      presets.capabilities?.optionDescriptors?.some((option) => option.id === "contextWindow"),
+      (presets.capabilities?.optionDescriptors ?? []).some((option) => option.id === "contextWindow"),
     ).toBe(false);
     const cursorCopy = descriptorsFromCapabilities(capabilities, ProviderDriverKind.make("cursor"));
     expect(cursorCopy.map((option) => option.id)).toEqual(["contextWindow", "thinking"]);

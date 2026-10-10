@@ -13,17 +13,17 @@
 ## What this fork changes
 
 T3 Code is a control plane for many coding agents (Claude Code, Codex, Cursor, Grok,
-OpenCode, Antigravity, plus an ACP registry). FR Code keeps that engine and UI intact
-and changes two things: the identity, and the kernel.
+OpenCode, Antigravity, plus an ACP registry). FR Code keeps the orchestration engine and clients, changes the identity, and reduces
+the agent runtime to Pi.
 
 ### 1. Rebrand
 
-| | Upstream | FR Code |
-|---|---|---|
-| Display name | T3 Code | FR Code |
+|                 | Upstream             | FR Code          |
+| --------------- | -------------------- | ---------------- |
+| Display name    | T3 Code              | FR Code          |
 | macOS bundle id | `com.t3tools.t3code` | `com.frcode.app` |
-| URL scheme | `t3code://` | `frcode://` |
-| Artifact name | `T3-Code-*.dmg` | `FR-Code-*.dmg` |
+| URL scheme      | `t3code://`          | `frcode://`      |
+| Artifact name   | `T3-Code-*.dmg`      | `FR-Code-*.dmg`  |
 
 The bundle id change is what lets FR Code install alongside the official app instead of
 replacing it. Verified: both run at once, on separate loopback ports.
@@ -37,9 +37,7 @@ redrawn as well.
 `apps/server/src/provider/builtInDrivers.ts` registers exactly one driver:
 
 ```ts
-export const BUILT_IN_DRIVERS: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv>> = [
-  PiDriver,
-];
+export const BUILT_IN_DRIVERS: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv>> = [PiDriver];
 ```
 
 `PiDriver` drives the user's own `pi` CLI over `--mode rpc` (line-delimited JSON on
@@ -53,8 +51,11 @@ exactly as they do in the Pi TUI, and sessions stay in your own `~/.pi/agent/ses
 Verified against Pi 1.0.4: the RPC commands the adapter sends (`get_state`,
 `get_available_models`, `prompt`, …) are all accepted.
 
-The removed drivers' UI stays in the tree and degrades to the documented `"unavailable"`
-shadow snapshot rather than crashing.
+Old provider adapters, native SDK workspaces, authentication flows, and registry installation
+controls are removed. New threads, text generation, onboarding, session discovery, and
+usage scanning use Pi. Multiple Pi instances remain supported. Existing thread history
+and opaque legacy settings remain readable; removed drivers cannot run new turns.
+CLIProxyAPI hubs remain available as independent subscription-usage sources.
 
 ### Also
 
@@ -63,22 +64,19 @@ shadow snapshot rather than crashing.
 - The Linux/Windows packaging identity (binary name, `StartupWMClass`, AppStream and
   doc paths) was carried over from the rebrand so those targets stay consistent.
 
-287 files changed, +673 / −669 across 7 commits on top of upstream `f4f148eb`.
-
 ---
 
 ## Build
 
-T3 Code uses a Bun-style workspace with pnpm and Vite+ (`vp`) for orchestration.
+FR Code uses a pnpm workspace and Vite+ (`vp`) for orchestration.
 
 ```bash
 pnpm install
-curl -fsSL https://vite.plus | bash   # required: the global `vp` CLI
 pnpm exec vp run dev:desktop         # run against a source checkout
 pnpm exec vp run dist:desktop:dmg    # package a .dmg
 ```
 
-Node `^22.16 || ^23.11 || >=24.10`.
+Node `^24.13.1`; pnpm `11.10.0`.
 
 ### Two environment notes
 
@@ -160,5 +158,6 @@ git fetch upstream && git rebase upstream/main
 ```
 
 The rebrand is deliberately mechanical (literal string replacement plus five identity
-constants) and the provider change is confined to one file, so the fork has stayed easy
-to rebase — but artwork binaries and the regenerated wordmark will conflict.
+constants). The Pi-only reduction touches contracts, clients, runtime wiring, and packaging;
+upstream provider changes need review when rebasing. Artwork binaries and the
+regenerated wordmark can also conflict.

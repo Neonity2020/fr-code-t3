@@ -21,14 +21,11 @@ import * as Schema from "effect/Schema";
 import { HttpClient } from "effect/http";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
-import * as ModelManifest from "./ModelManifest.ts";
-import { resolveProviderCompatibility } from "./providerCompatibility.ts";
 import * as ProviderRegistry from "./ProviderRegistry.ts";
 import { makeProviderMaintenanceCommandCoordinator } from "./providerMaintenanceCommandCoordinator.ts";
 import {
   enrichProviderSnapshotWithVersionAdvisory,
   makeTargetedProviderUpdateAction,
-  resolveLatestProviderVersion,
   type ProviderMaintenanceCommandAction,
   ProviderVersionCache,
 } from "./providerMaintenance.ts";
@@ -219,7 +216,6 @@ function makeUpdateState(input: {
 /** @public Service construction is part of the canonical Effect module API. */
 export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
   const providerRegistry = yield* ProviderRegistry.ProviderRegistry;
-  const manifestService = yield* ModelManifest.ModelManifest;
   const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
   const httpClient = yield* HttpClient.HttpClient;
   const versionCache = yield* ProviderVersionCache;
@@ -382,32 +378,11 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
                 }),
               );
             }
-
-            const manifest = yield* manifestService.current;
-            const candidateVersion =
-              targetVersion ??
-              (yield* resolveLatestProviderVersion(fresh).pipe(
-                Effect.provideService(HttpClient.HttpClient, httpClient),
-                Effect.provideService(ProviderVersionCache, versionCache),
-              ));
-            const advisory =
-              resolveProviderCompatibility(manifest.compatibility, provider, candidateVersion) ??
-              resolveProviderCompatibility(
-                ModelManifest.BUNDLED_MODEL_MANIFEST.compatibility,
-                provider,
-                candidateVersion,
-              );
             const command =
               targetVersion !== undefined
                 ? makeTargetedProviderUpdateAction(fresh, targetVersion)
                 : fresh.update;
-            const rejected =
-              targetVersion !== undefined
-                ? !command ||
-                  advisory?.recommendedVersion !== targetVersion ||
-                  advisory.status !== "supported"
-                : advisory?.status === "broken" || advisory?.status === "unsupported";
-            if (rejected || !command) {
+            if (!command) {
               return yield* finish(
                 makeUpdateState({
                   status: "failed",

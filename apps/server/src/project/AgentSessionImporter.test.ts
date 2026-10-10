@@ -19,8 +19,8 @@ import * as AgentSessionScanner from "./AgentSessionScanner.ts";
 import * as ProjectService from "./ProjectService.ts";
 
 const projectId = ProjectId.make("agent-session-import-project");
-const providerInstanceId = ProviderInstanceId.make("codex");
-const providerSessionId = "native-codex-thread";
+const providerInstanceId = ProviderInstanceId.make("pi");
+const providerSessionId = "native-pi-thread";
 const threadId = ThreadId.make(`import:${providerInstanceId}:${providerSessionId}`);
 
 it.effect("imports messages once and preserves the provider native resume binding", () => {
@@ -34,10 +34,10 @@ it.effect("imports messages once and preserves the provider native resume bindin
       Stream.succeed({
         _tag: "Importable",
         source: {
-          provider: "codex",
+          provider: "pi",
           providerInstanceId,
           providerSessionId,
-          filePath: "/tmp/native-codex-thread.jsonl",
+          filePath: "/tmp/native-pi-thread.jsonl",
           size: 100,
           mtimeMs: 2,
           device: 3,
@@ -45,7 +45,7 @@ it.effect("imports messages once and preserves the provider native resume bindin
           birthtimeMs: 1,
         },
         thread: {
-          source: "codex",
+          source: "pi",
           providerInstanceId,
           providerSessionId,
           title: "Imported thread",
@@ -125,7 +125,7 @@ it.effect("imports messages once and preserves the provider native resume bindin
     expect(providerThread?.payload).toMatchObject({
       appThreadId: threadId,
       nativeThreadRef: {
-        driver: "codex",
+        driver: "pi",
         nativeId: providerSessionId,
         strength: "strong",
       },
@@ -139,7 +139,7 @@ it.effect("imports messages once and preserves the provider native resume bindin
       expect.objectContaining({
         threadId,
         providerInstanceId,
-        resumeCursor: { threadId: providerSessionId },
+        resumeCursor: { threadId, resume: providerSessionId },
       }),
     ]);
     expect(recorded).toHaveLength(2);

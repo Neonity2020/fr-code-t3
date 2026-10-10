@@ -1,9 +1,4 @@
-import {
-  ANTIGRAVITY_DEFAULT_MODEL,
-  ProviderDriverKind,
-  ProviderInstanceId,
-  type ServerProvider,
-} from "@t3tools/contracts";
+import { ProviderDriverKind, ProviderInstanceId, type ServerProvider } from "@t3tools/contracts";
 import { DEFAULT_UNIFIED_SETTINGS, type UnifiedSettings } from "@t3tools/contracts/settings";
 import { describe, expect, it } from "vite-plus/test";
 import { createModelSelection } from "@t3tools/shared/model";
@@ -628,96 +623,6 @@ describe("instance-scoped model selection", () => {
       });
       expect(state.selectedModel).toBe("");
     }
-  });
-
-  it("offers only account catalog models for Antigravity despite custom model settings", () => {
-    const driver = ProviderDriverKind.make("antigravity");
-    const customId = ProviderInstanceId.make("antigravity_work");
-    const nativeModel = "gemini-3.1-pro";
-    const settings: UnifiedSettings = {
-      ...DEFAULT_UNIFIED_SETTINGS,
-      providers: {
-        ...DEFAULT_UNIFIED_SETTINGS.providers,
-        antigravity: {
-          ...DEFAULT_UNIFIED_SETTINGS.providers.antigravity,
-          customModels: ["api-only-model"],
-        },
-      },
-      providerInstances: {
-        [customId]: { driver, config: { customModels: ["unknown-model"] } },
-      },
-    };
-    const entries = deriveProviderInstanceEntries([
-      provider({ provider: driver, instanceId: "antigravity", models: [nativeModel] }),
-      provider({ provider: driver, instanceId: customId, models: [nativeModel] }),
-    ]);
-
-    for (const entry of entries) {
-      expect(getAppModelOptionsForInstance(settings, entry).map((model) => model.slug)).toEqual([
-        nativeModel,
-      ]);
-    }
-  });
-
-  it("resolves the Antigravity default marker without creating an unavailable model", () => {
-    const instanceId = ProviderInstanceId.make("antigravity_work");
-    const nativeModel = "gemini-3.1-pro";
-    const base = provider({
-      provider: ProviderDriverKind.make("antigravity"),
-      instanceId,
-      models: [nativeModel],
-    });
-    const liveProvider = {
-      ...base,
-      models: base.models.map((model) => ({
-        ...model,
-        isDefault: true,
-        aliases: [ANTIGRAVITY_DEFAULT_MODEL],
-      })),
-    };
-    const settings = settingsWithProviderInstances();
-
-    expect(
-      getAppModelOptionsForInstance(
-        settings,
-        deriveProviderInstanceEntries([liveProvider])[0]!,
-        ANTIGRAVITY_DEFAULT_MODEL,
-      ).map((model) => model.slug),
-    ).toEqual([nativeModel]);
-    expect(
-      resolveAppModelSelectionForInstance(
-        instanceId,
-        settings,
-        [liveProvider],
-        ANTIGRAVITY_DEFAULT_MODEL,
-        {
-          preserveUnavailableSelection: true,
-        },
-      ),
-    ).toBe(nativeModel);
-
-    const hiddenSettings: UnifiedSettings = {
-      ...settings,
-      providerModelPreferences: {
-        [instanceId]: { hiddenModels: [nativeModel], modelOrder: [] },
-      },
-    };
-    expect(
-      resolveAppModelSelectionForInstance(
-        instanceId,
-        hiddenSettings,
-        [liveProvider],
-        ANTIGRAVITY_DEFAULT_MODEL,
-        { preserveUnavailableSelection: true },
-      ),
-    ).toBeNull();
-    expect(
-      getAppModelOptionsForInstance(
-        settings,
-        deriveProviderInstanceEntries([{ ...base, models: [] }])[0]!,
-        ANTIGRAVITY_DEFAULT_MODEL,
-      ),
-    ).toEqual([]);
   });
 
   it("preserves saved options through dispatch when the model is absent from the catalog", () => {

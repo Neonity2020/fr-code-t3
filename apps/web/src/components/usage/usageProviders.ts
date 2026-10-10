@@ -14,6 +14,11 @@ type UsageProviderPresentation = {
  * only requires its contract support and one entry here.
  */
 export const PROVIDER_PRESENTATION = {
+  pi: {
+    label: "Pi",
+    color: "var(--contrast-foreground)",
+    driverKind: ProviderDriverKind.make("pi"),
+  },
   codex: {
     label: "Codex",
     color: "var(--contrast-foreground)",

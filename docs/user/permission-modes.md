@@ -8,31 +8,21 @@ Projects can override the environment default. New threads use this setting rath
 mode of the thread you were viewing. The initial default is **Full access**; existing threads
 and modes you choose in a draft keep their permissions.
 
-| Mode                  | Behavior                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------- |
-| **Supervised**        | Requests approval for commands and file changes.                                      |
-| **Auto-accept edits** | Approves file edits automatically; other actions can still require approval.          |
-| **Auto**              | Uses the provider's automatic review to approve routine actions and ask about others. |
-| **Full access**       | Allows commands and edits without approval prompts.                                   |
+| Mode                  | Behavior                                                                     |
+| --------------------- | ---------------------------------------------------------------------------- |
+| **Supervised**        | Requests approval for commands and file changes.                             |
+| **Auto-accept edits** | Approves file edits automatically; other actions can still require approval. |
+| **Full access**       | Allows commands and edits without approval prompts.                          |
 
 Approve or reject requests in the conversation to let the agent continue. Permission modes do
 not prevent the agent from asking questions about the task.
 
-## Provider differences
+## Pi permissions
 
-Providers enforce permissions differently. Some read-only actions can proceed in **Supervised**.
-**Auto** uses automatic review on Codex, Claude, Cursor, and Grok; providers without an equivalent,
-including OpenCode and Antigravity, fall back to asking. On Grok, commands its review blocks come
-to you for approval.
+Pi's blocking tool hook enforces these modes. Read-only tools can proceed in
+**Supervised**. **Auto-accept edits** allows Pi's edit and write tools while asking
+before commands and extension tools. **Full access** allows tools without prompts.
 
-Grok offers no **Auto-accept edits**. A Grok thread already set to it runs in **Supervised**. Grok
-file-change approvals offer **Allow all edits this session**. Its command approvals have no
-session-wide choice, because Grok would remember that command for the whole project.
-
-ACP Registry agents run their own tools in their own mode; T3 Code answers their approval requests
-by the permission mode. See [ACP Registry permissions](./providers-acp.md#permissions-and-terminals).
-
-Antigravity can still send native approval requests in **Full access**. It only offers remembered
-approvals for actions that support them.
-
-See the [provider guides](./install.md#providers) for setup and provider-specific limits.
+Pi does not expose an automatic approval reviewer, so **Auto** is hidden. Existing
+threads set to Auto behave as Supervised. Changing modes restarts the Pi session
+and resumes its native conversation. See [Pi permissions](./providers-pi.md#permission-modes).

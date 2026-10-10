@@ -4,17 +4,12 @@ import {
   rememberCheckoutIsRepo,
   threadShellHasStarted,
 } from "./ChatView.logic";
-import {
-  ANTIGRAVITY_DEFAULT_MODEL,
-  ProviderDriverKind,
-  type ServerProvider,
-} from "@t3tools/contracts";
+import { ProviderDriverKind, type ServerProvider } from "@t3tools/contracts";
 import { deriveProviderInstanceEntries, NO_PROVIDER_MODEL_SELECTION } from "../providerInstances";
 import type { RightPanelSurface } from "../rightPanelStore";
 import {
   CommandId,
   EnvironmentId,
-  EventId,
   MessageId,
   ProjectId,
   ProviderInstanceId,
@@ -28,7 +23,7 @@ import type { CodexArtifactTemplate } from "@t3tools/client-runtime/codex-artifa
 import * as DateTime from "effect/DateTime";
 import * as Option from "effect/Option";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { Atom, AsyncResult } from "effect/reactivity";
+import { Atom } from "effect/reactivity";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { environmentThreadDetails } from "../state/threads";
 
@@ -40,7 +35,6 @@ import {
   getAntigravitySendBlockReason,
   resolveBackgroundDraftWorkspaceOptions,
   resolveComposerInteractionMode,
-  restorePlanFollowUpComposer,
   resolveComposerProviderSelection,
   resolveProactiveTurnDiffAction,
   resolveDraftHeroState,
@@ -84,7 +78,6 @@ import {
   shouldShowPlanFollowUpPrompt,
   shouldWriteThreadErrorToCurrentServerThread,
   waitForRevertedMessage,
-  prepareRevertedMessageAttachments,
 } from "./ChatView.logic";
 
 const environmentId = EnvironmentId.make("environment-local");
@@ -1536,23 +1529,6 @@ describe("resolveComposerProviderSelection", () => {
 
     expect(getAntigravitySendBlockReason(provider, "gemini-pro")).toBe(
       "Install Antigravity in provider settings before sending.",
-    );
-  });
-
-  it("lets Antigravity check saved credentials when resuming after a restart", () => {
-    const provider = entry("antigravity", "google_work", {
-      status: "warning",
-      auth: { status: "unknown" },
-      models: [],
-    }).snapshot;
-
-    expect(getAntigravitySendBlockReason(provider, "gemini-pro")).toBeNull();
-    expect(getAntigravitySendBlockReason(provider, ANTIGRAVITY_DEFAULT_MODEL)).toBeNull();
-    expect(
-      getAntigravitySendBlockReason({ ...provider, models: catalogModels }, "gemini-pro"),
-    ).toBeNull();
-    expect(getAntigravitySendBlockReason(provider, "")).toBe(
-      "Choose an Antigravity model before sending.",
     );
   });
 

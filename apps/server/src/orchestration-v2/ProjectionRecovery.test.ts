@@ -23,7 +23,7 @@ import * as Layer from "effect/Layer";
 import * as SqlClient from "effect/sql/SqlClient";
 
 import * as SqlitePersistence from "../persistence/Sqlite.ts";
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as EffectOutbox from "./EffectOutbox.ts";
 import * as ProjectionStore from "./ProjectionStore.ts";
 import { restartContinuationRun } from "./RestartContinuation.ts";
@@ -308,7 +308,7 @@ it.effect("includes shared sessions and provider-owned background rosters in rec
           status: "ready",
           cwd: "/workspace",
           model: modelSelection.model,
-          capabilities: CodexProviderCapabilitiesV2,
+          capabilities: FullThreadTestCapabilities,
           createdAt: now,
           updatedAt: now,
           lastError: null,
@@ -361,7 +361,7 @@ it.effect("includes shared sessions and provider-owned background rosters in rec
         status: "stopped",
         cwd: "/workspace",
         model: modelSelection.model,
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         createdAt: now,
         updatedAt: now,
         lastError: null,

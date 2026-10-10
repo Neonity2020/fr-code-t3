@@ -1,8 +1,6 @@
-import * as CodexErrors from "effect-codex-app-server/errors";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
-  codexRateLimitsFailureMessage,
   codexRateLimitsToLimits,
   codexRateLimitsToUpdate,
   codexResetCreditsToContract,
@@ -154,26 +152,6 @@ describe("codexRateLimitsToUpdate", () => {
         windowDurationMins: 10080,
       },
     ]);
-  });
-});
-
-describe("codexRateLimitsFailureMessage", () => {
-  it("keeps the JSON-RPC code and nothing else from a request failure", () => {
-    expect(
-      codexRateLimitsFailureMessage(
-        new CodexErrors.CodexAppServerRequestError({
-          code: -32603,
-          errorMessage:
-            "failed to fetch codex rate limits: GET https://chatgpt.com/backend-api/wham/usage failed: 401 Unauthorized",
-        }),
-      ),
-    ).toBe("Codex could not read usage (JSON-RPC -32603).");
-  });
-
-  it("phrases a dead process differently from a bad answer", () => {
-    expect(
-      codexRateLimitsFailureMessage(new CodexErrors.CodexAppServerProcessExitedError({ code: 1 })),
-    ).toBe("Codex exited before it could report usage.");
   });
 });
 

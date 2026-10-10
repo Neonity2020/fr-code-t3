@@ -3,7 +3,7 @@ import type { ProviderReplayTranscript } from "@t3tools/contracts";
 
 import type { OrchestratorV2ScenarioResult } from "../../OrchestratorScenario.ts";
 import { projectionFor } from "../shared.ts";
-import { assertSimpleOutput } from "./codex_output.ts";
+import { assertSimpleOutput } from "./output.ts";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

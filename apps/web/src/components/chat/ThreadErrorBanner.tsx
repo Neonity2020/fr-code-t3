@@ -4,8 +4,6 @@ import { Alert, AlertAction, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
 import { CircleAlertIcon, XIcon } from "lucide-react";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { OpenAI } from "../Icons";
-import { ChatGptUsageButton } from "../settings/ChatGptUsageButton";
 
 export function getThreadErrorBannerKey(threadKey: string, error: string | null): string | null {
   return error === null ? null : `${threadKey}\u0000${error}`;
@@ -40,46 +38,30 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
   error,
   onDismiss,
   errorClass,
-  chatGptUsageLimit = false,
 }: {
   error: string | null;
   errorClass?: OrchestrationV2ProviderFailureClass | null;
   onDismiss?: () => void;
-  chatGptUsageLimit?: boolean;
 }) {
   if (!error) return null;
   const variant = errorClass === "usage_limit" ? "warning" : "error";
   return (
     <div className="pointer-events-auto mx-auto w-fit max-w-[min(48rem,calc(100%-2rem))] pt-3">
       <Alert variant={variant} surface="glass" controlAlignment="first-line" data-variant={variant}>
-        {chatGptUsageLimit ? (
-          <OpenAI className="size-4 text-foreground!" aria-hidden="true" />
-        ) : (
-          <CircleAlertIcon />
-        )}
+        <CircleAlertIcon />
         <AlertDescription>
-          {chatGptUsageLimit ? (
-            <div className="space-y-1">
-              <p className="font-medium">已达到 ChatGPT 用量限制</p>
-              <p>请在 ChatGPT 中检查用量设置以继续。</p>
-            </div>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger render={<div className="line-clamp-3" />}>{error}</TooltipTrigger>
-              <TooltipPopup side="top" className="whitespace-pre-wrap">
-                {error}
-              </TooltipPopup>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger render={<div className="line-clamp-3" />}>{error}</TooltipTrigger>
+            <TooltipPopup side="top" className="whitespace-pre-wrap">
+              {error}
+            </TooltipPopup>
+          </Tooltip>
         </AlertDescription>
-        {(chatGptUsageLimit || onDismiss) && (
+        {onDismiss && (
           <AlertAction>
-            {chatGptUsageLimit ? <ChatGptUsageButton variant="default" size="sm" /> : null}
-            {onDismiss ? (
-              <Button variant="ghost" size="icon-xs" aria-label="关闭错误提示" onClick={onDismiss}>
-                <XIcon />
-              </Button>
-            ) : null}
+            <Button variant="ghost" size="icon-xs" aria-label="关闭错误提示" onClick={onDismiss}>
+              <XIcon />
+            </Button>
           </AlertAction>
         )}
       </Alert>

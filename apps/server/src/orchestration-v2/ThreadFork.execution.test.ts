@@ -17,8 +17,8 @@ import {
 import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";
 
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
-import { ClaudeProviderCapabilitiesV2 } from "./Adapters/ClaudeAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
+import { RestartThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as EventSink from "./EventSink.ts";
 import * as Orchestrator from "./Orchestrator.ts";
 import type { ProviderAdapterV2Shape } from "./ProviderAdapter.ts";
@@ -34,7 +34,7 @@ const forkCases = (["codex", "claudeAgent"] as const).flatMap((driverName) => {
     driver,
     getCapabilities: () =>
       Effect.succeed(
-        driver === "codex" ? CodexProviderCapabilitiesV2 : ClaudeProviderCapabilitiesV2,
+        driver === "codex" ? FullThreadTestCapabilities : RestartThreadTestCapabilities,
       ),
     planSelectionTransition: () => Effect.succeed({ type: "apply_on_next_turn" }),
     openSession: () => Effect.die("Execution is paused after dispatch for handoff inspection"),

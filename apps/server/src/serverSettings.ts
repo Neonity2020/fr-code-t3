@@ -12,8 +12,6 @@
  */
 import {
   DEFAULT_TEXT_GENERATION_MODEL,
-  DEFAULT_TEXT_GENERATION_MODEL_BY_PROVIDER,
-  DEFAULT_MODEL_BY_PROVIDER,
   DEFAULT_SERVER_SETTINGS,
   ModelSelection,
   ProjectId,
@@ -23,7 +21,6 @@ import {
   type ProviderInstanceEnvironmentVariable,
   type UsageLimitSourceConfig,
   type ProviderInstanceMutation,
-  ProviderDriverKind,
   ProviderInstanceId,
   resolveProviderInstanceEnabled,
   ResponseStreamingMode,
@@ -236,6 +233,15 @@ function ensureProviderInstanceMutationAllowed(
   mutation: ProviderInstanceMutation,
   settingsPath: string,
 ): Effect.Effect<void, ServerSettingsError> {
+  if (mutation.operation !== "remove" && mutation.instance.driver !== "pi") {
+    return Effect.fail(
+      new ServerSettingsError({
+        settingsPath,
+        operation: "create-provider-instance",
+        providerInstanceId: mutation.instanceId,
+      }),
+    );
+  }
   if (
     mutation.operation === "create" &&
     settings.providerInstances[mutation.instanceId] !== undefined
@@ -384,106 +390,22 @@ const ServerSettingsJson = fromLenientJson(
   }),
 );
 const decodeServerSettingsJsonExit = Schema.decodeUnknownExit(ServerSettingsJson);
-const PersistedOptionalProviderSettings = Schema.Struct({
-  providers: Schema.optionalKey(
-    Schema.Struct({
-      cursor: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
-      grok: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
-      opencode: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
-    }),
-  ),
-});
-const decodePersistedOptionalProviderSettingsJsonExit = Schema.decodeUnknownExit(
-  fromLenientJson(PersistedOptionalProviderSettings),
-);
-
-function restoreUsedProviders(
-  settings: ServerSettings,
-  persisted: typeof PersistedOptionalProviderSettings.Type,
-  providerHistory: ReadonlyArray<{
-    readonly providerName: string;
-    readonly providerInstanceId: string | null;
-  }>,
-): ServerSettings {
-  const usedProviders = new Set(providerHistory.map(({ providerName }) => providerName));
-  const usedProviderInstances = new Set(
-    providerHistory.map(
-      ({ providerName, providerInstanceId }) => providerInstanceId ?? providerName,
-    ),
-  );
-  const providerInstances = Object.fromEntries(
-    Object.entries(settings.providerInstances).map(([instanceId, instance]) => [
-      instanceId,
-      instance.enabled === undefined &&
-      (instance.driver === "cursor" ||
-        instance.driver === "grok" ||
-        instance.driver === "opencode") &&
-      usedProviderInstances.has(instanceId)
-        ? { ...instance, enabled: true }
-        : instance,
-    ]),
-  );
-
-  return {
-    ...settings,
-    providers: {
-      ...settings.providers,
-      cursor: {
-        ...settings.providers.cursor,
-        enabled: persisted.providers?.cursor?.enabled ?? usedProviders.has("cursor"),
-      },
-      grok: {
-        ...settings.providers.grok,
-        enabled: persisted.providers?.grok?.enabled ?? usedProviders.has("grok"),
-      },
-      opencode: {
-        ...settings.providers.opencode,
-        enabled: persisted.providers?.opencode?.enabled ?? usedProviders.has("opencode"),
-      },
-    },
-    providerInstances,
-  };
-}
-
-const ACP_REGISTRY_DRIVER = ProviderDriverKind.make("acpRegistry");
-
-/** ACP Registry instances reject every application text-generation operation. */
-function selectionSupportsTextGeneration(
-  settings: ServerSettings,
-  selection: ModelSelection,
-): boolean {
-  return settings.providerInstances[selection.instanceId]?.driver !== ACP_REGISTRY_DRIVER;
-}
-
 function resolveTextGenerationProvider(settings: ServerSettings): ServerSettings {
   return isModelSelectionProviderEnabled(settings, settings.textGenerationModelSelection) &&
-    selectionSupportsTextGeneration(settings, settings.textGenerationModelSelection)
+    (settings.providerInstances[settings.textGenerationModelSelection.instanceId]?.driver ??
+      settings.textGenerationModelSelection.instanceId) === "pi"
     ? settings
     : fallbackTextGenerationProvider(settings);
 }
 
 function fallbackTextGenerationProvider(settings: ServerSettings): ServerSettings {
-  // Same precedence as isModelSelectionProviderEnabled: an explicit provider
-  // instance wins over the legacy providers map, which decodes to defaults
-  // (codex enabled) when the Providers UI has only written providerInstances.
-  const fallbackEntry = Object.entries(settings.providers).find(([driver, provider]) => {
-    const instance = settings.providerInstances[ProviderInstanceId.make(driver)];
-    return instance === undefined ? provider.enabled : resolveProviderInstanceEnabled(instance);
-  });
-  const fallback = fallbackEntry ? ProviderDriverKind.make(fallbackEntry[0]) : undefined;
-  if (!fallback) {
-    return settings;
-  }
-
+  const entry = Object.entries(settings.providerInstances).find(
+    ([, instance]) => instance.driver === "pi" && resolveProviderInstanceEnabled(instance),
+  );
+  const instanceId = entry ? ProviderInstanceId.make(entry[0]) : ProviderInstanceId.make("pi");
   return {
     ...settings,
-    textGenerationModelSelection: {
-      instanceId: ProviderInstanceId.make(fallback),
-      model:
-        DEFAULT_TEXT_GENERATION_MODEL_BY_PROVIDER[fallback] ??
-        DEFAULT_MODEL_BY_PROVIDER[fallback] ??
-        DEFAULT_TEXT_GENERATION_MODEL,
-    } satisfies ModelSelection,
+    textGenerationModelSelection: { instanceId, model: DEFAULT_TEXT_GENERATION_MODEL },
   };
 }
 
@@ -497,16 +419,7 @@ const ATOMIC_SETTINGS_KEYS: ReadonlySet<string> = new Set([
   "pullRequestMergeMethod",
 ]);
 
-// Preserve both enabled states because provider history cannot recover a new opt-in.
-const PERSISTED_SERVER_SETTINGS_DEFAULTS = {
-  ...DEFAULT_SERVER_SETTINGS,
-  providers: {
-    ...DEFAULT_SERVER_SETTINGS.providers,
-    cursor: { ...DEFAULT_SERVER_SETTINGS.providers.cursor, enabled: undefined },
-    grok: { ...DEFAULT_SERVER_SETTINGS.providers.grok, enabled: undefined },
-    opencode: { ...DEFAULT_SERVER_SETTINGS.providers.opencode, enabled: undefined },
-  },
-};
+const PERSISTED_SERVER_SETTINGS_DEFAULTS = DEFAULT_SERVER_SETTINGS;
 
 function stripDefaultServerSettings(current: unknown, defaults: unknown): unknown | undefined {
   if (Array.isArray(current) || Array.isArray(defaults)) {
@@ -740,7 +653,6 @@ const make = Effect.gen(function* () {
 
   const loadSettingsFromDisk = Effect.gen(function* () {
     let settings = DEFAULT_SERVER_SETTINGS;
-    let persisted: typeof PersistedOptionalProviderSettings.Type = {};
     // A file that failed to decode must stay on disk for the user to repair;
     // the fold below only writes when it started from the file's real contents.
     let settingsFileTrusted = true;
@@ -748,12 +660,8 @@ const make = Effect.gen(function* () {
     if (yield* readConfigExists) {
       const raw = yield* readRawConfig;
       const decoded = decodeServerSettingsJsonExit(raw);
-      const persistedSettings = decodePersistedOptionalProviderSettingsJsonExit(raw);
-      if (persistedSettings._tag === "Success") {
-        persisted = persistedSettings.value;
-      }
-      if (decoded._tag === "Failure" || persistedSettings._tag === "Failure") {
-        const failure = decoded._tag === "Failure" ? decoded : persistedSettings;
+      if (decoded._tag === "Failure") {
+        const failure = decoded;
         settingsFileTrusted = false;
         if (failure._tag === "Failure") {
           yield* Effect.logWarning("failed to parse settings.json, using defaults", {
@@ -766,32 +674,6 @@ const make = Effect.gen(function* () {
         settings = decoded.value;
       }
     }
-
-    const providerHistory = yield* sql<{
-      readonly providerName: string;
-      readonly providerInstanceId: string | null;
-    }>`
-      SELECT DISTINCT
-        provider_name AS "providerName",
-        provider_instance_id AS "providerInstanceId"
-      FROM projection_thread_sessions
-      WHERE provider_name IN ('cursor', 'grok', 'opencode')
-      UNION
-      SELECT DISTINCT
-        provider_name AS "providerName",
-        provider_instance_id AS "providerInstanceId"
-      FROM provider_session_runtime
-      WHERE provider_name IN ('cursor', 'grok', 'opencode')
-    `.pipe(
-      Effect.mapError(
-        (cause) =>
-          new ServerSettingsError({
-            settingsPath,
-            operation: "read-provider-history",
-            cause,
-          }),
-      ),
-    );
 
     const legacyProjectRows =
       settings.projectSettingsFolded || !settingsFileTrusted
@@ -816,9 +698,7 @@ const make = Effect.gen(function* () {
             ),
           );
 
-    const loaded = foldProviderInstanceEnabledFlags(
-      restoreUsedProviders(settings, persisted, providerHistory),
-    );
+    const loaded = foldProviderInstanceEnabledFlags(settings);
     const folded = settingsFileTrusted
       ? foldLegacyProjectSettings(loaded, legacyProjectRows)
       : loaded;

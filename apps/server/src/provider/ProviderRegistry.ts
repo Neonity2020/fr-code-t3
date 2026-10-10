@@ -14,7 +14,7 @@
  * bundled onto the `ProviderInstance` the registry produces.
  *
  * Each configured instance (including multi-instance setups like
- * `codex_personal` + `codex_work`) contributes one `ProviderSnapshotSource`,
+ * `pi_personal` + `pi_work`) contributes one `ProviderSnapshotSource`,
  * keyed by `instanceId`. Instances whose driver is unavailable or whose
  * config failed to decode are merged from `instanceRegistry.listUnavailable`
  * as shadow snapshots so the UI can render their exact unavailable reason.
@@ -46,8 +46,6 @@ import * as Ref from "effect/Ref";
 import * as Stream from "effect/Stream";
 import * as Semaphore from "effect/Semaphore";
 
-import * as ModelManifest from "./ModelManifest.ts";
-import { applyProviderCompatibility } from "./providerCompatibility.ts";
 import * as ServerConfig from "../config.ts";
 import * as ProviderInstanceRegistry from "./ProviderInstanceRegistry.ts";
 import {
@@ -201,61 +199,16 @@ export function upsertProviderWorkspaceSnapshot(
   };
 }
 
-const shouldRetainMissingProviderModels = (provider: ServerProvider): boolean => {
-  if (provider.driver === ProviderDriverKind.make("acpRegistry")) {
-    // ACP Registry discovery probes return the agent's complete inventory, so
-    // a completed probe (ready and authenticated) replaces the model list —
-    // otherwise agents that rename or collapse models leave stale entries
-    // pinned forever through the snapshot cache. Readiness-only and failed
-    // probe snapshots only know the "default" placeholder and stay partial.
-    return !(
-      provider.installed &&
-      provider.status === "ready" &&
-      provider.auth.status === "authenticated"
-    );
-  }
-
-  const isAntigravity = provider.driver === ProviderDriverKind.make("antigravity");
-  const isCodex = provider.driver === ProviderDriverKind.make("codex");
-  if (!isAntigravity && !isCodex && provider.driver !== ProviderDriverKind.make("opencode")) {
-    return true;
-  }
-
-  if (
-    (isAntigravity || isCodex) &&
-    (!provider.enabled || provider.auth.status === "unauthenticated")
-  ) {
-    return false;
-  }
-
-  // Successful discovery replaces these inventories so cached retired models disappear.
-  // Antigravity's local health check does not authenticate or discover models.
-  const isPendingAntigravityAuthentication =
-    isAntigravity && provider.status === "warning" && provider.auth.status === "unknown";
-  const isPendingInitialProbe =
-    provider.enabled && !provider.installed && provider.status === "warning";
-  const didInstalledProviderProbeFail = provider.installed && provider.status === "error";
-  return (
-    isPendingAntigravityAuthentication || isPendingInitialProbe || didInstalledProviderProbeFail
-  );
-};
-
-const shouldRetainMissingOpenCodeMetadata = (provider: ServerProvider): boolean =>
-  provider.driver === ProviderDriverKind.make("opencode") &&
-  shouldRetainMissingProviderModels(provider);
-
 const mergeProviderModels = (
-  provider: ServerProvider,
   previousModels: ReadonlyArray<ServerProvider["models"][number]>,
   nextModels: ReadonlyArray<ServerProvider["models"][number]>,
 ): ReadonlyArray<ServerProvider["models"][number]> => {
-  const shouldRetainMissingModels = shouldRetainMissingProviderModels(provider);
   // Custom rows are derived from settings and every snapshot carries the full
   // current list, so a custom model missing from `nextModels` was removed by
   // the user and must not be resurrected from the previous snapshot.
   const retainablePreviousModels = previousModels.filter((model) => !model.isCustom);
 
-  if (shouldRetainMissingModels && nextModels.length === 0 && retainablePreviousModels.length > 0) {
+  if (nextModels.length === 0 && retainablePreviousModels.length > 0) {
     return retainablePreviousModels;
   }
 
@@ -271,41 +224,10 @@ const mergeProviderModels = (
     };
   });
   const nextSlugs = new Set(nextModels.map((model) => model.slug));
-  return shouldRetainMissingModels
-    ? [...mergedModels, ...retainablePreviousModels.filter((model) => !nextSlugs.has(model.slug))]
-    : mergedModels;
-};
-
-/**
- * Antigravity's health check only initializes the agent, so after a server
- * restart it reports the account as unchecked. The saved Google login still
- * works, and the previous snapshot proves it. Carry that account state until
- * a session, refresh, or sign-out reports something new. A confirmed missing
- * installation, sign-out, disabled instance, or a changed sign-in method is
- * never overridden.
- */
-const carrySavedAntigravityAccount = (
-  previousProvider: ServerProvider,
-  nextProvider: ServerProvider,
-): Pick<ServerProvider, "auth" | "status"> | undefined => {
-  const antigravity = ProviderDriverKind.make("antigravity");
-  if (
-    nextProvider.driver !== antigravity ||
-    previousProvider.driver !== antigravity ||
-    !nextProvider.enabled ||
-    nextProvider.auth.status !== "unknown" ||
-    previousProvider.auth.status !== "authenticated" ||
-    (nextProvider.auth.type !== undefined &&
-      nextProvider.auth.type !== previousProvider.auth.type) ||
-    (!nextProvider.installed && nextProvider.status !== "warning")
-  ) {
-    return undefined;
-  }
-  // The pending boot probe (`installed: false`, warning) and a failed probe
-  // keep their own status; only a passed health check reads as ready.
-  const status =
-    nextProvider.installed && nextProvider.status === "warning" ? "ready" : nextProvider.status;
-  return { auth: previousProvider.auth, status };
+  return [
+    ...mergedModels,
+    ...retainablePreviousModels.filter((model) => !nextSlugs.has(model.slug)),
+  ];
 };
 
 export const mergeProviderSnapshot = (
@@ -315,28 +237,14 @@ export const mergeProviderSnapshot = (
   if (!previousProvider) {
     return nextProvider;
   }
-  const savedAccount = carrySavedAntigravityAccount(previousProvider, nextProvider);
-  // "Google account access is not checked yet" describes the probe, not the
-  // account; it must not outlive the state it explained.
-  const { message: _uncheckedMessage, ...nextWithoutMessage } = nextProvider;
   return {
-    ...(savedAccount?.status === "ready" ? nextWithoutMessage : nextProvider),
-    ...savedAccount,
-    models: mergeProviderModels(nextProvider, previousProvider.models, nextProvider.models),
+    ...nextProvider,
+    models: mergeProviderModels(previousProvider.models, nextProvider.models),
     ...(nextProvider.workspaceSnapshots !== undefined
       ? { workspaceSnapshots: nextProvider.workspaceSnapshots }
       : previousProvider.workspaceSnapshots !== undefined
         ? { workspaceSnapshots: previousProvider.workspaceSnapshots }
         : {}),
-    ...(shouldRetainMissingOpenCodeMetadata(nextProvider)
-      ? {
-          slashCommands:
-            nextProvider.slashCommands.length === 0
-              ? previousProvider.slashCommands
-              : nextProvider.slashCommands,
-          skills: nextProvider.skills.length === 0 ? previousProvider.skills : nextProvider.skills,
-        }
-      : {}),
   };
 };
 
@@ -416,8 +324,6 @@ export const layer = Layer.effect(
   ProviderRegistry,
   Effect.gen(function* () {
     const instanceRegistry = yield* ProviderInstanceRegistry.ProviderInstanceRegistry;
-    const manifestService = yield* ModelManifest.ModelManifest;
-    const serviceScope = yield* Effect.scope;
     const config = yield* ServerConfig.ServerConfig;
     const fileSystem = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
@@ -496,19 +402,7 @@ export const layer = Layer.effect(
         ),
       ),
     );
-    const initialManifest = yield* manifestService.current;
-    const classifyCompatibility = (
-      provider: ServerProvider,
-      manifest: ModelManifest.ModelManifestData,
-    ) =>
-      applyProviderCompatibility(
-        provider,
-        manifest.compatibility,
-        ModelManifest.BUNDLED_MODEL_MANIFEST.compatibility,
-      );
-    const providersRef = yield* Ref.make<ReadonlyArray<ServerProvider>>(
-      cachedProviders.map((provider) => classifyCompatibility(provider, initialManifest)),
-    );
+    const providersRef = yield* Ref.make<ReadonlyArray<ServerProvider>>(cachedProviders);
     const workspaceRefreshesRef = yield* Ref.make<
       ReadonlyMap<ProviderInstance, ReadonlySet<string>>
     >(new Map());
@@ -576,7 +470,6 @@ export const layer = Layer.effect(
         readonly replace?: boolean;
       },
     ) {
-      const manifest = yield* manifestService.current;
       const nextProvidersWithUpdateState = yield* Effect.forEach(
         nextProviders,
         applyProviderUpdateState,
@@ -603,11 +496,7 @@ export const layer = Layer.effect(
             );
           }
 
-          const providers = orderProviderSnapshots(
-            [...mergedProviders.values()].map((provider) =>
-              classifyCompatibility(provider, manifest),
-            ),
-          );
+          const providers = orderProviderSnapshots([...mergedProviders.values()]);
           const providersToPersist = providers.filter((provider) =>
             updatedKeys.has(snapshotInstanceKey(provider)),
           );
@@ -630,7 +519,6 @@ export const layer = Layer.effect(
       return providers;
     });
 
-    const compatibilityRefreshRunning = yield* Ref.make(false);
     const syncProvider = Effect.fn("syncProvider")(function* (
       provider: ServerProvider,
       options?: {
@@ -638,15 +526,6 @@ export const layer = Layer.effect(
       },
     ) {
       const providers = yield* upsertProviders([provider], options);
-      // Reclassify the current read model after fetching. Never republish the
-      // probe captured before the fetch: a newer health result may have landed.
-      if (!(yield* Ref.getAndSet(compatibilityRefreshRunning, true))) {
-        yield* manifestService.refresh.pipe(
-          Effect.andThen(upsertProviders([], { persist: false })),
-          Effect.ensuring(Ref.set(compatibilityRefreshRunning, false)),
-          Effect.forkIn(serviceScope),
-        );
-      }
       return providers;
     });
 

@@ -14,7 +14,6 @@ import type {
 } from "@t3tools/contracts";
 import * as DateTime from "effect/DateTime";
 import * as Option from "effect/Option";
-import type * as CodexErrors from "effect-codex-app-server/errors";
 
 import { clampPercent, makeUsageLimits } from "./providerUsageLimits.ts";
 
@@ -139,24 +138,6 @@ export function codexRateLimitsToUpdate(
 ): ProviderUsageLimitsUpdate | undefined {
   const windows = codexRateLimitsToWindows(snapshot);
   return windows.length > 0 ? { windows } : undefined;
-}
-
-/**
- * A bounded, client-safe reason for a failed `account/rateLimits/read`. The
- * raw error is for the log; only the category and, for a JSON-RPC failure,
- * the code reach the Limits view.
- */
-export function codexRateLimitsFailureMessage(error: CodexErrors.CodexAppServerError): string {
-  switch (error._tag) {
-    case "CodexAppServerRequestError":
-      return `Codex could not read usage (JSON-RPC ${error.code}).`;
-    case "CodexAppServerSpawnError":
-      return "Codex could not be started to read usage.";
-    case "CodexAppServerProcessExitedError":
-      return "Codex exited before it could report usage.";
-    default:
-      return "Codex did not answer the usage request.";
-  }
 }
 
 /**

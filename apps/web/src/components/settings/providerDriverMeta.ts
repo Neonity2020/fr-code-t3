@@ -1,14 +1,4 @@
-import {
-  AcpRegistrySettings,
-  AntigravitySettings,
-  ClaudeSettings,
-  CodexSettings,
-  CursorSettings,
-  GrokSettings,
-  OpenCodeSettings,
-  PiSettings,
-  ProviderDriverKind,
-} from "@t3tools/contracts";
+import { PiSettings, ProviderDriverKind } from "@t3tools/contracts";
 import type * as Schema from "effect/Schema";
 
 type ProviderSettingsSchema = {
@@ -48,54 +38,10 @@ export interface ProviderEnvironmentFieldDefinition {
 
 const PROVIDER_CLIENT_DEFINITIONS: readonly ProviderClientDefinition[] = [
   {
-    value: ProviderDriverKind.make("codex"),
-    label: "Codex",
-    settingsSchema: CodexSettings,
-  },
-  {
-    value: ProviderDriverKind.make("claudeAgent"),
-    label: "Claude",
-    settingsSchema: ClaudeSettings,
-  },
-  {
-    value: ProviderDriverKind.make("cursor"),
-    label: "Cursor",
-    settingsSchema: CursorSettings,
-    environmentFields: [
-      {
-        name: "CURSOR_API_KEY",
-        label: "Cursor API 密钥",
-        description: "可选。覆盖此提供方的浏览器登录。",
-        placeholder: "粘贴 API 密钥",
-        sensitive: true,
-      },
-    ],
-  },
-  {
-    value: ProviderDriverKind.make("grok"),
-    label: "Grok",
-    settingsSchema: GrokSettings,
-  },
-  {
-    value: ProviderDriverKind.make("opencode"),
-    label: "OpenCode",
-    settingsSchema: OpenCodeSettings,
-  },
-  {
-    value: ProviderDriverKind.make("antigravity"),
-    label: "Antigravity",
-    settingsSchema: AntigravitySettings,
-  },
-  {
     value: ProviderDriverKind.make("pi"),
     label: "Pi",
     settingsSchema: PiSettings,
-  },
-  {
-    value: ProviderDriverKind.make("acpRegistry"),
-    label: "ACP 注册表",
-    settingsSchema: AcpRegistrySettings,
-    hasDefaultInstance: false,
+    hasDefaultInstance: true,
   },
 ];
 

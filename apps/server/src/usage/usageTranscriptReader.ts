@@ -28,6 +28,8 @@ import {
   mightCarryUsage,
   parseClaudeLine,
   parseClaudeRecord,
+  parsePiRecord,
+  parsePiLine,
   parseCodexLine,
   parseCodexRecord,
   parseGrokLine,
@@ -93,7 +95,13 @@ type SelectedFields = { readonly [key: string]: true | SelectedFields };
 
 // Keep the fields consumed by usageTranscripts, including reducer state and
 // dedupe/cost metadata. A selected subtree (usage) keeps future token fields.
-const USAGE_FIELDS: Record<"claude" | "codex" | "grok", SelectedFields> = {
+const USAGE_FIELDS: Record<"pi" | "claude" | "codex" | "grok", SelectedFields> = {
+  pi: {
+    type: true,
+    id: true,
+    timestamp: true,
+    message: { role: true, timestamp: true, model: true, provider: true, usage: true },
+  },
   claude: {
     type: true,
     timestamp: true,
@@ -127,7 +135,10 @@ const USAGE_FIELDS: Record<"claude" | "codex" | "grok", SelectedFields> = {
 };
 
 function selectUsageFields(provider: UsageProviderKind) {
-  const fields = USAGE_FIELDS[provider === "codex" || provider === "grok" ? provider : "claude"];
+  const fields =
+    USAGE_FIELDS[
+      provider === "pi" || provider === "codex" || provider === "grok" ? provider : "claude"
+    ];
   return (path: ReadonlyArray<string | number | null>): boolean => {
     let selected: true | SelectedFields = fields;
     for (const key of path) {
@@ -277,6 +288,31 @@ export async function readTranscriptRecords(
   }
 
   try {
+    // Pi message records omit the session id. Read its bounded header even
+    // on incremental scans so session counts survive cache reloads and moves.
+    let piSessionId = filePath;
+    if (provider === "pi") {
+      const header = Buffer.alloc(8192);
+      const { bytesRead } = await handle.read(header, 0, header.length, 0);
+      try {
+        const entry: unknown = JSON.parse(
+          header.subarray(0, bytesRead).toString("utf8").split("\n")[0] ?? "",
+        );
+        if (
+          typeof entry === "object" &&
+          entry !== null &&
+          "type" in entry &&
+          entry.type === "session" &&
+          "id" in entry &&
+          typeof entry.id === "string"
+        )
+          piSessionId = entry.id;
+      } catch {
+        /* A partial header will be retried on the next scan. */
+      }
+    }
+    const withSession = (record: UsageRecord): UsageRecord =>
+      provider === "pi" ? { ...record, sessionId: piSessionId } : record;
     let codexState = initialCodexScanState();
     let resumed = false;
     let start = 0;
@@ -302,7 +338,7 @@ export async function readTranscriptRecords(
           return;
         }
         const record = parseCodexLine(line, state);
-        if (record !== null) out.push(record);
+        if (record !== null) out.push(withSession(record));
         return;
       }
       if (!mightCarryUsage(line, provider)) return;
@@ -310,8 +346,8 @@ export async function readTranscriptRecords(
         for (const grokRecord of parseGrokLine(line)) out.push(grokRecord);
         return;
       }
-      const record = parseClaudeLine(line);
-      if (record !== null) out.push(record);
+      const record = provider === "pi" ? parsePiLine(line) : parseClaudeLine(line);
+      if (record !== null) out.push(withSession(record));
     };
 
     const toLineString = (lineBuffer: Buffer): string => {
@@ -358,10 +394,12 @@ export async function readTranscriptRecords(
           out.push(...parseGrokRecord(projected));
         } else {
           const record =
-            provider === "codex"
-              ? parseCodexRecord(projected, state)
-              : parseClaudeRecord(projected);
-          if (record !== null) out.push(record);
+            provider === "pi"
+              ? parsePiRecord(projected)
+              : provider === "codex"
+                ? parseCodexRecord(projected, state)
+                : parseClaudeRecord(projected);
+          if (record !== null) out.push(withSession(record));
         }
       } else if (pendingBytes > 0) {
         const line =

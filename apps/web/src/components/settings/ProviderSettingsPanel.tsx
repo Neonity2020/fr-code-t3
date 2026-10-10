@@ -10,7 +10,6 @@ import {
 import {
   defaultInstanceIdForDriver,
   type EnvironmentId,
-  type AcpRegistryUrlAuthAction,
   PROVIDER_DISPLAY_NAMES,
   ProviderDriverKind,
   type ProviderInstanceConfig,
@@ -49,7 +48,6 @@ import {
 } from "../../state/environments";
 import { EMPTY_SERVER_PROVIDERS, serverEnvironment } from "../../state/server";
 import { useEnvironmentSessionState } from "../../state/session";
-import { useProjects } from "../../state/entities";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { getRelativeTimeState } from "../../timestampFormat";
 import {
@@ -87,10 +85,6 @@ import { AddProviderInstanceDialog } from "./AddProviderInstanceDialog";
 import { ExpandableText } from "./ExpandableText";
 import { ProviderInstanceCard } from "./ProviderInstanceCard";
 import { UsageProviderSettings } from "./UsageProviderSettings";
-import { ProviderSetupSection, readAntigravityAuthMethod } from "./ProviderSetupSection";
-import { ProviderAuthenticationSection } from "./ProviderAuthenticationSection";
-import { CodexSetupSection, CodexManagedRuntimeFields } from "./CodexSetupSection";
-import { readCodexSetupMode } from "./CodexSetupSection.logic";
 import { DRIVER_OPTIONS, getDriverOption } from "./providerDriverMeta";
 import { searchableSetting } from "./settingsSearch";
 import {
@@ -136,20 +130,9 @@ function withoutProviderInstanceFavorites(
   return favorites.filter((favorite) => favorite.provider !== instanceId);
 }
 
-function providerConfigString(config: unknown, key: string): string | null {
-  if (config === null || typeof config !== "object") return null;
-  const value = (config as Record<string, unknown>)[key];
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-}
-
 const PROVIDER_SETTINGS = DRIVER_OPTIONS.map((definition) => ({
   provider: definition.value,
 }));
-
-function configuredBinaryPath(config: unknown): string {
-  if (config === null || typeof config !== "object" || !("binaryPath" in config)) return "";
-  return typeof config.binaryPath === "string" ? config.binaryPath.trim() : "";
-}
 
 function ProviderLastChecked({ lastCheckedAt }: { lastCheckedAt: string | null }) {
   useRelativeTimeTick();
@@ -607,18 +590,10 @@ export function EnvironmentProviderSettings({
   const updateClientSettings = useUpdateClientSettings();
   const serverProviders =
     useAtomValue(serverEnvironment.providersValueAtom(environmentId)) ?? EMPTY_SERVER_PROVIDERS;
-  const projects = useProjects().filter((project) => project.environmentId === environmentId);
   const refreshServerProviders = useAtomCommand(serverEnvironment.refreshProviders, {
     reportFailure: false,
   });
   const updateProvider = useAtomCommand(serverEnvironment.updateProvider, {
-    reportFailure: false,
-  });
-  const uninstallAcpRegistryManagedBinary = useAtomCommand(
-    serverEnvironment.uninstallAcpRegistryManagedBinary,
-    { reportFailure: false },
-  );
-  const acceptAcpRegistryUrlAuth = useAtomCommand(serverEnvironment.acceptAcpRegistryUrlAuth, {
     reportFailure: false,
   });
   const [isRefreshingProviders, setIsRefreshingProviders] = useState(false);
@@ -631,33 +606,6 @@ export function EnvironmentProviderSettings({
   >(() => new Set());
   const refreshingRef = useRef(false);
   const updatingInstanceIdsRef = useRef<Set<ProviderInstanceId>>(new Set());
-
-  const acceptUrlAuthentication = useCallback(
-    (instanceId: ProviderInstanceId, action: AcpRegistryUrlAuthAction) => {
-      void acceptAcpRegistryUrlAuth({
-        environmentId,
-        input: { instanceId, elicitationId: action.elicitationId },
-      }).then((result) => {
-        if (result._tag === "Success" && !result.value.accepted) {
-          toastManager.add({
-            type: "warning",
-            title: "身份验证请求已过期",
-            description: "刷新提供方并重新开始身份验证。",
-          });
-          return;
-        }
-        if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-          const error = squashAtomCommandFailure(result);
-          toastManager.add({
-            type: "error",
-            title: "无法继续身份验证",
-            description: error instanceof Error ? error.message : "身份验证请求已过期。",
-          });
-        }
-      });
-    },
-    [acceptAcpRegistryUrlAuth, environmentId],
-  );
 
   const providerUpdateCandidateByInstanceId = useMemo(
     () =>
@@ -778,16 +726,7 @@ export function EnvironmentProviderSettings({
     instancesByDriver.set(driver, list);
   }
 
-  const defaultSlotIdsBySource = new Set<string>(
-    visibleProviderSettings.map((providerSettings) =>
-      String(defaultInstanceIdForDriver(providerSettings.provider)),
-    ),
-  );
-
   const rows: InstanceRow[] = [];
-  const visibleDriverKinds = new Set<ProviderDriverKind>(
-    visibleProviderSettings.map((providerSettings) => providerSettings.provider),
-  );
 
   for (const providerSettings of visibleProviderSettings) {
     type LegacyProviderSettings = (typeof settings.providers)[keyof typeof settings.providers];
@@ -847,17 +786,6 @@ export function EnvironmentProviderSettings({
       rows.push({ instanceId: id, instance, driver: instance.driver, isDefault: false });
     }
   }
-  for (const [driver, list] of instancesByDriver) {
-    if (visibleDriverKinds.has(driver)) continue;
-    for (const [id, instance] of list) {
-      rows.push({
-        instanceId: id,
-        instance,
-        driver: instance.driver,
-        isDefault: defaultSlotIdsBySource.has(String(id)),
-      });
-    }
-  }
 
   const targetInstanceMissing =
     targetInstanceId !== undefined &&
@@ -911,27 +839,6 @@ export function EnvironmentProviderSettings({
         description: error instanceof Error ? error.message : "设置更新失败。",
       });
       return;
-    }
-
-    if (row.driver !== ProviderDriverKind.make("acpRegistry")) return;
-    if (providerConfigString(row.instance.config, "source") === "local") return;
-    const agentId = providerConfigString(row.instance.config, "agentId");
-    if (agentId === null) return;
-
-    // The server decides from its latest settings whether this was the last
-    // instance using the managed agent. A client-side snapshot check can race
-    // two removals and make both callers skip cleanup.
-    const uninstallResult = await uninstallAcpRegistryManagedBinary({
-      environmentId,
-      input: { agentId },
-    });
-    if (uninstallResult._tag === "Failure" && !isAtomCommandInterrupted(uninstallResult)) {
-      const error = squashAtomCommandFailure(uninstallResult);
-      toastManager.add({
-        type: "warning",
-        title: "提供方已删除，但托管文件仍保留",
-        description: error instanceof Error ? error.message : "托管可执行程序清理失败。",
-      });
     }
   };
 
@@ -1031,10 +938,6 @@ export function EnvironmentProviderSettings({
       <ProviderInstanceCard
         key={row.instanceId}
         environmentId={environmentId}
-        acpProjects={projects}
-        onAcceptUrlAuth={
-          readOnly ? undefined : (action) => acceptUrlAuthentication(row.instanceId, action)
-        }
         instanceId={row.instanceId}
         instance={row.instance}
         driverOption={driverOption}
@@ -1043,77 +946,6 @@ export function EnvironmentProviderSettings({
         selected={mode === "list" && selectedRow?.instanceId === row.instanceId}
         onSelect={mode === "list" ? () => setSelectedInstanceId(row.instanceId) : undefined}
         readOnly={readOnly}
-        runtime={
-          mode === "editor" &&
-          row.driver === "codex" &&
-          readCodexSetupMode(row.instance.config) === "managed" ? (
-            <CodexManagedRuntimeFields
-              environmentId={environmentId}
-              instanceId={row.instanceId}
-              provider={liveProvider}
-            />
-          ) : undefined
-        }
-        setup={
-          mode === "editor" && row.driver === "antigravity" ? (
-            <ProviderSetupSection
-              environmentId={environmentId}
-              environmentLabel={environmentLabel}
-              instanceId={row.instanceId}
-              provider={liveProvider}
-              binaryPath={configuredBinaryPath(row.instance.config)}
-              authMethod={readAntigravityAuthMethod(row.instance.config)}
-              enabled={resolveProviderInstanceEnabled(row.instance)}
-              readOnly={readOnly}
-              onEnable={() => updateProviderInstance(row, { ...row.instance, enabled: true })}
-            />
-          ) : mode === "editor" &&
-            row.driver === "codex" &&
-            readCodexSetupMode(row.instance.config) === "managed" ? (
-            <CodexSetupSection
-              environmentId={environmentId}
-              instanceId={row.instanceId}
-              provider={liveProvider}
-              mode={readCodexSetupMode(row.instance.config)}
-              enabled={resolveProviderInstanceEnabled(row.instance)}
-              readOnly={readOnly}
-              onModeChange={(setupMode) =>
-                updateProviderInstance(row, {
-                  ...row.instance,
-                  enabled: true,
-                  config: {
-                    ...(row.instance.config !== null && typeof row.instance.config === "object"
-                      ? row.instance.config
-                      : {}),
-                    enabled: true,
-                    setupMode,
-                  },
-                })
-              }
-            />
-          ) : mode === "editor" &&
-            !readOnly &&
-            liveProvider &&
-            (liveProvider.setup?.canAuthenticate ||
-              (liveProvider.driver === "acpRegistry" && liveProvider.installed)) ? (
-            <ProviderAuthenticationSection
-              key={`${environmentId}:${row.instanceId}`}
-              environmentId={environmentId}
-              environmentLabel={environmentLabel}
-              instanceId={row.instanceId}
-              provider={liveProvider}
-              readOnly={readOnly}
-            />
-          ) : mode === "editor" &&
-            !readOnly &&
-            row.driver === "cursor" &&
-            liveProvider?.setup?.canAuthenticate === false ? (
-            <SettingsRow
-              title="Cursor 账户"
-              description="正在使用 CURSOR_API_KEY。请从此提供方的环境中移除它，以使用浏览器登录。"
-            />
-          ) : null
-        }
         onUpdate={(next) => {
           const wasEnabled = resolveProviderInstanceEnabled(row.instance);
           const isDisabling = next.enabled === false && wasEnabled;

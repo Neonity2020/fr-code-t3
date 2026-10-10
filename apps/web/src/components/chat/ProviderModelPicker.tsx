@@ -1,5 +1,4 @@
 import {
-  ANTIGRAVITY_DEFAULT_MODEL,
   type ProviderInstanceId,
   type ProviderDriverKind,
   type ResolvedKeybindingsConfig,
@@ -10,7 +9,6 @@ import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "~/lib/utils";
 import { ModelPickerContent, resolveModelPickerSelectedModel } from "./ModelPickerContent";
-import { ChatGptSharingControl } from "./ChatGptSharingControl";
 import { ProviderInstanceIcon } from "./ProviderInstanceIcon";
 import {
   ModelEsque,
@@ -86,9 +84,7 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
       : selectedInstanceOptions[0]);
   const triggerTitle = selectedModel
     ? getTriggerDisplayModelName(selectedModel)
-    : props.model === ANTIGRAVITY_DEFAULT_MODEL
-      ? "选择模型"
-      : props.model || "选择模型";
+    : props.model || "选择模型";
   const triggerLabel = selectedModel
     ? `${getTriggerDisplayModelLabel(selectedModel)}${selectedModel.isUnavailable ? "（不可用）" : ""}`
     : triggerTitle;
@@ -316,9 +312,6 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
             : {})}
           onInstanceModelChange={handleInstanceModelChange}
         />
-        {props.selectedModels === undefined ? (
-          <ChatGptSharingControl provider={activeEntry?.snapshot ?? null} />
-        ) : null}
       </PopoverPopup>
     </Popover>
   );

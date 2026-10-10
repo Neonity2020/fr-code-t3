@@ -8,7 +8,7 @@ extensions, skills, context files, and native session history.
 1. Install Pi on the machine running the T3 Code server. Pi 1.0 is recommended; 0.80.5 is the
    oldest version T3 Code supports.
 2. Run Pi once in a terminal and finish the provider login or API-key setup you normally use.
-3. Open T3 Code Settings, enable Pi, and refresh the provider.
+3. Open FR Code Settings → Providers and refresh Pi. Pi is enabled by default.
 
 If `pi` is not on the server's `PATH`, set Pi's binary path to the executable. Provider environment
 variables and launch arguments are also available for installations that need a custom agent
@@ -16,13 +16,16 @@ directory, endpoint, or model configuration. `--provider` must be paired with `-
 rejects launch arguments that change Pi's execution mode or select a session because T3 owns those
 parts of the process lifecycle.
 
+To isolate another Pi account, add a Pi instance and set `PI_CODING_AGENT_DIR` to its
+agent directory. Configure credentials in that Pi home before using the instance.
+
 ## What Carries Over
 
 T3 Code discovers the models reported by Pi and exposes their supported thinking levels. The
 thinking picker marks Pi's current configured level as the default without overriding it. Threads
 use Pi's native session files for resume, rollback, and forks within the same Pi instance. Forks
 preserve the native conversation through the selected turn in the destination workspace.
-Switching providers uses portable conversation context. Extension
+Switching Pi instances uses portable conversation context when a native continuation is unavailable. Extension
 dialogs appear in the T3 Code composer, and the composer context meter follows Pi's own usage
 reporting while a response streams and after it settles.
 

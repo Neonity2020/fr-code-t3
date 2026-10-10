@@ -35,11 +35,9 @@ unreadable settings with defaults.
 
 ## Check your agents
 
-T3 Code checks each selected computer for Claude Code and Codex. If an agent is
-not installed or signed in, select its action to open a terminal with the
-correct command ready to run. Install uses the vendor's own installer, which
-keeps **Update now** working in Settings. Other providers can be enabled in
-Settings.
+FR Code checks each selected computer for Pi. If Pi is missing, open the setup
+terminal to install `@earendil-works/pi-coding-agent`. Run Pi interactively and use
+`/login` or your usual API-key configuration before refreshing its status.
 
 The setup terminal uses the home directory and environment configured for the
 selected provider instance. Sensitive values remain redacted in Settings and
@@ -47,7 +45,7 @@ terminal metadata while the terminal process can use them.
 
 ## Import your projects
 
-T3 Code finds directories that Claude Code or Codex has used. Git repositories
+FR Code finds directories recorded in Pi sessions. Git repositories
 are listed first, newest activity on top. When the remote is on GitHub, the
 group shows the repository as `owner/name`. Clones with the same remote share
 one group. Directories that are not git repositories sit under "Other folders".
@@ -61,20 +59,16 @@ offered.
 A large or malformed history can reach the scan limit. T3 Code keeps the
 projects it found and warns when projects or conversations may be missing.
 
-Imported projects include Codex and Claude conversations active within the last
-30 days. You can continue those conversations in T3 Code.
+Imported projects include Pi conversations. You can continue their native session
+files in FR Code.
 
-Conversation import is best effort. T3 Code keeps the first user prompt and the
-newest remaining visible user and assistant messages, with 200 messages total.
-It omits tool activity and attachments. For Codex, it omits generated setup
-context only when a canonical user event and a valid shared turn ID identify the
-same user turn. Ambiguous legacy or response-only context stays in the imported
-conversation so T3 Code does not remove user text. It reads one conversation at
-a time and skips files larger than 16 MiB. It ignores malformed records and skips
-unreadable or unparseable conversations.
+Conversation import follows Pi's active session branch and includes visible user and
+assistant messages. It omits reasoning, tool activity, and attachments. It reads one
+conversation at a time, skips files larger than 16 MiB or 20,000 records, and skips
+unreadable, cyclic, or unparseable conversations.
 
 Each import attempt reads up to 100 conversation files and 64 MiB per project,
-with up to 100,000 input records. Run import again to continue a large batch.
+Run import again to continue a large batch.
 Completed conversations are not imported again. You can continue without the
 remaining history.
 

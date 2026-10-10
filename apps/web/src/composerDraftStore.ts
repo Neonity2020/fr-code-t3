@@ -1133,7 +1133,7 @@ function normalizeModelSelection(
   // into a driver kind here; they get generic default normalization.
   const driverKindHint =
     normalizeProviderDriverKind(candidate?.provider ?? legacy?.provider) ??
-    ProviderDriverKind.make("codex");
+    ProviderDriverKind.make("pi");
   const model = normalizeModelSlug(rawModel, driverKindHint);
   if (!model) {
     return null;
@@ -2347,6 +2347,7 @@ function normalizeCurrentPersistedComposerDraftStoreState(
     const normalizedStickyModelSelection = normalizeModelSelection(
       normalizedPersistedState.stickyModelSelection,
       {
+        // Storage versions 1 and 2 predate Pi and implicitly selected Codex.
         provider: normalizedPersistedState.stickyProvider ?? "codex",
         model: normalizedPersistedState.stickyModel,
         modelOptions: stickyModelOptions,

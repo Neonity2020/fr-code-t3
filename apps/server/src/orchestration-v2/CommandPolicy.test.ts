@@ -11,16 +11,16 @@ import {
 } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
-import { CursorProviderCapabilitiesV2 } from "./Adapters/CursorAdapterV2.ts";
-import { GrokProviderCapabilitiesV2 } from "./Adapters/GrokAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
+import { ReadOnlyThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
+import { NativeSnapshotTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as CommandPolicy from "./CommandPolicy.ts";
 
 const commandId = CommandId.make("command-policy-test");
 const threadId = ThreadId.make("command-policy-thread");
 const activeRunId = RunId.make("command-policy-active-run");
 
-const baseCapabilities: OrchestrationV2ProviderCapabilities = CodexProviderCapabilitiesV2;
+const baseCapabilities: OrchestrationV2ProviderCapabilities = FullThreadTestCapabilities;
 
 function capabilities(
   override: (current: OrchestrationV2ProviderCapabilities) => OrchestrationV2ProviderCapabilities,
@@ -190,7 +190,7 @@ layer("CommandPolicyV2", (it) => {
         commandId,
         threadId,
         providerInstanceId: ProviderInstanceId.make("grok"),
-        capabilities: GrokProviderCapabilitiesV2,
+        capabilities: NativeSnapshotTestCapabilities,
       });
 
       assert.equal(result, "interrupt_restart");
@@ -205,7 +205,7 @@ layer("CommandPolicyV2", (it) => {
         commandId,
         threadId,
         providerInstanceId: ProviderInstanceId.make("codex"),
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         forceRestart: true,
       });
 
@@ -475,7 +475,7 @@ layer("CommandPolicyV2", (it) => {
         commandId,
         threadId,
         providerInstanceId: ProviderInstanceId.make("codex"),
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         sameProvider: true,
         hasStrongNativeSource: true,
         sourceRunStatus: "completed",
@@ -494,7 +494,7 @@ layer("CommandPolicyV2", (it) => {
         commandId,
         threadId,
         providerInstanceId: ProviderInstanceId.make("cursor"),
-        capabilities: CursorProviderCapabilitiesV2,
+        capabilities: ReadOnlyThreadTestCapabilities,
         sameProvider: true,
         hasStrongNativeSource: true,
         sourceRunStatus: "completed",
@@ -513,7 +513,7 @@ layer("CommandPolicyV2", (it) => {
         commandId,
         threadId,
         providerInstanceId: ProviderInstanceId.make("grok"),
-        capabilities: GrokProviderCapabilitiesV2,
+        capabilities: NativeSnapshotTestCapabilities,
         sameProvider: true,
         hasStrongNativeSource: true,
         sourceRunStatus: "completed",

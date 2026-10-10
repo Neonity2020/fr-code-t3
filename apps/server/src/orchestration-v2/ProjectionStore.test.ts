@@ -31,7 +31,7 @@ import * as SqlClient from "effect/sql/SqlClient";
 import { projectThreadAwarenessV2 } from "@t3tools/shared/agentAwareness";
 
 import * as SqlitePersistence from "../persistence/Sqlite.ts";
-import { CodexProviderCapabilitiesV2 } from "./Adapters/CodexAdapterV2.ts";
+import { FullThreadTestCapabilities } from "./testkit/ProviderCapabilities.ts";
 import * as ProjectionStore from "./ProjectionStore.ts";
 import {
   buildBoundedThreadProjection,
@@ -1473,7 +1473,7 @@ it.layer(layerTest)("ProjectionStoreV2", (it) => {
             status: "running",
             cwd: "/workspace",
             model: modelSelection.model,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             createdAt: now,
             updatedAt: now,
             lastError: null,
@@ -2511,7 +2511,7 @@ it.layer(layerTest)("ProjectionStoreV2", (it) => {
         status: "ready" as const,
         cwd: "/workspace",
         model: modelSelection.model,
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         createdAt: now,
         updatedAt: now,
         lastError: null,
@@ -2633,7 +2633,7 @@ it.layer(layerTest)("ProjectionStoreV2", (it) => {
         status: "error" as const,
         cwd: "/workspace",
         model: modelSelection.model,
-        capabilities: CodexProviderCapabilitiesV2,
+        capabilities: FullThreadTestCapabilities,
         createdAt: now,
         updatedAt: now,
         lastError: "provider process exited",
@@ -4594,7 +4594,7 @@ it.layer(layerTest)("ProjectionStoreV2", (it) => {
       assert.deepEqual((yield* store.getThreadShell(threadId))?.pendingBackgroundTasks, [
         {
           taskId: "pull-request-watch:github.com/pingdotgg/t3code#7",
-          description: "Watching pull request #7",
+          description: "正在关注拉取请求 #7",
           kind: "monitor",
         },
       ]);

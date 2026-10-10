@@ -8,14 +8,14 @@ import * as NodeUtil from "node:util";
 import * as NodeCrypto from "node:crypto";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { CodexSettings, ProviderInstanceId } from "@t3tools/contracts";
+import { PiSettings, ProviderInstanceId } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Duration from "effect/Duration";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import * as Schema from "effect/Schema";
-import * as CodexTextGeneration from "../src/textGeneration/CodexTextGeneration.ts";
+import { makePiTextGeneration } from "../src/textGeneration/PiTextGeneration.ts";
 import { threadTitleEvaluationCases } from "./threadTitleEvaluationCases.ts";
 import {
   formatThreadTitleContext,
@@ -59,7 +59,7 @@ const Results = Schema.fromJsonString(
   ),
 );
 const decodeResults = Schema.decodeUnknownEffect(Results);
-const decodeSettings = Schema.decodeUnknownEffect(CodexSettings);
+const decodeSettings = Schema.decodeUnknownEffect(PiSettings);
 const encodeReport = Schema.encodeEffect(Schema.fromJsonString(Schema.Unknown));
 
 await Effect.runPromise(
@@ -67,9 +67,7 @@ await Effect.runPromise(
     const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
     const cwd = yield* fs.makeTempDirectoryScoped({ prefix: "t3-title-evaluation-" });
-    const generation = yield* CodexTextGeneration.makeCodexTextGeneration(
-      yield* decodeSettings({}),
-    );
+    const generation = yield* makePiTextGeneration(yield* decodeSettings({}));
     const baseline = values.baseline
       ? yield* fs.readFileString(values.baseline).pipe(Effect.flatMap(decodeResults))
       : [];
@@ -105,7 +103,7 @@ await Effect.runPromise(
           previousTitle: values.initial ? undefined : fixture.previousTitle,
           attachments,
           linkedContext,
-          modelSelection: { instanceId: ProviderInstanceId.make("codex"), model },
+          modelSelection: { instanceId: ProviderInstanceId.make("pi"), model },
         });
         return { generated, linkedContextDigest };
       }).pipe(Effect.timed);

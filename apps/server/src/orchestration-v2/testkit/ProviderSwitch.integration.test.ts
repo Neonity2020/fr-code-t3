@@ -34,13 +34,20 @@ import * as SqlClient from "effect/sql/SqlClient";
 
 import * as SqlitePersistence from "../../persistence/Sqlite.ts";
 import { CommandPolicyCapabilityUnsupportedError } from "../CommandPolicy.ts";
-import { ClaudeProviderCapabilitiesV2 } from "../Adapters/ClaudeAdapterV2.ts";
-import {
-  CodexProviderCapabilitiesV2,
-  canReuseCodexContextUsage,
-} from "../Adapters/CodexAdapterV2.ts";
-import { AcpProviderCapabilitiesV2 } from "../Adapters/AcpAdapterV2.ts";
-import { CursorProviderCapabilitiesV2 } from "../Adapters/CursorAdapterV2.ts";
+import { RestartThreadTestCapabilities } from "./ProviderCapabilities.ts";
+import { FullThreadTestCapabilities } from "./ProviderCapabilities.ts";
+// A test adapter that changes generation effort without changing the context window.
+const canReuseTestContextUsage = (previous: ModelSelection, next: ModelSelection) =>
+  JSON.stringify({
+    ...previous,
+    options: (previous.options ?? []).filter((option) => option.id !== "reasoningEffort"),
+  }) ===
+  JSON.stringify({
+    ...next,
+    options: (next.options ?? []).filter((option) => option.id !== "reasoningEffort"),
+  });
+import { PortableThreadTestCapabilities } from "./ProviderCapabilities.ts";
+import { ReadOnlyThreadTestCapabilities } from "./ProviderCapabilities.ts";
 import * as EventSink from "../EventSink.ts";
 import * as EventStore from "../EventStore.ts";
 import * as LegacyV1ThreadImporter from "../legacy/LegacyV1ThreadImporter.ts";
@@ -448,7 +455,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: CODEX_MODEL_SELECTION.instanceId,
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: { 1: "Original partial work" },
             capturedTurns,
@@ -456,7 +463,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: CLAUDE_MODEL_SELECTION.instanceId,
             driver: CLAUDE_DRIVER,
-            capabilities: ClaudeProviderCapabilitiesV2,
+            capabilities: RestartThreadTestCapabilities,
             modelSelection: CLAUDE_MODEL_SELECTION,
             responseByRunOrdinal: {},
             capturedTurns,
@@ -467,7 +474,7 @@ describe("orchestration v2 provider switching", () => {
               : {}),
             ...(turnUsageScenario
               ? {
-                  canReuseContextUsage: canReuseCodexContextUsage,
+                  canReuseContextUsage: canReuseTestContextUsage,
                   tokenUsageByRunOrdinal: {
                     2: {
                       usedTokens: replaceNative ? 30_000 : 37_321,
@@ -910,7 +917,7 @@ describe("orchestration v2 provider switching", () => {
             makeTestAdapter({
               instanceId: CODEX_MODEL_SELECTION.instanceId,
               driver: CODEX_DRIVER,
-              capabilities: CodexProviderCapabilitiesV2,
+              capabilities: FullThreadTestCapabilities,
               modelSelection: CODEX_MODEL_SELECTION,
               responseByRunOrdinal: { 1: "Original partial work" },
               capturedTurns,
@@ -918,7 +925,7 @@ describe("orchestration v2 provider switching", () => {
             makeTestAdapter({
               instanceId: CLAUDE_MODEL_SELECTION.instanceId,
               driver: CLAUDE_DRIVER,
-              capabilities: ClaudeProviderCapabilitiesV2,
+              capabilities: RestartThreadTestCapabilities,
               modelSelection: CLAUDE_MODEL_SELECTION,
               responseByRunOrdinal: {},
               capturedTurns,
@@ -1072,7 +1079,7 @@ describe("orchestration v2 provider switching", () => {
             makeTestAdapter({
               instanceId: CLAUDE_MODEL_SELECTION.instanceId,
               driver: CLAUDE_DRIVER,
-              capabilities: ClaudeProviderCapabilitiesV2,
+              capabilities: RestartThreadTestCapabilities,
               modelSelection: CLAUDE_MODEL_SELECTION,
               responseByRunOrdinal: {},
               capturedTurns,
@@ -1218,8 +1225,8 @@ describe("orchestration v2 provider switching", () => {
         const layerRegistry = ProviderAdapterRegistry.layerFromAdapters(
           (
             [
-              [CODEX_MODEL_SELECTION, CODEX_DRIVER, CodexProviderCapabilitiesV2],
-              [CLAUDE_MODEL_SELECTION, CLAUDE_DRIVER, ClaudeProviderCapabilitiesV2],
+              [CODEX_MODEL_SELECTION, CODEX_DRIVER, FullThreadTestCapabilities],
+              [CLAUDE_MODEL_SELECTION, CLAUDE_DRIVER, RestartThreadTestCapabilities],
             ] as const
           ).map(([modelSelection, driver, capabilities]) =>
             makeTestAdapter({
@@ -1392,9 +1399,9 @@ describe("orchestration v2 provider switching", () => {
               instanceId: CODEX_MODEL_SELECTION.instanceId,
               driver: CODEX_DRIVER,
               capabilities: {
-                ...CodexProviderCapabilitiesV2,
+                ...FullThreadTestCapabilities,
                 turns: {
-                  ...CodexProviderCapabilitiesV2.turns,
+                  ...FullThreadTestCapabilities.turns,
                   supportsQueuedMessages: scenario.activeSupportsQueue,
                 },
               },
@@ -1407,9 +1414,9 @@ describe("orchestration v2 provider switching", () => {
               instanceId: CLAUDE_MODEL_SELECTION.instanceId,
               driver: CLAUDE_DRIVER,
               capabilities: {
-                ...ClaudeProviderCapabilitiesV2,
+                ...RestartThreadTestCapabilities,
                 turns: {
-                  ...ClaudeProviderCapabilitiesV2.turns,
+                  ...RestartThreadTestCapabilities.turns,
                   supportsQueuedMessages: scenario.selectedSupportsQueue,
                 },
               },
@@ -1509,7 +1516,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: CODEX_MODEL_SELECTION.instanceId,
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: { 2: "Codex queued response" },
             capturedTurns,
@@ -1518,7 +1525,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: CLAUDE_MODEL_SELECTION.instanceId,
             driver: CLAUDE_DRIVER,
-            capabilities: ClaudeProviderCapabilitiesV2,
+            capabilities: RestartThreadTestCapabilities,
             modelSelection: CLAUDE_MODEL_SELECTION,
             responseByRunOrdinal: { 3: "Claude queued response" },
             capturedTurns,
@@ -1526,7 +1533,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: GROK_MODEL_SELECTION.instanceId,
             driver: GROK_DRIVER,
-            capabilities: AcpProviderCapabilitiesV2,
+            capabilities: PortableThreadTestCapabilities,
             modelSelection: GROK_MODEL_SELECTION,
             responseByRunOrdinal: { 1: "Grok steered response" },
             capturedTurns,
@@ -1722,14 +1729,14 @@ describe("orchestration v2 provider switching", () => {
           instanceId: ProviderInstanceId.make("codex-alternate"),
         };
         const alternateCapabilities = {
-          ...CodexProviderCapabilitiesV2,
+          ...FullThreadTestCapabilities,
           canConsumeHandoffSummaries: false,
         };
         const adapters = [
           makeTestAdapter({
             instanceId: CODEX_MODEL_SELECTION.instanceId,
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: {},
             capturedTurns,
@@ -1769,7 +1776,7 @@ describe("orchestration v2 provider switching", () => {
                     capabilities:
                       instanceId === alternateSelection.instanceId
                         ? alternateCapabilities
-                        : CodexProviderCapabilitiesV2,
+                        : FullThreadTestCapabilities,
                   });
             },
           }),
@@ -1904,7 +1911,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("codex"),
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: {
               1: "Codex current turn complete",
@@ -1917,7 +1924,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("claudeAgent"),
             driver: CLAUDE_DRIVER,
-            capabilities: ClaudeProviderCapabilitiesV2,
+            capabilities: RestartThreadTestCapabilities,
             modelSelection: CLAUDE_MODEL_SELECTION,
             responseByRunOrdinal: { 4: "Claude turn complete" },
             capturedTurns,
@@ -2144,9 +2151,9 @@ describe("orchestration v2 provider switching", () => {
         const rejectedThreadId = ThreadId.make("thread:queued-handoff-rejection");
         const rejectedMessageId = MessageId.make("message:queued-handoff-rejection:claude");
         const unsupportedClaudeCapabilities = {
-          ...ClaudeProviderCapabilitiesV2,
+          ...RestartThreadTestCapabilities,
           context: {
-            ...ClaudeProviderCapabilitiesV2.context,
+            ...RestartThreadTestCapabilities.context,
             canConsumeHandoffSummaries: false,
           },
         };
@@ -2154,7 +2161,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: CODEX_MODEL_SELECTION.instanceId,
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: { 3: "Later Codex queued turn complete" },
             capturedTurns,
@@ -2362,7 +2369,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("codex"),
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: {},
             capturedTurns,
@@ -2372,7 +2379,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("claudeAgent"),
             driver: CLAUDE_DRIVER,
-            capabilities: ClaudeProviderCapabilitiesV2,
+            capabilities: RestartThreadTestCapabilities,
             modelSelection: CLAUDE_MODEL_SELECTION,
             responseByRunOrdinal: { 2: "The imported release marker is violet." },
             capturedTurns,
@@ -2650,7 +2657,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("codex"),
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: {
               1: "codex before switch",
@@ -2663,7 +2670,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("claudeAgent"),
             driver: CLAUDE_DRIVER,
-            capabilities: ClaudeProviderCapabilitiesV2,
+            capabilities: RestartThreadTestCapabilities,
             modelSelection: CLAUDE_MODEL_SELECTION,
             responseByRunOrdinal: { 2: "claude switched response" },
             capturedTurns,
@@ -2862,7 +2869,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("codex"),
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: CODEX_MODEL_SELECTION,
             responseByRunOrdinal: { 1: "The release color is violet." },
             capturedTurns,
@@ -2870,7 +2877,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("claudeAgent"),
             driver: CLAUDE_DRIVER,
-            capabilities: ClaudeProviderCapabilitiesV2,
+            capabilities: RestartThreadTestCapabilities,
             modelSelection: CLAUDE_MODEL_SELECTION,
             responseByRunOrdinal: { 1: "I will remember violet." },
             capturedTurns,
@@ -3002,7 +3009,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: ProviderInstanceId.make("cursor"),
             driver: CURSOR_DRIVER,
-            capabilities: CursorProviderCapabilitiesV2,
+            capabilities: ReadOnlyThreadTestCapabilities,
             modelSelection: CURSOR_MODEL_SELECTION,
             responseByRunOrdinal: {},
             responseByThreadId: {
@@ -3137,7 +3144,7 @@ describe("orchestration v2 provider switching", () => {
             makeTestAdapter({
               instanceId: ProviderInstanceId.make("codex"),
               driver: CODEX_DRIVER,
-              capabilities: CodexProviderCapabilitiesV2,
+              capabilities: FullThreadTestCapabilities,
               modelSelection: CODEX_MODEL_SELECTION,
               responseByRunOrdinal: {},
               responseByThreadId: {
@@ -3155,7 +3162,7 @@ describe("orchestration v2 provider switching", () => {
             makeTestAdapter({
               instanceId: ProviderInstanceId.make("claudeAgent"),
               driver: CLAUDE_DRIVER,
-              capabilities: ClaudeProviderCapabilitiesV2,
+              capabilities: RestartThreadTestCapabilities,
               modelSelection: CLAUDE_MODEL_SELECTION,
               responseByRunOrdinal: { 2: "I will remember violet." },
               capturedTurns,
@@ -3360,7 +3367,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: personalSelection.instanceId,
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: personalSelection,
             responseByRunOrdinal: { 1: "personal response" },
             capturedTurns,
@@ -3368,7 +3375,7 @@ describe("orchestration v2 provider switching", () => {
           makeTestAdapter({
             instanceId: workSelection.instanceId,
             driver: CODEX_DRIVER,
-            capabilities: CodexProviderCapabilitiesV2,
+            capabilities: FullThreadTestCapabilities,
             modelSelection: workSelection,
             responseByRunOrdinal: { 1: "work response" },
             capturedTurns,

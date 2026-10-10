@@ -1,7 +1,6 @@
 import * as Option from "effect/Option";
 import type { EnvironmentThreadShell } from "@t3tools/client-runtime/state/shell";
 import {
-  ANTIGRAVITY_DEFAULT_MODEL,
   type AssetCreateUrlInput,
   type AssetCreateUrlResult,
   type ChatFileAttachment,
@@ -666,7 +665,6 @@ export function getAntigravitySendBlockReason(
   // retry with the same model is the right move.
   if (
     provider.status === "ready" &&
-    slug !== ANTIGRAVITY_DEFAULT_MODEL &&
     !provider.models.some((entry) => entry.slug === slug || entry.aliases?.includes(slug))
   ) {
     return "That Antigravity model is no longer available. Choose another model.";

@@ -12,7 +12,7 @@ import * as Hex from "effect/encoding/Hex";
 import * as Schema from "effect/Schema";
 import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http";
 
-import { codexPlanLabel } from "../provider/CodexProvider.ts";
+const codexPlanLabel = (plan: string | undefined) => plan;
 import { codexRateLimitsToLimits } from "../provider/codexUsageLimits.ts";
 import { claudeUsageResponseToLimits } from "../provider/claudeUsageLimits.ts";
 import { makeUnavailableUsageLimits } from "../provider/providerUsageLimits.ts";

@@ -118,7 +118,6 @@ minimumReleaseAgeExclude:
   - expo-sqlite@58.0.8
   - expo-symbols@58.0.3
   - electron@44.4.2
-  - "@anthropic-ai/claude-agent-sdk@0.3.276"
   - "@alchemy.run/cloudflare-runtime@2.0.0-beta.80"
   - "@alchemy.run/floci@2.0.0-beta.80"
   - "@alchemy.run/node-utils@2.0.0-beta.80"
@@ -161,9 +160,6 @@ minimumReleaseAgeExclude:
   - "@distilled.cloud/gcp@1.0.0-rc.13"
   - "@distilled.cloud/infisical@1.0.0-rc.13"
   - "@distilled.cloud/zerossl@1.0.0-rc.13"
-  - "@opencode/client@2.0.23"
-  - "@opencode/protocol@2.0.23"
-  - "@opencode/schema@2.0.23"
 
 overrides:
   # Keep jsdom's optional peer consistent so Vite+ has one test-runner instance.
@@ -174,14 +170,6 @@ overrides:
   # registry manifest, so the edge has to be cut here as well.
   "dbus-next>usocket": "-"
   # The SDK always receives the user's Claude executable, so its bundled binaries are unused.
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-darwin-arm64": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-darwin-x64": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-linux-arm64": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-linux-arm64-musl": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-linux-x64": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-linux-x64-musl": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-win32-arm64": "-"
-  "@anthropic-ai/claude-agent-sdk>@anthropic-ai/claude-agent-sdk-win32-x64": "-"
   # Alchemy's Ink fork declares React as a hard dependency, but the relay only
   # reaches its terminal-capability helpers; the TUI is never imported, so the
   # extra React copy is pure install weight.
@@ -225,15 +213,6 @@ overrides:
   "@tailwindcss/vite": "catalog:"
   "@types/node": "catalog:"
   effect: "catalog:"
-  # OpenCode 2's protocol and schema packages hard-pin an older Effect rc as a
-  # dependency, and their schemas fail to decode under a second Effect copy.
-  # The `effect` override above already collapses them; these name the edge so it
-  # stays pinned on its own. OpenCode2Client.live.test.ts re-proves it on bumps.
-  # All three still target Effect rc.112 APIs (effect/unstable/*, Encoding,
-  # Schema.isStartsWith) that 4.0 removed; their patches port those call sites
-  # until OpenCode moves to stable Effect.
-  "@opencode/protocol>effect": "catalog:"
-  "@opencode/schema>effect": "catalog:"
   node-abi: 4.33.0
   lightningcss: "catalog:"
   tailwindcss: "catalog:"
@@ -267,9 +246,6 @@ patchedDependencies:
   expo-widgets@58.0.11: patches/expo-widgets@58.0.11.patch
   "@ff-labs/fff-node@0.9.4": patches/@ff-labs__fff-node@0.9.4.patch
   "@legendapp/list@3.3.5": patches/@legendapp__list@3.3.5.patch
-  "@opencode/client@2.0.23": patches/@opencode__client@2.0.23.patch
-  "@opencode/protocol@2.0.23": patches/@opencode__protocol@2.0.23.patch
-  "@opencode/schema@2.0.23": patches/@opencode__schema@2.0.23.patch
   "@pierre/diffs@1.3.0-beta.10": patches/@pierre%2Fdiffs@1.3.0-beta.10.patch
   "@react-native-ai/apple@0.12.0": patches/@react-native-ai__apple@0.12.0.patch
   "@react-native-menu/menu@2.0.0": patches/@react-native-menu__menu@2.0.0.patch
@@ -289,12 +265,6 @@ peerDependencyRules:
     - vite
   allowedVersions:
     vite: "*"
-
-# @cursor/sdk finds its platform package (sandbox helper, rg, tree-sitter) by
-# walking up from the entry script for node_modules/@cursor/sdk-<platform>-<arch>.
-# pnpm keeps optional deps inside the virtual store, so hoist it to the root.
-publicHoistPattern:
-  - "@cursor/sdk-*"
 
 supportedArchitectures:
   cpu: [current, x64]

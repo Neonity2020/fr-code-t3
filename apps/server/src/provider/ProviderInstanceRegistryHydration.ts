@@ -1,46 +1,4 @@
-/**
- * ProviderInstanceRegistryHydration — derive a `ProviderInstanceConfigMap`
- * from `ServerSettings` and keep `ProviderInstanceRegistry` in sync with it.
- *
- * The server still reads two shapes:
- *
- *   1. `settings.providerInstances` — the new driver-agnostic map the
- *      registry expects. Keyed by `ProviderInstanceId`, values are
- *      `ProviderInstanceConfig` envelopes.
- *   2. `settings.providers.<kind>` — the legacy single-instance-per-driver
- *      fields (`providers.codex`, `providers.claudeAgent`, …). These are
- *      the source of truth for every deployment that hasn't been migrated
- *      yet to an explicit `providerInstances` entry.
- *
- * This module bridges (2) into (1) and wires the resulting map into a
- * mutable registry. For every built-in driver whose id is not already
- * present in `providerInstances` (keyed on
- * `defaultInstanceIdForDriver(driverKind)` — literally the driver kind as a
- * routing slug), we synthesize an envelope from the legacy field. The
- * registry decodes both flavours through the same `configSchema` and ends
- * up with one uniform `ProviderInstance` per entry.
- *
- * Explicit `providerInstances` entries always win — users can already
- * override the legacy `providers.<kind>` blob by authoring a
- * `providerInstances.codex` entry with a matching driver, and we don't
- * want the synthesized envelope to silently stomp their config.
- *
- * Hot-reload
- * ----------
- * On layer build we:
- *   1. Read the current `ServerSettings` once and use it to seed the
- *      registry's initial state via `ProviderInstanceRegistry.layer`.
- *   2. Fork a daemon fiber (lifetime tied to the layer's scope) that
- *      acquires `ServerSettingsService.subscribeChanges` and calls
- *      `ProviderInstanceRegistryMutator.reconcile` on every emission.
- *
- * Failures inside the watcher are logged and swallowed so a single bad
- * settings emission cannot kill the registry. Unknown drivers and invalid
- * configs already round-trip through the registry's own "unavailable"
- * shadow bucket.
- *
- * @module provider/ProviderInstanceRegistryHydration
- */
+/** Derive the active Pi instances and reconcile them when settings change. Legacy driver records remain readable but never enter the runtime. */
 import {
   defaultInstanceIdForDriver,
   type ProviderInstanceConfig,
@@ -56,40 +14,27 @@ import { BUILT_IN_DRIVERS, type BuiltInDriversEnv } from "./builtInDrivers.ts";
 import * as ProviderInstanceRegistry from "./ProviderInstanceRegistry.ts";
 import * as ProviderInstanceRegistryMutator from "./ProviderInstanceRegistryMutator.ts";
 import * as ProviderOrchestrationAdapterInfrastructure from "./ProviderOrchestrationAdapterInfrastructure.ts";
-import * as AcpRegistrySupport from "./acp/AcpRegistrySupport.ts";
-import * as AcpRegistryCatalog from "./AcpRegistryCatalog.ts";
 
 type ProviderInstanceRegistryHydrationEnv =
   | Exclude<
       BuiltInDriversEnv,
-      | ProviderOrchestrationAdapterInfrastructure.ProviderOrchestrationAdapterInfrastructure
-      | AcpRegistrySupport.AcpRegistryCatalog
+      ProviderOrchestrationAdapterInfrastructure.ProviderOrchestrationAdapterInfrastructure
     >
   | Settings.ServerSettingsService;
 
-/**
- * Synthesize a `ProviderInstanceConfigMap` from a `ServerSettings` snapshot.
- *
- * Strategy:
- *   1. Copy all explicit `settings.providerInstances` entries verbatim.
- *   2. For each built-in driver whose `defaultInstanceIdForDriver(id)` key
- *      is *not* already in the explicit map, synthesize an entry from the
- *      matching legacy `settings.providers.<kind>` blob.
- *
- * The returned map is the input the registry consumes; pure & exported
- * separately so the hydration logic can be exercised by unit tests
- * without layering.
- */
 export const deriveProviderInstanceConfigMap = (
   settings: ServerSettings,
 ): ProviderInstanceConfigMap => {
-  const merged: Record<string, ProviderInstanceConfig> = { ...settings.providerInstances };
+  const merged: Record<string, ProviderInstanceConfig> = Object.fromEntries(
+    Object.entries(settings.providerInstances).filter(([, entry]) => entry.driver === "pi"),
+  );
 
   for (const driver of BUILT_IN_DRIVERS) {
     const instanceId = defaultInstanceIdForDriver(driver.driverKind);
-    if (instanceId in merged) {
+    if (instanceId in settings.providerInstances) {
       // Explicit `providerInstances` entry for this slot — user-authored
-      // config always wins over the legacy mirror.
+      // config always wins over the legacy mirror, including an unavailable
+      // driver. Reusing its id for Pi would reroute saved threads implicitly.
       continue;
     }
 
@@ -178,10 +123,7 @@ export const layer: Layer.Layer<
     const layerMutable = ProviderInstanceRegistry.layer({
       drivers: BUILT_IN_DRIVERS,
       configMap: initialConfigMap,
-    }).pipe(
-      Layer.provide(ProviderOrchestrationAdapterInfrastructure.layer),
-      Layer.provide(AcpRegistryCatalog.layer),
-    );
+    }).pipe(Layer.provide(ProviderOrchestrationAdapterInfrastructure.layer));
 
     return layerSettingsWatcher.pipe(Layer.provideMerge(layerMutable));
   }),
