@@ -114,9 +114,8 @@ On the mirror above the same download runs at 6.7 MB/s.
 
 - **Unsigned.** No Developer ID signature or notarization. Gatekeeper will quarantine the
   DMG on another machine; `xattr -dr com.apple.quarantine` or right-click → Open works.
-- **Shares `~/.t3` with an installed T3 Code.** Threads, projects and settings are
-  shared, which is convenient but means the two can interfere. Set `T3CODE_HOME` to
-  isolate.
+- **State lives in `~/.fr`.** Threads, projects, settings, and runtime files are isolated
+  from an installed T3 Code. Set `T3CODE_HOME` only to use a custom state directory.
 - **`apps/mobile/` and `apps/marketing/` are unbranded.** They do not ship in the
   desktop build. `apps/marketing/public/95/t3-code-concepts/` still carries upstream
   screenshot filenames, and the `apps/mobile/modules/t3-*` native module names
@@ -124,7 +123,7 @@ On the mirror above the same download runs at 6.7 MB/s.
   module names, podspec names and Java package paths have to agree with each other,
   so renaming those is a coordinated change across Android and iOS, not a find-replace.
 - **Internal identifiers still say `t3`.** `T3CODE_HOME`, `t3` (the `@t3tools/server`
-  package name), `T3CODE_*` env vars and `~/.t3` are upstream's own names. Renaming
+  package name), and `T3CODE_*` env vars are upstream's own names. Renaming
   them buys cosmetics and costs every `git rebase upstream/main` in the future.
 
 ---
