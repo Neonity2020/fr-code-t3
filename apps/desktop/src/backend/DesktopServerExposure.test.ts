@@ -83,7 +83,7 @@ function layerEnvironmentFor(baseDir: string, env: Record<string, string | undef
     runningUnderArm64Translation: false,
   }).pipe(
     Layer.provide(
-      Layer.mergeAll(NodeServices.layer, DesktopConfig.layerTest({ T3CODE_HOME: baseDir, ...env })),
+      Layer.mergeAll(NodeServices.layer, DesktopConfig.layerTest({ FRCODE_HOME: baseDir, ...env })),
     ),
   );
 }
@@ -95,7 +95,7 @@ function layer(input: {
   readonly spawnerLayer?: Layer.Layer<ChildProcessSpawner.ChildProcessSpawner>;
   readonly desktopSettingsLayer?: Layer.Layer<DesktopAppSettings.DesktopAppSettings>;
 }) {
-  const env = { T3CODE_HOME: input.baseDir, ...input.env };
+  const env = { FRCODE_HOME: input.baseDir, ...input.env };
   const layerEnvironment = layerEnvironmentFor(input.baseDir, env);
   const layerNetwork = Layer.succeed(DesktopNetworkInterfaces.DesktopNetworkInterfaces, {
     read: Effect.succeed(input.networkInterfaces ?? emptyNetworkInterfaces),

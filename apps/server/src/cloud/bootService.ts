@@ -59,12 +59,12 @@ function quoteSystemdValue(value: string): string {
 }
 
 /**
- * Reads `T3CODE_HOME` back out of a rendered unit or plist. Only values this
+ * Reads `FRCODE_HOME` back out of a rendered unit or plist. Only values this
  * file writes are expected, so a quoted systemd value is unquoted and
  * unescaped the same way `quoteSystemdValue` produced it.
  */
 export function bootServiceBaseDirOf(contents: string): string | undefined {
-  const systemd = /^Environment=T3CODE_HOME=(.*)$/m.exec(contents)?.[1];
+  const systemd = /^Environment=FRCODE_HOME=(.*)$/m.exec(contents)?.[1];
   if (systemd !== undefined) {
     const raw = systemd.trim();
     const unquoted =
@@ -73,7 +73,7 @@ export function bootServiceBaseDirOf(contents: string): string | undefined {
         : raw;
     return unquoted.replaceAll("%%", "%");
   }
-  const plist = /<key>T3CODE_HOME<\/key>\s*<string>([^<]*)<\/string>/.exec(contents)?.[1];
+  const plist = /<key>FRCODE_HOME<\/key>\s*<string>([^<]*)<\/string>/.exec(contents)?.[1];
   if (plist !== undefined) {
     return plist.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
   }
@@ -105,7 +105,7 @@ export function renderBootServiceUnit(plan: BootServicePlan): string {
     "[Service]",
     "Type=simple",
     "WorkingDirectory=%h",
-    `Environment=T3CODE_HOME=${quoteSystemdValue(plan.baseDir)}`,
+    `Environment=FRCODE_HOME=${quoteSystemdValue(plan.baseDir)}`,
     `Environment=${BOOT_SERVICE_UNIT_ENV}=${BOOT_SERVICE_UNIT_FILE}`,
     `ExecStart=${plan.program.map(quoteSystemdValue).join(" ")}`,
     // Let the launcher mark an explicit stop before it signals the server.
@@ -164,7 +164,7 @@ export function renderBootServicePlist(
     `  <dict>`,
     `    <key>PATH</key>`,
     `    <string>${escapeXmlText(options.environmentPath)}</string>`,
-    `    <key>T3CODE_HOME</key>`,
+    `    <key>FRCODE_HOME</key>`,
     `    <string>${escapeXmlText(plan.baseDir)}</string>`,
     `    <key>${BOOT_SERVICE_UNIT_ENV}</key>`,
     `    <string>${BOOT_SERVICE_PLIST_FILE}</string>`,

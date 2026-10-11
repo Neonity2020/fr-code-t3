@@ -627,9 +627,9 @@ export class Launcher {
 }
 
 export async function main(): Promise<void> {
-  const baseDir = process.env.T3CODE_HOME?.trim();
+  const baseDir = process.env.FRCODE_HOME?.trim();
   if (baseDir === undefined || baseDir === "") {
-    throw new Error("T3CODE_HOME is required by the FR Code service launcher.");
+    throw new Error("FRCODE_HOME is required by the FR Code service launcher.");
   }
   const statePath = NodePath.join(baseDir, "runtime", SERVICE_STATE_FILE);
   const state = await readServiceState(statePath);

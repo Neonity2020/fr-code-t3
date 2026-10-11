@@ -26,7 +26,7 @@ Add `--browser` to open a browser automatically.
 
 ### State and ports
 
-Linked worktrees default to their own `.t3/userdata`, even when `T3CODE_HOME` is set.
+Linked worktrees default to their own `.t3/userdata`, even when `FRCODE_HOME` is set.
 The main checkout defaults to `~/.fr/dev/userdata`. An explicit `--home-dir` wins in both cases.
 Never run a development server against the live `~/.fr/userdata`.
 See [test data](../../AGENTS.md#test-data) for copying a consistent database snapshot.
