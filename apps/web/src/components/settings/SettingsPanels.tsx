@@ -3303,6 +3303,10 @@ export function GeneralSettingsPanel() {
           </>
         )}
         <SettingsRow
+          title="FR Code"
+          description="FR Code 是一款仅使用 Pi 作为唯一 provider 的编码智能体客户端。"
+        />
+        <SettingsRow
           {...searchableSetting("privacy-policy")}
           description="我们如何处理你的数据，包括 FR Code 收集的匿名用量数据。"
           control={
