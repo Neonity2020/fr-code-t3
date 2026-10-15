@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚀 飞船展厅 · Neonity Edition</title>
+    <style>
+      :root {
+        --bg-0: #04060d;
+        --bg-1: #0a1226;
+        --accent: #5ce1ff;
+        --accent-2: #ff7ac6;
+        --text: #d6e7ff;
+        --muted: #7a8aa8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: radial-gradient(ellipse at top, var(--bg-1), var(--bg-0) 70%);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        overflow: hidden;
+      }
+      #app {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+      canvas {
+        display: block;
+      }
+      .ui {
+        position: absolute;
+        pointer-events: none;
+      }
+      .panel {
+        pointer-events: auto;
+        background: rgba(10, 18, 38, 0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(92, 225, 255, 0.18);
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      }
+      .top-left {
+        top: 20px;
+        left: 20px;
+        max-width: 280px;
+      }
+      .top-left h1 {
+        margin: 0 0 6px;
+        font-size: 18px;
+        letter-spacing: 0.04em;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .top-left p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .bottom-bar {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 90vw;
+      }
+      .ship-btn {
+        pointer-events: auto;
+        background: rgba(10, 18, 38, 0.6);
+        border: 1px solid rgba(92, 225, 255, 0.2);
+        color: var(--text);
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        letter-spacing: 0.03em;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .ship-btn:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(92, 225, 255, 0.25);
+      }
+      .ship-btn.active {
+        background: linear-gradient(135deg, rgba(92, 225, 255, 0.18), rgba(255, 122, 198, 0.18));
+        border-color: var(--accent);
+      }
+      .ship-btn .icon {
+        font-size: 16px;
+      }
+      .info {
+        top: 20px;
+        right: 20px;
+        max-width: 280px;
+      }
+      .info h2 {
+        margin: 0 0 8px;
+        font-size: 15px;
+        color: var(--accent);
+      }
+      .info .row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        padding: 4px 0;
+        border-bottom: 1px dashed rgba(122, 138, 168, 0.25);
+      }
+      .info .row:last-child {
+        border-bottom: none;
+      }
+      .info .row span:first-child {
+        color: var(--muted);
+      }
+      .info .row span:last-child {
+        color: var(--text);
+        font-weight: 500;
+      }
+      .hint {
+        position: absolute;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="ui top-left panel">
+        <h1>🚀 飞船展厅</h1>
+        <p>拖拽旋转 · 滚轮缩放 · 右键平移</p>
+      </div>
+
+      <div class="ui info panel" id="info">
+        <h2 id="ship-name">侦察舰</h2>
+        <div class="row"><span>类型</span><span id="ship-class">轻型</span></div>
+        <div class="row"><span>长度</span><span id="ship-length">—</span></div>
+        <div class="row"><span>推进器</span><span id="ship-engines">—</span></div>
+        <div class="row"><span>武器</span><span id="ship-weapons">—</span></div>
+        <div class="row"><span>舰载能力</span><span id="ship-capacity">—</span></div>
+      </div>
+
+      <div class="hint">点击下方按钮切换飞船</div>
+
+      <div class="ui bottom-bar">
+        <button class="ship-btn active" data-ship="scout">
+          <span class="icon">✦</span> 侦察舰
+        </button>
+        <button class="ship-btn" data-ship="cruiser"><span class="icon">⚡</span> 主力舰</button>
+        <button class="ship-btn" data-ship="dreadnought"><span class="icon">☄️</span> 旗舰</button>
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      // ============ 场景 ============
+      const container = document.getElementById("app");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x04060d, 0.008);
+
+      const camera = new THREE.PerspectiveCamera(
+        50,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        2000,
+      );
+      camera.position.set(8, 4, 12);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      container.appendChild(renderer.domElement);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.minDistance = 4;
+      controls.maxDistance = 60;
+
+      // ============ 光照 ============
+      const ambient = new THREE.AmbientLight(0x445566, 0.6);
+      scene.add(ambient);
+
+      const keyLight = new THREE.DirectionalLight(0xaaccff, 1.6);
+      keyLight.position.set(10, 14, 8);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0xff7ac6, 0.8);
+      rimLight.position.set(-8, 2, -6);
+      scene.add(rimLight);
+
+      const fillLight = new THREE.PointLight(0x5ce1ff, 1.2, 30);
+      fillLight.position.set(-6, -3, 6);
+      scene.add(fillLight);
+
+      // ============ 星空 ============
+      function makeStars() {
+        const g = new THREE.BufferGeometry();
+        const count = 2500;
+        const positions = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+          const r = 400 + Math.random() * 400;
+          const t = Math.random() * Math.PI * 2;
+          const p = Math.acos(2 * Math.random() - 1);
+          positions[i * 3] = r * Math.sin(p) * Math.cos(t);
+          positions[i * 3 + 1] = r * Math.cos(p);
+          positions[i * 3 + 2] = r * Math.sin(p) * Math.sin(t);
+          const tint = 0.6 + Math.random() * 0.4;
+          colors[i * 3] = tint;
+          colors[i * 3 + 1] = tint;
+          colors[i * 3 + 2] = tint * (0.8 + Math.random() * 0.2);
+        }
+        g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        const m = new THREE.PointsMaterial({
+          size: 1.2,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.9,
+          depthWrite: false,
+        });
+        return new THREE.Points(g, m);
+      }
+      scene.add(makeStars());
+
+      // ============ 行星 ============
+      function makePlanet() {
+        const geo = new THREE.SphereGeometry(40, 64, 64);
+        const tex = new THREE.DataTexture(generatePlanetData(64, 64), 64, 64, THREE.RGBAFormat);
+        tex.needsUpdate = true;
+        const m = new THREE.MeshStandardMaterial({
+          map: tex,
+          roughness: 0.95,
+          metalness: 0.0,
+        });
+        return new THREE.Mesh(geo, m);
+      }
+      function generatePlanetData(w, h) {
+        const data = new Uint8Array(w * h * 4);
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const i = (y * w + x) * 4;
+            const n = Math.sin(x * 0.3) * Math.cos(y * 0.4) + Math.sin(x * 0.1 + y * 0.2);
+            const t = (n + 2) / 4;
+            data[i] = 30 + t * 60; // r
+            data[i + 1] = 50 + t * 80; // g
+            data[i + 2] = 90 + t * 100; // b
+            data[i + 3] = 255;
+          }
+        }
+        return data;
+      }
+      const planet = makePlanet();
+      planet.position.set(-80, -60, -120);
+      scene.add(planet);
+
+      // ============ 材质工厂 ============
+      const hullMat = new THREE.MeshStandardMaterial({
+        color: 0xc8d6e5,
+        metalness: 0.85,
+        roughness: 0.32,
+      });
+      const darkMat = new THREE.MeshStandardMaterial({
+        color: 0x2a3a55,
+        metalness: 0.8,
+        roughness: 0.4,
+      });
+      const accentMat = new THREE.MeshStandardMaterial({
+        color: 0x5ce1ff,
+        metalness: 0.4,
+        roughness: 0.3,
+        emissive: 0x1a4a6b,
+        emissiveIntensity: 0.6,
+      });
+      const accentMat2 = new THREE.MeshStandardMaterial({
+        color: 0xff7ac6,
+        metalness: 0.4,
+        roughness: 0.3,
+        emissive: 0x6b1a4a,
+        emissiveIntensity: 0.5,
+      });
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: 0x5ce1ff,
+        transparent: true,
+        opacity: 0.9,
+      });
+      const glowMat2 = new THREE.MeshBasicMaterial({
+        color: 0xff9adb,
+        transparent: true,
+        opacity: 0.9,
+      });
+
+      // ============ 飞船建造器 ============
+      function buildScout() {
+        const g = new THREE.Group();
+        // 主体:细长锥形
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 4.5, 16), hullMat);
+        body.rotation.z = Math.PI / 2;
+        g.add(body);
+        // 驾驶舱
+        const cockpit = new THREE.Mesh(
+          new THREE.SphereGeometry(0.45, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+          accentMat,
+        );
+        cockpit.rotation.x = Math.PI / 2;
+        cockpit.position.set(0.8, 0.3, 0);
+        g.add(cockpit);
+        // 双翼
+        for (const z of [-1, 1]) {
+          const wing = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 1.4), darkMat);
+          wing.position.set(-0.2, 0, z * 1.0);
+          g.add(wing);
+          const tip = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), accentMat);
+          tip.position.set(-0.2, 0, z * 1.65);
+          g.add(tip);
+        }
+        // 尾部引擎
+        const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.55, 0.8, 16), darkMat);
+        engine.rotation.z = Math.PI / 2;
+        engine.position.set(-2.6, 0, 0);
+        g.add(engine);
+        const flame = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.4, 16), glowMat);
+        flame.rotation.z = -Math.PI / 2;
+        flame.position.set(-3.4, 0, 0);
+        g.add(flame);
+        return { group: g, flame };
+      }
+
+      function buildCruiser() {
+        const g = new THREE.Group();
+        // 主舰体
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 6, 24), hullMat);
+        body.rotation.z = Math.PI / 2;
+        g.add(body);
+        // 上层结构
+        const upper = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.55, 1.4), darkMat);
+        upper.position.set(0.2, 0.55, 0);
+        g.add(upper);
+        // 桥楼(驾驶舱)
+        const bridge = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 12), accentMat);
+        bridge.position.set(1.5, 0.7, 0);
+        g.add(bridge);
+        // 侧舷炮塔
+        for (const z of [-1.4, 1.4]) {
+          const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.5, 12), darkMat);
+          turret.rotation.x = Math.PI / 2;
+          turret.position.set(0.2, 0.5, z);
+          g.add(turret);
+          const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.7, 8), darkMat);
+          barrel.rotation.x = Math.PI / 2;
+          barrel.position.set(0.55, 0.5, z * 1.15);
+          g.add(barrel);
+          const tip = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), accentMat2);
+          tip.position.set(0.9, 0.5, z * 1.15);
+          g.add(tip);
+        }
+        // 双引擎
+        for (const y of [-0.45, 0.45]) {
+          const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 1, 16), darkMat);
+          engine.rotation.z = Math.PI / 2;
+          engine.position.set(-3.3, y, 0);
+          g.add(engine);
+          const flame = new THREE.Mesh(new THREE.ConeGeometry(0.28, 1.6, 16), glowMat);
+          flame.rotation.z = -Math.PI / 2;
+          flame.position.set(-4.2, y, 0);
+          g.add(flame);
+        }
+        // 翼
+        for (const z of [-1, 1]) {
+          const wing = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.08, 1.6), darkMat);
+          wing.position.set(-0.5, 0, z * 1.4);
+          g.add(wing);
+        }
+        return { group: g, flames: g.children.filter((c) => c.material === glowMat) };
+      }
+
+      function buildDreadnought() {
+        const g = new THREE.Group();
+        // 巨型舰体 - 八边形棱柱
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 9, 8), hullMat);
+        body.rotation.z = Math.PI / 2;
+        g.add(body);
+        // 顶部脊背
+        const spine = new THREE.Mesh(new THREE.BoxGeometry(6, 0.4, 0.8), darkMat);
+        spine.position.set(0, 1.3, 0);
+        g.add(spine);
+        // 桥楼
+        const bridge = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.7, 1.2), accentMat);
+        bridge.position.set(2.5, 1.0, 0);
+        g.add(bridge);
+        // 多层结构
+        for (let i = 0; i < 3; i++) {
+          const deck = new THREE.Mesh(new THREE.BoxGeometry(0.8 - i * 0.15, 0.15, 1.2), accentMat);
+          deck.position.set(1.5 + i * 0.5, 1.6 + i * 0.18, 0);
+          g.add(deck);
+        }
+        // 重型炮塔 × 4
+        for (let i = 0; i < 4; i++) {
+          const x = -2 + i * 1.5;
+          for (const z of [-1.4, 1.4]) {
+            const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.4, 0.7, 12), darkMat);
+            turret.rotation.x = Math.PI / 2;
+            turret.position.set(x, 0.5, z);
+            g.add(turret);
+            const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.2, 8), darkMat);
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(x + 0.7, 0.5, z);
+            g.add(barrel);
+          }
+        }
+        // 4 个大型引擎
+        for (const [x, y] of [
+          [-4.7, -0.7],
+          [-4.7, 0.7],
+          [-4.7, -1.4],
+          [-4.7, 1.4],
+        ]) {
+          const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.65, 1.2, 16), darkMat);
+          engine.rotation.z = Math.PI / 2;
+          engine.position.set(x, y, 0);
+          g.add(engine);
+          const flame = new THREE.Mesh(new THREE.ConeGeometry(0.4, 2.2, 16), glowMat2);
+          flame.rotation.z = -Math.PI / 2;
+          flame.position.set(x - 1.4, y, 0);
+          g.add(flame);
+        }
+        // 翼
+        for (const z of [-1, 1]) {
+          const wing = new THREE.Mesh(new THREE.BoxGeometry(4, 0.1, 2), darkMat);
+          wing.position.set(-1, 0, z * 1.9);
+          g.add(wing);
+        }
+        return { group: g, flames: g.children.filter((c) => c.material === glowMat2) };
+      }
+
+      // ============ 飞船清单 ============
+      const ships = {
+        scout: {
+          name: "侦察舰 XR-7",
+          cls: "轻型",
+          length: "45 米",
+          engines: "1 台脉冲推进器",
+          weapons: "激光点防 ×2",
+          capacity: "船员 4 人",
+          build: buildScout,
+        },
+        cruiser: {
+          name: "主力舰 SV-22",
+          cls: "中型",
+          length: "120 米",
+          engines: "2 台等离子推进器",
+          weapons: "双联装粒子炮 ×2",
+          capacity: "船员 60 人",
+          build: buildCruiser,
+        },
+        dreadnought: {
+          name: "旗舰 VOID 旗舰",
+          cls: "重型",
+          length: "280 米",
+          engines: "4 台聚变推进器",
+          weapons: "重型粒子炮塔 ×8",
+          capacity: "船员 800 人",
+          build: buildDreadnought,
+        },
+      };
+
+      // ============ 当前飞船 ============
+      let currentShip = null;
+      let flameTime = 0;
+
+      function loadShip(key) {
+        if (currentShip) scene.remove(currentShip.group);
+        const def = ships[key];
+        const built = def.build();
+        currentShip = built;
+        built.group.position.y = 0;
+        scene.add(built.group);
+
+        // 更新 UI
+        document.getElementById("ship-name").textContent = def.name;
+        document.getElementById("ship-class").textContent = def.cls;
+        document.getElementById("ship-length").textContent = def.length;
+        document.getElementById("ship-engines").textContent = def.engines;
+        document.getElementById("ship-weapons").textContent = def.weapons;
+        document.getElementById("ship-capacity").textContent = def.capacity;
+
+        document.querySelectorAll(".ship-btn").forEach((b) => {
+          b.classList.toggle("active", b.dataset.ship === key);
+        });
+      }
+
+      // ============ 交互 ============
+      document.querySelectorAll(".ship-btn").forEach((btn) => {
+        btn.addEventListener("click", () => loadShip(btn.dataset.ship));
+      });
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // ============ 启动 ============
+      loadShip("scout");
+
+      // ============ 动画循环 ============
+      const clock = new THREE.Clock();
+      function tick() {
+        const t = clock.getElapsedTime();
+        flameTime = t;
+
+        // 飞船轻微悬浮
+        if (currentShip) {
+          currentShip.group.position.y = Math.sin(t * 0.6) * 0.15;
+          currentShip.group.rotation.y = Math.sin(t * 0.2) * 0.05;
+        }
+
+        // 尾焰脉动
+        const pulse = 0.85 + Math.sin(t * 12) * 0.15;
+        const allFlames = [];
+        if (currentShip?.flame) allFlames.push(currentShip.flame);
+        if (currentShip?.flames) allFlames.push(...currentShip.flames);
+        allFlames.forEach((f, i) => {
+          f.scale.x = pulse;
+          f.scale.z = pulse;
+          f.scale.y = pulse * (1 + (i % 2) * 0.1);
+        });
+
+        // 星空微旋转
+        scene.children.forEach((c) => {
+          if (c.isPoints) c.rotation.y = t * 0.005;
+        });
+
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(tick);
+      }
+      tick();
+    </script>
+  </body>
+</html>

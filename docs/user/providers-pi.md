@@ -1,22 +1,22 @@
 # Pi
 
-T3 Code can use your existing Pi coding agent installation while keeping Pi's models, auth,
+FR Code can use your existing Pi coding agent installation while keeping Pi's models, auth,
 extensions, skills, context files, and native session history.
 
 ## Set Up Pi
 
-1. Install Pi on the machine running the T3 Code server. Pi 1.0 is recommended; 0.80.5 is the
+1. Install Pi on the machine running the FR Code server. Pi 1.0 is recommended; 0.80.5 is the
    oldest version T3 Code supports.
 2. Run Pi once in a terminal and finish the provider login or API-key setup you normally use.
 3. Open FR Code Settings → Providers and refresh Pi. Pi is enabled by default.
 
 If `pi` is not on the server's `PATH`, set Pi's binary path to the executable. Provider environment
 variables and launch arguments are also available for installations that need a custom agent
-directory, endpoint, or model configuration. `--provider` must be paired with `--model`. T3 Code
-rejects launch arguments that change Pi's execution mode or select a session because T3 owns those
+directory, endpoint, or model configuration. `--provider` must be paired with `--model`. FR Code
+rejects launch arguments that change Pi's execution mode or select a session because FR owns those
 parts of the process lifecycle.
 
-To control which Pi models appear in the chat model picker, open T3 Code Settings → Providers,
+To control which Pi models appear in the chat model picker, open FR Code Settings → Providers,
 select the Pi instance, and use **Selectable models**. Built-in models can be enabled, disabled,
 favorited, and reordered. Custom model slugs and their supported options can be added there too.
 Visibility, favorites, and ordering are saved on the current device; custom models are saved in the
@@ -49,7 +49,7 @@ T3 Code applies the composer permission mode through Pi's blocking tool hook:
 - **Supervised** asks before commands, file changes, and extension tools. Read-only tools continue.
 - **Auto-accept edits** allows Pi's edit and write tools, but asks before commands and extension
   tools.
-- **Full access** allows tools without T3 Code approval prompts.
+- **Full access** allows tools without FR Code approval prompts.
 
 The **Auto** option is not shown for Pi because Pi does not expose an AI approval reviewer.
 Threads that already stored Auto before Pi support was added behave and display as Supervised.
