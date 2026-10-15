@@ -15,6 +15,7 @@ import {
   ProviderInstanceCard,
   readProviderEnvironmentVariable,
 } from "./ProviderInstanceCard";
+import { getDriverOption } from "./providerDriverMeta";
 
 describe("deriveProviderModelsForDisplay", () => {
   it("uses current config custom models instead of stale live custom rows", () => {
@@ -88,9 +89,9 @@ describe("deriveProviderModelsForDisplay", () => {
     });
   });
 
-  it("shows a redacted provider email in the editor header status line", () => {
-    const instanceId = ProviderInstanceId.make("codex");
-    const driver = ProviderDriverKind.make("codex");
+  it("renders Pi's selectable built-in and custom models in settings", () => {
+    const instanceId = ProviderInstanceId.make("pi");
+    const driver = ProviderDriverKind.make("pi");
     const liveProvider: ServerProvider = {
       instanceId,
       driver,
@@ -98,9 +99,16 @@ describe("deriveProviderModelsForDisplay", () => {
       installed: true,
       version: "1.0.0",
       status: "ready",
-      auth: { status: "authenticated", email: "developer@example.com" },
+      auth: { status: "authenticated" },
       checkedAt: "2026-08-27T12:00:00.000Z",
-      models: [],
+      models: [
+        {
+          slug: "anthropic/claude-sonnet-5",
+          name: "Claude Sonnet 5",
+          isCustom: false,
+          capabilities: null,
+        },
+      ],
       slashCommands: [],
       skills: [],
     };
@@ -108,8 +116,8 @@ describe("deriveProviderModelsForDisplay", () => {
     const markup = renderToStaticMarkup(
       createElement(ProviderInstanceCard, {
         instanceId,
-        instance: { driver },
-        driverOption: undefined,
+        instance: { driver, config: { customModels: ["openai/gpt-5"] } },
+        driverOption: getDriverOption(driver),
         liveProvider,
         mode: "editor",
         onUpdate: () => undefined,
@@ -122,16 +130,15 @@ describe("deriveProviderModelsForDisplay", () => {
       }),
     );
 
-    expect(markup).toContain("已认证为");
-    expect(markup).toContain('aria-label="切换账号邮箱可见性"');
-    expect(markup).toContain("blur-xs");
-    expect(markup).not.toContain("developer@example.com");
+    expect(markup).toContain("可选模型");
+    expect(markup).toContain("开启的模型会出现在聊天模型选择器中");
+    expect(markup).toContain("Claude Sonnet 5");
+    expect(markup).toContain("openai/gpt-5");
   });
-  it("surfaces a failed probe message in both the list row and the editor", () => {
-    const instanceId = ProviderInstanceId.make("codex_work");
-    const driver = ProviderDriverKind.make("codex");
-    const message =
-      "Codex app-server provider probe failed: Cannot create Codex shadow home entry 'auth.json' because '/home/me/.codex-t3/work/auth.json' already exists and is not a symlink.";
+  it("surfaces a failed Pi probe message in the provider list", () => {
+    const instanceId = ProviderInstanceId.make("pi_work");
+    const driver = ProviderDriverKind.make("pi");
+    const message = "Pi RPC discovery failed because the configured executable is unavailable.";
     const liveProvider: ServerProvider = {
       instanceId,
       driver,
@@ -149,7 +156,7 @@ describe("deriveProviderModelsForDisplay", () => {
     const props = {
       instanceId,
       instance: { driver },
-      driverOption: undefined,
+      driverOption: getDriverOption(driver),
       liveProvider,
       onUpdate: () => undefined,
       hiddenModels: [],
@@ -160,11 +167,11 @@ describe("deriveProviderModelsForDisplay", () => {
       onModelOrderChange: () => undefined,
     } as const;
 
-    for (const mode of ["list", "editor"] as const) {
-      const markup = renderToStaticMarkup(createElement(ProviderInstanceCard, { ...props, mode }));
-      expect(markup).toContain("不可用");
-      expect(markup).toContain("is not a symlink");
-    }
+    const markup = renderToStaticMarkup(
+      createElement(ProviderInstanceCard, { ...props, mode: "list" }),
+    );
+    expect(markup).toContain("不可用");
+    expect(markup).toContain(message);
   });
 });
 

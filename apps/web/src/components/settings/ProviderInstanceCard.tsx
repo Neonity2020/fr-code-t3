@@ -984,14 +984,14 @@ export function ProviderInstanceCard({
 
       {driverOption !== undefined ? (
         <SettingsSection
-          title="模型"
+          title="可选模型"
           inert={readOnly}
           aria-disabled={readOnly || undefined}
           className={readOnly ? "opacity-50 select-none" : undefined}
         >
           <div className="px-3 py-3 sm:px-4">
             <p className="mb-3 text-xs text-muted-foreground">
-              收藏、可见性和排序保存在此设备。自定义模型保存在所选环境。
+              开启的模型会出现在聊天模型选择器中。收藏、可见性和排序保存在此设备，自定义模型保存在所选环境。
             </p>
             <ProviderModelsSection
               instanceId={instanceId}

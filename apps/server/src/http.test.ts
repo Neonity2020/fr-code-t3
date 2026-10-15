@@ -113,6 +113,46 @@ describe("browser API CORS", () => {
       await dispose();
     }
   });
+
+  it("accepts the desktop development renderer origin", async () => {
+    const config = await Effect.runPromise(
+      Effect.scoped(
+        Layer.build(
+          ServerConfig.layerTest(process.cwd(), { prefix: "http-desktop-cors-test-" }).pipe(
+            Layer.provide(NodeServices.layer),
+          ),
+        ).pipe(Effect.map((context) => Context.get(context, ServerConfig.ServerConfig))),
+      ),
+    );
+    const layerRoute = Layer.effectDiscard(
+      Effect.gen(function* () {
+        const router = yield* HttpRouter.HttpRouter;
+        yield* router.add("GET", "/api/environment", HttpServerResponse.empty());
+      }),
+    );
+    const layerApp = Layer.merge(layerRoute, ServerHttp.layerBrowserApiCors).pipe(
+      Layer.provide(ServerConfig.layer({ ...config, devUrl: new URL("http://127.0.0.1:5733") })),
+    );
+    const { handler, dispose } = HttpRouter.toWebHandler(layerApp, { disableLogger: true });
+
+    try {
+      const response = await handler(
+        new Request("https://backend.example/api/environment", {
+          method: "OPTIONS",
+          headers: {
+            origin: "frcode-dev://app",
+            "access-control-request-method": "GET",
+          },
+        }),
+      );
+
+      expect(response.status).toBe(204);
+      expect(response.headers.get("access-control-allow-origin")).toBe("frcode-dev://app");
+      expect(response.headers.get("access-control-allow-credentials")).toBe("true");
+    } finally {
+      await dispose();
+    }
+  });
 });
 
 const layerFileResponse = Layer.mergeAll(NodeHttpPlatform.layer, NodeServices.layer);

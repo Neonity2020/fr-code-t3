@@ -16,6 +16,12 @@ directory, endpoint, or model configuration. `--provider` must be paired with `-
 rejects launch arguments that change Pi's execution mode or select a session because T3 owns those
 parts of the process lifecycle.
 
+To control which Pi models appear in the chat model picker, open T3 Code Settings → Providers,
+select the Pi instance, and use **Selectable models**. Built-in models can be enabled, disabled,
+favorited, and reordered. Custom model slugs and their supported options can be added there too.
+Visibility, favorites, and ordering are saved on the current device; custom models are saved in the
+selected environment.
+
 To isolate another Pi account, add a Pi instance and set `PI_CODING_AGENT_DIR` to its
 agent directory. Configure credentials in that Pi home before using the instance.
 
